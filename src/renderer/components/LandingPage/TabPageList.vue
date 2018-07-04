@@ -2,10 +2,10 @@
   <div class="tab-page-list-wrapper">
       <div v-for="(item) in persona.tabs" v-show="item.isActive" v-bind:key="item.id" class="tab-page-list-item">
         <template v-if="item.url === 'home'">
-          <home-page v-bind:persona="persona"></home-page>
+          <home-page v-bind:persona="persona" v-bind:show-welcome="showWelcome" v-on:persona-edited="$emit('persona-edited', persona)" v-on:persona-deleted="$emit('persona-deleted', persona)"></home-page>
         </template>
         <template v-else>
-          <tab-page v-bind:tab="item" v-bind:partition="persona.id"></tab-page>
+          <tab-page v-bind:tab="item" v-bind:partition="persona._id"></tab-page>
         </template>
       </div>
   </div>
@@ -18,7 +18,8 @@
   export default {
     components: { HomePage, TabPage },
     props: {
-      persona: null
+      persona: null,
+      showWelcome: false
     }
   }
 </script>

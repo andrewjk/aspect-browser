@@ -3,7 +3,7 @@
     <div class="tab-list">
       <a v-for="(item, index) in persona.tabs" v-bind:key="item.id" v-bind:class="['tab', item.isActive ? 'active' : '']" v-on:click="setActiveIndex(index)">
         <template v-if="item.isLoading">
-          <fa icon="spinner" class="tab-icon"/>
+          <fa icon="spinner" class="tab-icon" spin/>
         </template>
         <template v-else>
           <fa icon="search" class="tab-icon"/>
@@ -49,13 +49,13 @@
   .tab-list-wrapper {
     background-color: #ccc;
     height: 28px;
+    font-size: 13px;
   }
 
   .tab {
     display: inline-block;
     line-height: 28px;
     padding: 0 10px;
-    font-size: 13px;
     border-right: 1px solid #aaa;
     cursor: default;
   }

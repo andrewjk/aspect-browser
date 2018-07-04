@@ -1,23 +1,53 @@
 <template>
   <div class="persona-list-wrapper">
     <div class="persona-list">
-      <div class="search">
-        <fa icon="search"/>
+      <div class="list">
+        <a v-for="(item, index) in personas" v-bind:key="item._id" class="persona" v-on:click="setActiveIndex(index)">
+          <div class="persona-icon" v-bind:style="{ backgroundColor: getBackgroundColor(index) }">
+            {{ item.shortName }}
+          </div>
+          <div class="persona-name">{{ item.name }}</div>
+        </a>
       </div>
-      <a v-for="(item, index) in personas" v-bind:key="item.id" class="persona" v-on:click="setActiveIndex(index)">
-        <div class="persona-icon" v-bind:style="{ backgroundColor: getBackgroundColor(index) }">
-          {{ item.shortName }}
-        </div>
-        <div class="persona-name">{{ item.name }}</div>
+      <a class="button" @click="search">
+        <fa icon="search"/>
+      </a>
+      <a class="button" @click="addPersona">
+        <fa icon="plus"/>
       </a>
     </div>
+    <modal v-if="showPersonaModal" @close="showPersonaModal = false">
+      <h3 slot="header">Add Persona:</h3>
+      <persona-form slot="body" v-bind:persona="newPersona"></persona-form>
+      <div slot="footer" class="modal-button-footer">
+        <button @click="commitPersonaAdd">
+          Save
+        </button>
+        <button @click="cancelPersonaAdd">
+          Cancel
+        </button>
+      </div>
+    </modal>
   </div>
 </template>
 
 <script>
+  import Modal from './Modal'
+  import PersonaForm from './PersonaForm'
+
+  // NOTE: V4 uses random numbers
+  import uuid from 'uuid/v4'
+
   export default {
+    components: { Modal, PersonaForm },
     props: {
       personas: Array
+    },
+    data () {
+      return {
+        showPersonaModal: false,
+        newPersona: {}
+      }
     },
     methods: {
       setActiveIndex (index) {
@@ -38,7 +68,6 @@
               activeTab.url = 'home'
             }
           }
-
           item.isActive = (i === index)
         })
       },
@@ -46,6 +75,47 @@
         if (this.personas[index].isActive) {
           return this.personas[index].color
         }
+      },
+      search () {
+        // TODO:
+      },
+      addPersona () {
+        // TODO: Should I emit an event so that this gets done centrally in the landing page?
+        this.newPersona = {
+          _id: uuid(),
+          order: this.personas.length + 1,
+          isActive: true,
+          bookmarks: [],
+          tabs: [
+            {
+              _id: uuid(),
+              url: 'home',
+              title: 'Home',
+              isActive: true,
+              history: [],
+              forwardHistory: []
+            }
+          ]
+        }
+        this.showPersonaModal = true
+      },
+      commitPersonaAdd () {
+        // Save the persona to the database
+        const self = this
+        this.$db.insert(this.newPersona, function (err, dbPersona) {
+          if (err) {
+            alert('ERROR: ' + err)
+            return
+          }
+          // Do things further up the chain
+          self.$emit('persona-added', dbPersona)
+          // Close the modal
+          self.showPersonaModal = false
+        })
+      },
+      cancelPersonaAdd () {
+        //  Close the modal
+        this.showPersonaModal = false
       }
     }
   }
@@ -53,27 +123,29 @@
 
 <style scoped>
 
-  .persona-list-wrapper {
-    padding: 0 10px;
+  .persona-list {
+    padding: 10px 5px;
     background-color: #aaa;
     height: 100vh;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
   }
 
-  .search {
-    height: 30px;
-    line-height: 30px;
-    font-size: 11px;
+  .list {
+    flex: 1 0 auto;
   }
 
   .persona {
+    border-radius: 2px;
     display: block;
     margin-bottom: 10px;
     cursor: default;
+    padding: 5px;
+    text-align: center;
   }
 
   .persona:hover {
-    color: white;
+    background-color: #ddd;
   }
 
   .persona-icon {
@@ -87,12 +159,29 @@
     font-size: 18px;
   }
 
-  .persona:hover .persona-icon {
-    background-color: #ccc;
-  }
-
   .persona-name {
     font-size: 11px;
+  }
+
+  .button {
+    border-radius: 2px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 11px;
+    text-align: center;
+    flex: 0 0 auto;
+  }
+
+  .button:hover {
+    background-color: #ddd;
+  }
+
+  .modal-button-footer {
+    text-align: right;
+  }
+
+  .modal-button-footer button {
+    margin-left: 10px;
   }
 
 </style>

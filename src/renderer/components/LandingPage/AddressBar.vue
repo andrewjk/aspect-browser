@@ -13,6 +13,9 @@
       <div class="address">
         <input type="text" id="address-text" v-bind:value="getUrl()" v-on:keypress="keyPressed">
       </div>
+      <a class="button" v-on:click="editBookmark">
+        <fa icon="star"/>
+      </a>
       <a class="button" v-on:click="refresh">
         <fa icon="sync-alt"/>
       </a>
@@ -98,9 +101,14 @@
           }
         }
       },
+      editBookmark () {
+        // TODO:
+      },
       refresh () {
         const activeTab = this.getActiveTab()
-        activeTab.webview.reload()
+        if (activeTab.webview) {
+          activeTab.webview.reload()
+        }
       }
     }
   }
@@ -110,26 +118,33 @@
 
   .address-bar-wrapper {
     background-color: #eee;
-    height: 32px;
+    height: 34px;
     border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    padding: 4px;
   }
 
   .address-bar {
     display: flex;
-    line-height: 32px;
+    line-height: 24px;
   }
 
   .button {
+    border-radius: 2px;
     display: inline-block;
     padding: 0 10px;
   }
 
   .button:hover {
-    color: white;
+    background-color: #ddd;
   }
 
   .button.disabled {
     color: #bbb;
+  }
+
+  .button.disabled:hover {
+    background-color: inherit;
   }
 
   .address {
@@ -139,9 +154,6 @@
 
   .address > input {
     width: 100%;
-    border-radius: 2px;
-    border: 1px solid #ddd;
-    padding: 4px 6px;
   }
 
 </style>
