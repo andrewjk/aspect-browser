@@ -1,24 +1,24 @@
 <template>
   <div class="address-bar-wrapper">
     <div class="address-bar">
-      <a v-bind:class="['button', canGoBack() ? '' : 'disabled']" v-on:click="goBack" v-bind:title="getHistory()">
+      <button v-bind:class="['address-button', canGoBack() ? '' : 'disabled']" v-bind:tabindex="canGoBack() ? '0' : '-1'" v-on:click="goBack" v-bind:title="getBackHistory()">
         <fa icon="arrow-left"/>
-      </a>
-      <a v-bind:class="['button', canGoForward() ? '' : 'disabled']" v-on:click="goForward" v-bind:title="getForwardHistory()">
+      </button>
+      <button v-bind:class="['address-button', canGoForward() ? '' : 'disabled']" v-bind:tabindex="canGoForward() ? '0' : '-1'" v-on:click="goForward" v-bind:title="getForwardHistory()">
         <fa icon="arrow-right"/>
-      </a>
-      <a class="button" v-on:click="goHome">
+      </button>
+      <button class="address-button" v-on:click="goHome">
         <fa icon="home"/>
-      </a>
-      <div class="address">
-        <input type="text" id="address-text" v-bind:value="getUrl()" v-on:keypress="keyPressed">
+      </button>
+      <div class="address-input">
+        <input type="text" v-bind:id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" v-on:keypress="keyPressed">
       </div>
-      <a class="button" v-on:click="editBookmark">
+      <button class="address-button" v-on:click="editBookmark">
         <fa icon="star"/>
-      </a>
-      <a class="button" v-on:click="refresh">
+      </button>
+      <button class="address-button" v-on:click="refresh">
         <fa icon="sync-alt"/>
-      </a>
+      </button>
     </div>
   </div>
 </template>
@@ -26,78 +26,80 @@
 <script>
   export default {
     props: {
-      persona: null
+      persona: null,
+      activeTab: null
     },
     methods: {
-      // TODO: These should all emit events so they can be handled centrally
-      getActiveTab () {
-        return this.persona.tabs.find(function (item) {
-          return item.isActive
-        })
-      },
-      getUrl () {
-        const activeTab = this.getActiveTab()
-        return activeTab ? activeTab.url : 'ERROR'
-      },
+      // TODO: These should probably all emit events so they can be handled centrally
       canGoBack () {
-        const activeTab = this.getActiveTab()
-        return activeTab.history.length
+        return this.activeTab.backHistory && this.activeTab.backHistory.length
       },
       goBack () {
-        const activeTab = this.getActiveTab()
-        if (activeTab.history.length) {
+        if (this.activeTab.backHistory.length) {
           // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-          activeTab.forwardHistory.push({
-            url: activeTab.url,
-            title: activeTab.title
+          this.activeTab.forwardHistory.push({
+            url: this.activeTab.url,
+            title: this.activeTab.title
           })
-          activeTab.url = activeTab.history.pop().url
-          activeTab.historyNavigation = true
+          this.activeTab.url = this.activeTab.backHistory.pop().url
+          this.activeTab.backHistoryNavigation = true
         }
       },
-      getHistory () {
-        const activeTab = this.getActiveTab()
-        return activeTab.history.map(function (item) { return item.url }).join('\n')
+      getBackHistory () {
+        return this.activeTab.backHistory ? this.activeTab.backHistory.map(function (item) { return item.url }).join('\n') : []
       },
       canGoForward () {
-        const activeTab = this.getActiveTab()
-        return activeTab.forwardHistory.length
+        return this.activeTab.forwardHistory && this.activeTab.forwardHistory.length
       },
       goForward () {
-        const activeTab = this.getActiveTab()
-        if (activeTab.forwardHistory.length) {
+        if (this.activeTab.forwardHistory.length) {
           // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-          activeTab.history.push({
-            url: activeTab.url,
-            title: activeTab.title
+          if (!this.activeTab.forwardHistory) {
+            this.activeTab.forwardHistory = []
+          }
+          this.activeTab.backHistory.push({
+            url: this.activeTab.url,
+            title: this.activeTab.title
           })
-          activeTab.url = activeTab.forwardHistory.pop().url
-          activeTab.historyNavigation = true
+          this.activeTab.url = this.activeTab.forwardHistory.pop().url
+          this.activeTab.backHistoryNavigation = true
         }
       },
       getForwardHistory () {
-        const activeTab = this.getActiveTab()
-        return activeTab.forwardHistory.map(function (item) { return item.url }).join('\n')
+        return this.activeTab.forwardHistory ? this.activeTab.forwardHistory.map(function (item) { return item.url }).join('\n') : []
       },
       goHome () {
-        const activeTab = this.getActiveTab()
-        if (activeTab) {
+        if (this.activeTab) {
           // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-          activeTab.history.push({
-            url: activeTab.url,
-            title: activeTab.title
+          if (!this.activeTab.backHistory) {
+            this.activeTab.backHistory = []
+          }
+          this.activeTab.backHistory.push({
+            url: this.activeTab.url,
+            title: this.activeTab.title
           })
-          activeTab.forwardHistory = []
-          activeTab.url = 'home'
+          this.activeTab.forwardHistory = []
+          this.activeTab.url = 'home'
+          this.activeTab.addressText = 'home'
+          this.activeTab.title = 'Home'
         }
       },
       keyPressed (e) {
         if (e.keyCode === 13) {
-          const activeTab = this.getActiveTab()
-          if (activeTab) {
-            const url = document.getElementById('address-text').value
-            activeTab.initialUrl = url
-            activeTab.url = url
+          if (this.activeTab) {
+            // Might need to add http:// on the front there
+            let url = this.activeTab.addressText.trim()
+            if (url.indexOf('http://') !== 0) {
+              url = 'http://' + url
+            }
+            this.activeTab.addressText = url
+
+            if (this.activeTab.webview) {
+              this.activeTab.webview.loadURL(url)
+            } else {
+              this.activeTab.initialUrl = url
+              this.activeTab.url = url
+            }
           }
         }
       },
@@ -105,9 +107,8 @@
         // TODO:
       },
       refresh () {
-        const activeTab = this.getActiveTab()
-        if (activeTab.webview) {
-          activeTab.webview.reload()
+        if (this.activeTab.webview) {
+          this.activeTab.webview.reload()
         }
       }
     }
@@ -129,30 +130,33 @@
     line-height: 24px;
   }
 
-  .button {
+  .address-button {
+    border: inherit;
+    background-color: inherit;
     border-radius: 2px;
     display: inline-block;
     padding: 0 10px;
   }
 
-  .button:hover {
+  .address-button:hover,
+  .address-button:focus {
     background-color: #ddd;
   }
 
-  .button.disabled {
+  .address-button.disabled {
     color: #bbb;
   }
 
-  .button.disabled:hover {
+  .address-button.disabled:hover {
     background-color: inherit;
   }
 
-  .address {
+  .address-input {
     flex-grow: 1;
-    padding: 0 10px;
+    padding: 0 5px;
   }
 
-  .address > input {
+  .address-input > input {
     width: 100%;
   }
 

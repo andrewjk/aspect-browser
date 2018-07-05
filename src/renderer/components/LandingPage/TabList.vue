@@ -1,17 +1,25 @@
 <template>
   <div class="tab-list-wrapper">
     <div class="tab-list">
-      <a v-for="(item, index) in persona.tabs" v-bind:key="item.id" v-bind:class="['tab', item.isActive ? 'active' : '']" v-on:click="setActiveIndex(index)">
-        <template v-if="item.isLoading">
+      <a v-for="(item, index) in tabs" v-bind:key="item._id" v-bind:class="['tab', item.isActive ? 'active' : 'inactive']" v-on:click="setActiveIndex(index)">
+        <template v-if="item.url === 'home'">
+          <fa icon="home" class="tab-icon"/>
+        </template>
+        <template v-else-if="item.isLoading">
           <fa icon="spinner" class="tab-icon" spin/>
         </template>
-        <template v-else>
-          <fa icon="search" class="tab-icon"/>
+        <template v-else-if="item.icon">
+          <img class="tab-icon" v-bind:src="item.icon">
         </template>
         <span class="title">{{ item.title }}</span>
+        <a class="tab-close" v-on:click.stop="closeTab(index)">
+          <fa icon="times"/>
+        </a>
       </a>
       <a class="tab" v-on:click="openNewTab()">
-        <fa icon="plus"/>
+        <a class="tab-new">
+          <fa icon="plus"/>
+        </a>
       </a>
     </div>
   </div>
@@ -22,23 +30,59 @@
 
   export default {
     props: {
-      persona: null
+      persona: null,
+      tabs: Array
     },
     methods: {
       getActiveTab () {
-        return this.persona.tabs.find(function (item) {
+        return this.tabs.find(function (item) {
           return item.isActive
         })
       },
       // TODO: Emit these up the heirarchy
       setActiveIndex (index) {
-        this.persona.tabs.forEach(function (item, i) {
+        this.tabs.forEach(function (item, i) {
           item.isActive = (i === index)
+          // When changing the active tab, set the addresstext back to the url so that it's not confusing when it's returned to
+          item.addressText = item.url
         })
       },
+      closeTab (index) {
+        const isActiveTab = this.tabs[index].isActive
+        this.tabs.splice(index, 1)
+        if (!this.tabs.length) {
+          this.tabs.push({
+            _id: uuid(),
+            url: 'home',
+            addressText: 'home',
+            title: 'Home',
+            icon: null,
+            isActive: true,
+            isLoading: false,
+            backHistory: [],
+            forwardHistory: []
+          })
+        }
+        if (isActiveTab) {
+          this.setActiveIndex(Math.min(index, this.tabs.length - 1))
+        }
+      },
       openNewTab () {
-        this.persona.tabs.push({ id: uuid(), url: 'home', title: 'New tab' })
-        this.setActiveIndex(this.persona.tabs.length - 1)
+        this.tabs.push({
+          _id: uuid(),
+          url: 'home',
+          addressText: 'home',
+          title: 'New tab',
+          icon: null,
+          isActive: true,
+          isLoading: false,
+          backHistory: [],
+          forwardHistory: []
+        })
+        this.setActiveIndex(this.tabs.length - 1)
+        const box = document.getElementById('address-text-' + this.persona._id)
+        box.focus()
+        box.select()
       }
     }
   }
@@ -54,22 +98,53 @@
 
   .tab {
     display: inline-block;
-    line-height: 28px;
-    padding: 0 10px;
+    padding: 0 5px;
     border-right: 1px solid #aaa;
     cursor: default;
+    line-height: 28px;
   }
 
   .tab.active {
     background-color: #eee;
   }
 
-  .tab:hover {
-    color: white;
+  .tab.inactive {
+    background-color: #ccc;
+  }
+
+  .tab.inactive:hover {
+    background-color: #ddd;
   }
 
   .tab-icon {
-    margin-right: 2px;
+    height: 16px;
+    width: 16px;
+    vertical-align: top;
+    margin: 6px 2px;
+  }
+
+  .tab-close {
+    border-radius: 2px;
+    margin-left: 2px;
+    padding: 2px 4px;
+  }
+
+  .tab-close:hover {
+    background-color: #ccc;
+  }
+
+  .hidden-button {
+    display: none
+  }
+
+  .tab-new {
+    border-radius: 2px;
+    margin-left: 2px;
+    padding: 2px 4px;
+  }
+
+  .tab-new:hover {
+    background-color: #eee;
   }
 
 </style>

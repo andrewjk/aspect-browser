@@ -1,14 +1,12 @@
 <template>
-  <div id="wrapper">
-    <main>
-      <div class="persona-list-container">
-        <persona-list v-bind:personas="personas" v-on:persona-added="personaAdded"></persona-list>
-      </div>
-      <div class="persona-browser-container">
-        <persona-browser v-bind:personas="personas" v-on:persona-edited="personaEdited" v-on:persona-deleted="personaDeleted"></persona-browser>
-      </div>
-    </main>
-  </div>
+  <main>
+    <div class="persona-list-container">
+      <persona-list v-bind:personas="personas" v-on:persona-added="personaAdded"></persona-list>
+    </div>
+    <div class="persona-browser-container">
+      <persona-browser v-bind:personas="personas" v-on:persona-edited="personaEdited" v-on:persona-deleted="personaDeleted"></persona-browser>
+    </div>
+  </main>
 </template>
 
 <script>
@@ -23,94 +21,38 @@
     components: { PersonaList, PersonaBrowser },
     data () {
       return {
-        personas: []
+        personas: [],
+        // TODO: tabs and history per persona:
+        activity: {},
+        zoomLevel: 0
       }
-      // const id1 = 'p1'
-      // const id2 = 'p2'
-      // return {
-      //   personas: [
-      //     {
-      //       id: id1,
-      //       name: 'Persona',
-      //       shortName: 'P',
-      //       color: 'LightGreen',
-      //       isActive: true,
-      //       bookmarks: [
-      //         {
-      //           id: uuid(),
-      //           url: 'http://localhost:9080/#/home/',
-      //           title: 'Home2'
-      //         },
-      //         {
-      //           id: uuid(),
-      //           url: 'https://mail.google.com/mail/',
-      //           title: 'Gmail'
-      //         },
-      //         {
-      //           id: uuid(),
-      //           url: 'https://twitter.com/',
-      //           title: 'Twitter'
-      //         }
-      //       ],
-      //       tabs: [
-      //         {
-      //           id: uuid(),
-      //           url: 'home',
-      //           title: 'Home',
-      //           isActive: true,
-      //           history: [],
-      //           forwardHistory: []
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       id: id2,
-      //       name: 'Persona 2',
-      //       shortName: 'P2',
-      //       color: 'Blue',
-      //       isActive: false,
-      //       bookmarks: [
-      //         {
-      //           id: uuid(),
-      //           url: 'https://mail.google.com/mail/',
-      //           title: 'Gmail'
-      //         }
-      //       ],
-      //       tabs: [
-      //         {
-      //           id: uuid(),
-      //           url: 'home',
-      //           title: 'Home',
-      //           isActive: true,
-      //           history: [],
-      //           forwardHistory: []
-      //         },
-      //         {
-      //           id: uuid(),
-      //           url: 'http://blah.com',
-      //           title: 'Blah',
-      //           isActive: false,
-      //           history: [],
-      //           forwardHistory: []
-      //         }
-      //       ]
-      //     }
-      //   ]
-      // }
     },
     created: function () {
       // Load the personas from the database
       // HACK: Should be some way to bind 'this'...
       const self = this
-      this.$db.find({}).sort({ order: 1 }).exec(function (err, dbPersonas) {
+      this.$db.find({}).sort({ order: -1 }).exec(function (err, dbPersonas) {
         if (err) {
           alert('ERROR: ' + err)
           return
         }
 
         self.personas = dbPersonas
+
+        // Ensure that the first persona is active and reset the tabs for each persona
         self.personas.forEach(function (item, i) {
           item.isActive = (i === 0)
+          item.tabs = [
+            {
+              _id: uuid(),
+              url: 'home',
+              addressText: 'home',
+              title: 'Home',
+              isActive: true,
+              backHistory: [],
+              forwardHistory: []
+            }
+          ]
         })
 
         // If there are no personas, add a default one that the user can edit
@@ -118,12 +60,56 @@
           self.createDefaultPersona()
         }
       })
+
+      // TODO: Load history from the database
+    },
+    mounted: function () {
+      document.addEventListener('keydown', this.keyDown)
+      document.addEventListener('keypress', this.keyPress)
     },
     methods: {
       setActiveIndex (index) {
         this.personas.forEach(function (item, i) {
           item.isActive = (i === index)
         })
+      },
+      setActiveTabIndex (index) {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          activePersona.tabs.forEach(function (item, i) {
+            item.isActive = (i === index)
+          })
+        }
+      },
+      getActivePersona () {
+        return this.personas.find(function (item) {
+          return item.isActive
+        })
+      },
+      getActivePersonaIndex () {
+        for (let i = 0; i < this.personas.length; i++) {
+          if (this.personas[i].isActive) {
+            return i
+          }
+        }
+      },
+      getActiveTab () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          return activePersona.tabs.find(function (item) {
+            return item.isActive
+          })
+        }
+      },
+      getActiveTabIndex () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          for (let i = 0; i < activePersona.tabs.length; i++) {
+            if (activePersona.tabs[i].isActive) {
+              return i
+            }
+          }
+        }
       },
       sortPersonas () {
         this.personas.sort(function (a, b) {
@@ -170,7 +156,7 @@
               url: 'home',
               title: 'Home',
               isActive: true,
-              history: [],
+              backHistory: [],
               forwardHistory: []
             }
           ]
@@ -183,6 +169,129 @@
           }
           self.personas = [ dbPersona ]
         })
+      },
+      keyDown (e) {
+        // Have to listen for Ctrl + Tab in keyDown because it doesn't work in keyPress
+        if (e.ctrlKey || e.metaKey) {
+          console.log(e.keyCode)
+          if (e.keyCode === 9) { // Tab
+            if (e.shiftKey) {
+              this.previousTab()
+            } else {
+              this.nextTab()
+            }
+          } else if (e.keyCode === 192) { // Tilde
+            if (e.shiftKey) {
+              this.previousPersona()
+            } else {
+              this.nextPersona()
+            }
+          }
+        }
+      },
+      keyPress (e) {
+        console.log(e.keyCode)
+        if (e.ctrlKey || e.metaKey) {
+          if (e.keyCode === 12) { // L
+            this.focusAddressBox()
+          } else if (e.keyCode === 20) { // T
+            this.openNewTab()
+          } else if (e.keyCode === 23) { // V
+            this.closeTab()
+          } else if (e.keyCode === 43) { // Minus
+            this.zoomOut()
+          } else if (e.keyCode === 45) { // Plus
+            this.zoomIn()
+          }
+        }
+      },
+      nextPersona () {
+        const index = this.getActivePersonaIndex()
+        const newIndex = index < this.personas.length - 1 ? index + 1 : 0
+        this.setActiveIndex(newIndex)
+      },
+      previousPersona () {
+        const index = this.getActivePersonaIndex()
+        const newIndex = index > 0 ? index - 1 : this.personas.length - 1
+        this.setActiveIndex(newIndex)
+      },
+      nextTab () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          const index = this.getActiveTabIndex()
+          const newIndex = index < activePersona.tabs.length - 1 ? index + 1 : 0
+          this.setActiveTabIndex(newIndex)
+        }
+      },
+      previousTab () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          const index = this.getActiveTabIndex()
+          const newIndex = index > 0 ? index - 1 : activePersona.tabs.length - 1
+          this.setActiveTabIndex(newIndex)
+        }
+      },
+      closeTab () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          const index = this.getActiveTabIndex()
+          activePersona.tabs.splice(index, 1)
+          if (!activePersona.tabs.length) {
+            activePersona.tabs.push({
+              _id: uuid(),
+              url: 'home',
+              addressText: 'home',
+              title: 'Home',
+              icon: null,
+              isActive: true,
+              isLoading: false,
+              backHistory: [],
+              forwardHistory: []
+            })
+          }
+          this.setActiveTabIndex(Math.min(index, activePersona.tabs.length - 1))
+        }
+      },
+      openNewTab () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          activePersona.tabs.push({
+            _id: uuid(),
+            url: 'home',
+            addressText: 'home',
+            title: 'New tab',
+            icon: null,
+            isActive: true,
+            isLoading: false,
+            backHistory: [],
+            forwardHistory: []
+          })
+          this.setActiveTabIndex(activePersona.tabs.length - 1)
+          const box = document.getElementById('address-text-' + activePersona._id)
+          box.focus()
+          box.select()
+        }
+      },
+      focusAddressBox () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          const box = document.getElementById('address-text-' + activePersona._id)
+          box.focus()
+        }
+      },
+      zoomIn () {
+        const activeTab = this.getActiveTab()
+        if (activeTab && activeTab.webview) {
+          this.zoomLevel = this.zoomLevel + 1
+          activeTab.webview.setZoomLevel(this.zoomLevel)
+        }
+      },
+      zoomOut () {
+        const activeTab = this.getActiveTab()
+        if (activeTab && activeTab.webview) {
+          this.zoomLevel = this.zoomLevel - 1
+          activeTab.webview.setZoomLevel(this.zoomLevel)
+        }
       }
     }
   }
@@ -213,10 +322,6 @@
     width: 100%;
   }
 
-  button {
-    padding: 4px 10px;
-  }
-
   form table {
     border-spacing: 10px;
     width: 100%;
@@ -236,13 +341,10 @@
     height: 100vh;
   }
 
-  #wrapper {
-    height: 100vh;
-    width: 100vw;
-  }
-
   main {
     display: flex;
+    height: 100vh;
+    width: 100vw;
   }
 
 </style>

@@ -14,15 +14,16 @@
         A default, empty persona called "Personal" has been setup for you. You can store your personal
         login details (emails, social media and so on) in this persona and create one or more separate
         personas to store your work login details. Or you can edit this persona to store something else.
+        It's up to you!
       </p>
     </div>
     <div class="home-bookmarks">
-      <a v-for="(item, index) in persona.bookmarks" v-bind:key="item.id" class="bookmark" v-on:click="bookmarkClicked(item)">
+      <button v-for="(item, index) in persona.bookmarks" v-bind:key="item._id" class="bookmark-button" v-on:click="bookmarkClicked(item)">
         <div class="bookmark-icon" v-bind:style="{ backgroundColor: getBackgroundColor(index) }">
           G
         </div>
         <div class="bookmark-title">{{ item.title }}</div>
-      </a>
+      </button>
     </div>
     <div class="home-links">
       <a href="#" v-on:click="addBookmark">Add a bookmark</a> |
@@ -89,12 +90,15 @@
         })
 
         // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-        activeTab.history.push({
+        if (!activeTab.backHistory) {
+          activeTab.backHistory = []
+        }
+        activeTab.backHistory.push({
           url: 'home',
           title: 'Home'
         })
         activeTab.forwardHistory = []
-        activeTab.historyNavigation = true
+        activeTab.backHistoryNavigation = true
 
         activeTab.isLoading = true
         activeTab.initialUrl = bookmark.url
@@ -198,8 +202,10 @@
     margin-bottom: 20px;
   }
 
-  .bookmark {
+  .bookmark-button {
     border-radius: 2px;
+    border: inherit;
+    background-color: inherit;
     display: inline-block;
     margin-left: 10px;
     cursor: default;
@@ -207,7 +213,8 @@
     text-align: center;
   }
 
-  .bookmark:hover {
+  .bookmark-button:hover,
+  .bookmark-button:focus {
     background-color: #ddd;
   }
 

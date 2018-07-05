@@ -2,19 +2,19 @@
   <div class="persona-list-wrapper">
     <div class="persona-list">
       <div class="list">
-        <a v-for="(item, index) in personas" v-bind:key="item._id" class="persona" v-on:click="setActiveIndex(index)">
+        <button v-for="(item, index) in personas" v-bind:key="item._id" class="persona" v-on:click="setActiveIndex(index)">
           <div class="persona-icon" v-bind:style="{ backgroundColor: getBackgroundColor(index) }">
             {{ item.shortName }}
           </div>
           <div class="persona-name">{{ item.name }}</div>
-        </a>
+        </button>
       </div>
-      <a class="button" @click="search">
+      <button class="persona-button" @click="search">
         <fa icon="search"/>
-      </a>
-      <a class="button" @click="addPersona">
+      </button>
+      <button class="persona-button" @click="addPersona">
         <fa icon="plus"/>
-      </a>
+      </button>
     </div>
     <modal v-if="showPersonaModal" @close="showPersonaModal = false">
       <h3 slot="header">Add Persona:</h3>
@@ -60,12 +60,14 @@
             })
             if (activeTab) {
               // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-              activeTab.history.push({
+              activeTab.backHistory.push({
                 url: activeTab.url,
                 title: activeTab.title
               })
               activeTab.forwardHistory = []
               activeTab.url = 'home'
+              activeTab.addressText = 'home'
+              activeTab.title = 'Home'
             }
           }
           item.isActive = (i === index)
@@ -92,7 +94,7 @@
               url: 'home',
               title: 'Home',
               isActive: true,
-              history: [],
+              backHistory: [],
               forwardHistory: []
             }
           ]
@@ -137,6 +139,8 @@
 
   .persona {
     border-radius: 2px;
+    border: inherit;
+    background-color: inherit;
     display: block;
     margin-bottom: 10px;
     cursor: default;
@@ -144,7 +148,8 @@
     text-align: center;
   }
 
-  .persona:hover {
+  .persona:hover,
+  .persona:focus {
     background-color: #ddd;
   }
 
@@ -163,8 +168,10 @@
     font-size: 11px;
   }
 
-  .button {
+  .persona-button {
     border-radius: 2px;
+    border: none;
+    background-color: inherit;
     height: 30px;
     line-height: 30px;
     font-size: 11px;
@@ -172,7 +179,8 @@
     flex: 0 0 auto;
   }
 
-  .button:hover {
+  .persona-button:hover,
+  .persona-button:focus {
     background-color: #ddd;
   }
 

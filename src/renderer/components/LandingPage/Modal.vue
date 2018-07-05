@@ -18,9 +18,7 @@
 
           <div class="modal-footer">
             <slot name="footer">
-              <button class="modal-default-button" @click="$emit('close')">
-                OK
-              </button>
+
             </slot>
           </div>
         </div>
@@ -38,6 +36,22 @@
     }
   }
 </script>
+
+<style>
+
+  .modal-header h3 {
+    margin-top: 0;
+  }
+
+  .modal-body {
+    margin: 20px 0;
+  }
+
+  .modal-footer button {
+    padding: 4px 10px;
+  }
+
+</style>
 
 <style scoped>
 
@@ -67,18 +81,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
     font-family: sans-serif;
-  }
-
-  .modal-header h3 {
-    margin-top: 0;
-  }
-
-  .modal-body {
-    margin: 20px 0;
-  }
-
-  .modal-default-button {
-    float: right;
   }
 
   /*
