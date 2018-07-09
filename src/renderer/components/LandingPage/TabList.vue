@@ -11,7 +11,7 @@
         <template v-else-if="item.icon">
           <img class="tab-icon" v-bind:src="item.icon">
         </template>
-        <span class="title">{{ item.title }}</span>
+        <span class="tab-title">{{ item.title }}</span>
         <a class="tab-close" v-on:click.stop="closeTab(index)">
           <fa icon="times"/>
         </a>
@@ -121,6 +121,13 @@
     width: 16px;
     vertical-align: top;
     margin: 6px 2px;
+  }
+
+  .tab-title {
+    /* display: inline-block;
+    max-width: 120px; */
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .tab-close {

@@ -18,7 +18,7 @@
       </p>
     </div>
     <div class="home-bookmarks">
-      <button v-for="(item, index) in persona.bookmarks" v-bind:key="item._id" class="bookmark-button" v-on:click="bookmarkClicked(item)">
+      <button v-for="(item, index) in persona.bookmarks" v-bind:key="item._id" class="bookmark-button" v-on:click="openBookmark(item, $event)">
         <div class="bookmark-icon" v-bind:style="{ backgroundColor: getBackgroundColor(index) }">
           G
         </div>
@@ -84,7 +84,18 @@
       getBackgroundColor (index) {
         return 'red'
       },
-      bookmarkClicked (bookmark) {
+      openBookmark (bookmark, e) {
+        let url = bookmark.url.trim()
+        if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+          url = 'https://' + url
+        }
+
+        // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
+        if (e.ctrlKey || e.which === 2 || e.which === 4) {
+          this.$emit('open-new-window', url, true)
+          return
+        }
+
         const activeTab = this.persona.tabs.find(function (item) {
           return item.isActive
         })
@@ -101,8 +112,8 @@
         activeTab.backHistoryNavigation = true
 
         activeTab.isLoading = true
-        activeTab.initialUrl = bookmark.url
-        activeTab.url = bookmark.url
+        activeTab.initialUrl = url
+        activeTab.url = url
       },
       addBookmark () {
         // TODO: Should I emit an event so that this gets done centrally in the landing page?

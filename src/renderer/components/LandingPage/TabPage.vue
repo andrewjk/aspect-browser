@@ -1,14 +1,22 @@
 <template>
   <div class="tab-page-wrapper">
-      <webview v-bind:src="tab.initialUrl" class="tab-page-view" v-bind:id="tab._id" v-bind:partition="getPartition()"></webview>
+      <webview v-bind:id="tab._id" class="tab-page-view" v-bind:partition="getPartition()" v-bind:src="tab.initialUrl" v-bind:preload="preload"></webview>
   </div>
 </template>
 
 <script>
+  import path from 'path'
+
   export default {
     props: {
       tab: null,
       partition: ''
+    },
+    data () {
+      return {
+        // Per https://github.com/SimulatedGREG/electron-vue/issues/239
+        preload: 'file://' + path.join(__static, '/webview-preload.js')
+      }
     },
     mounted: function () {
       const webview = document.getElementById(this.tab._id)
@@ -17,12 +25,21 @@
 
       // TODO: Should probably use did-navigate and did-navigate-in-page for history?
 
+      // Listen to webview events
       webview.addEventListener('did-start-loading', this.loadStarted)
       webview.addEventListener('did-stop-loading', this.loadFinished)
       webview.addEventListener('did-fail-load', this.loadFailed)
 
       webview.addEventListener('page-title-updated', this.pageTitleUpdated)
       webview.addEventListener('page-favicon-updated', this.pageIconUpdated)
+
+      webview.addEventListener('will-navigate', this.willNavigate)
+      webview.addEventListener('did-navigate', this.didNavigate)
+      webview.addEventListener('did-navigate-in-page', this.didNavigateInPage)
+
+      webview.addEventListener('new-window', this.newWindow)
+
+      // Add a context menu to the webview
     },
     methods: {
       getPartition () {
@@ -35,9 +52,6 @@
       loadFinished () {
         console.log('load finished: ' + this.tab.webview.getURL())
 
-        const url = this.tab.webview.getURL()
-        const title = this.tab.webview.getTitle()
-
         // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
         if (!this.tab.backHistoryNavigation) {
           this.tab.backHistory.push({
@@ -47,6 +61,9 @@
           this.tab.forwardHistory = []
         }
         this.tab.backHistoryNavigation = false
+
+        const url = this.tab.webview.getURL()
+        const title = this.tab.webview.getTitle()
 
         this.tab.isLoading = false
         this.tab.url = url
@@ -64,7 +81,22 @@
         this.tab.title = e.title
       },
       pageIconUpdated (e) {
-        this.tab.icon = e.favicons[0]
+        if (e.favicons.length) {
+          this.tab.icon = e.favicons[0]
+        }
+      },
+      willNavigate () {
+        // TODO:
+      },
+      didNavigate () {
+        // TODO:
+      },
+      didNavigateInPage () {
+        // TODO:
+      },
+      newWindow (e) {
+        // Do things further up the chain
+        this.$emit('open-new-window', e.url, e.disposition === 'background-tab')
       }
     }
   }

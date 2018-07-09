@@ -4,7 +4,7 @@
       <a v-for="(item) in personas" v-show="item.isActive" v-bind:key="item._id" class="persona">
         <tab-list v-bind:persona="item" v-bind:tabs="item.tabs" class="persona-tab-list"></tab-list>
         <address-bar v-bind:persona="item" v-bind:active-tab="getActiveTab()" class="persona-address-bar"></address-bar>
-        <tab-page-list v-bind:persona="item" v-bind:show-welcome="personas.length === 1" class="persona-tab-page-list" v-on:persona-edited="$emit('persona-edited', item)" v-on:persona-deleted="$emit('persona-deleted', item)"></tab-page-list>
+        <tab-page-list v-bind:persona="item" v-bind:show-welcome="personas.length === 1" class="persona-tab-page-list" v-on:persona-edited="$emit('persona-edited', item)" v-on:persona-deleted="$emit('persona-deleted', item)" v-on:open-new-window="openNewWindow"></tab-page-list>
       </a>
     </div>
   </div>
@@ -29,6 +29,9 @@
           return item.isActive
         })
         return activeTab
+      },
+      openNewWindow (url, background) {
+        this.$emit('open-new-window', url, background)
       }
     }
   }

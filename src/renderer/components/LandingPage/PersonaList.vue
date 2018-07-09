@@ -12,6 +12,9 @@
       <button class="persona-button" @click="search">
         <fa icon="search"/>
       </button>
+      <button class="persona-button" @click="settings">
+        <fa icon="cog"/>
+      </button>
       <button class="persona-button" @click="addPersona">
         <fa icon="plus"/>
       </button>
@@ -81,6 +84,9 @@
       search () {
         // TODO:
       },
+      settings () {
+        // TODO:
+      },
       addPersona () {
         // TODO: Should I emit an event so that this gets done centrally in the landing page?
         this.newPersona = {
@@ -127,7 +133,7 @@
 
   .persona-list {
     padding: 10px 5px;
-    background-color: #aaa;
+    background-color: #444;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -150,7 +156,7 @@
 
   .persona:hover,
   .persona:focus {
-    background-color: #ddd;
+    background-color: #777;
   }
 
   .persona-icon {
@@ -166,6 +172,7 @@
 
   .persona-name {
     font-size: 11px;
+    color: white;
   }
 
   .persona-button {
@@ -173,6 +180,7 @@
     border: none;
     background-color: inherit;
     height: 30px;
+    color: white;
     line-height: 30px;
     font-size: 11px;
     text-align: center;
@@ -181,7 +189,7 @@
 
   .persona-button:hover,
   .persona-button:focus {
-    background-color: #ddd;
+    background-color: #777;
   }
 
   .modal-button-footer {

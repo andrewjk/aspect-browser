@@ -29,6 +29,24 @@
       persona: null,
       activeTab: null
     },
+    data () {
+      return {
+        isTextSelected: false
+      }
+    },
+    beforeUpdate: function () {
+      // HACK: In various places we set some text and call select() on the address text box, which gets overridden when redrawing
+      // This is the only way I can figure out how to maintain the selection before and after redrawing
+      const box = document.getElementById('address-text-' + this.persona._id)
+      this.isTextSelected = box.selectionStart === 0 && box.selectionEnd === box.value.length
+    },
+    updated: function () {
+      if (this.isTextSelected) {
+        const box = document.getElementById('address-text-' + this.persona._id)
+        box.select()
+        this.isTextSelected = false
+      }
+    },
     methods: {
       // TODO: These should probably all emit events so they can be handled centrally
       canGoBack () {
@@ -87,10 +105,16 @@
       keyPressed (e) {
         if (e.keyCode === 13) {
           if (this.activeTab) {
-            // Might need to add http:// on the front there
             let url = this.activeTab.addressText.trim()
-            if (url.indexOf('http://') !== 0) {
-              url = 'http://' + url
+            if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
+              // If it has a dot and no spaces, treat it as a URL
+              // Might need to add http:// on the front there
+              if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+                url = 'https://' + url
+              }
+            } else {
+              // Search for whatever was typed in
+              url = 'https://duckduckgo.com/?q=' + url
             }
             this.activeTab.addressText = url
 

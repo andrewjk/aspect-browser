@@ -4,7 +4,7 @@
       <persona-list v-bind:personas="personas" v-on:persona-added="personaAdded"></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser v-bind:personas="personas" v-on:persona-edited="personaEdited" v-on:persona-deleted="personaDeleted"></persona-browser>
+      <persona-browser v-bind:personas="personas" v-on:persona-edited="personaEdited" v-on:persona-deleted="personaDeleted" v-on:open-new-window="openNewWindow"></persona-browser>
     </div>
   </main>
 </template>
@@ -31,13 +31,16 @@
       // Load the personas from the database
       // HACK: Should be some way to bind 'this'...
       const self = this
-      this.$db.find({}).sort({ order: -1 }).exec(function (err, dbPersonas) {
+      this.$db.find({}).sort({ order: 1 }).exec(function (err, dbPersonas) {
         if (err) {
           alert('ERROR: ' + err)
           return
         }
 
         self.personas = dbPersonas
+
+        // HACK: The sort function doesn't seem to work?
+        self.sortPersonas()
 
         // Ensure that the first persona is active and reset the tabs for each persona
         self.personas.forEach(function (item, i) {
@@ -69,6 +72,9 @@
     },
     methods: {
       setActiveIndex (index) {
+        if (index < 0 || index >= this.personas.length) {
+          return
+        }
         this.personas.forEach(function (item, i) {
           item.isActive = (i === index)
         })
@@ -76,6 +82,9 @@
       setActiveTabIndex (index) {
         const activePersona = this.getActivePersona()
         if (activePersona) {
+          if (index < 0 || index >= activePersona.tabs.length) {
+            return
+          }
           activePersona.tabs.forEach(function (item, i) {
             item.isActive = (i === index)
           })
@@ -123,17 +132,14 @@
         })
       },
       personaAdded (persona) {
-        console.log('persona added')
         this.personas.push(persona)
         this.setActiveIndex(this.personas.length - 1)
         this.sortPersonas()
       },
       personaEdited (persona) {
-        console.log('persona edited')
         this.sortPersonas()
       },
       personaDeleted (persona) {
-        console.log('persona deleted')
         const index = this.personas.indexOf(persona)
         this.personas.splice(index, 1)
         if (!this.personas.length) {
@@ -146,7 +152,7 @@
           _id: uuid(),
           name: 'Personal',
           shortName: 'P',
-          color: 'lightgreen',
+          color: 'green',
           order: 1,
           isActive: true,
           bookmarks: [],
@@ -172,8 +178,8 @@
       },
       keyDown (e) {
         // Have to listen for Ctrl + Tab in keyDown because it doesn't work in keyPress
+        console.log(e.keyCode)
         if (e.ctrlKey || e.metaKey) {
-          console.log(e.keyCode)
           if (e.keyCode === 9) { // Tab
             if (e.shiftKey) {
               this.previousTab()
@@ -186,6 +192,18 @@
             } else {
               this.nextPersona()
             }
+          } else if (e.keyCode >= 49 && e.keyCode <= 57) { // 1 - 9
+            this.setActiveTabIndex(e.keyCode - 49)
+          } else if (e.keyCode === 45 || e.keyCode === 109 || e.keyCode === 189) { // Minus
+            this.zoomOut()
+          } else if (e.keyCode === 43 || e.keyCode === 61 || e.keyCode === 107 || e.keyCode === 187) { // Plus or equals
+            this.zoomIn()
+          } else if (e.keyCode === 48) { // Zero
+            this.zoomDefault()
+          }
+        } else if (e.altKey) {
+          if (e.keyCode >= 48 && e.keyCode <= 57) { // 0 - 9
+            this.setActiveIndex(e.keyCode - 49)
           }
         }
       },
@@ -198,10 +216,6 @@
             this.openNewTab()
           } else if (e.keyCode === 23) { // V
             this.closeTab()
-          } else if (e.keyCode === 43) { // Minus
-            this.zoomOut()
-          } else if (e.keyCode === 45) { // Plus
-            this.zoomIn()
           }
         }
       },
@@ -272,6 +286,29 @@
           box.select()
         }
       },
+      openNewWindow (url, background) {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          activePersona.tabs.push({
+            _id: uuid(),
+            initialUrl: url,
+            url: url,
+            addressText: url,
+            title: url.replace('http://', '').replace('https://', ''),
+            icon: null,
+            isActive: false,
+            isLoading: false,
+            backHistory: [],
+            forwardHistory: []
+          })
+          if (!background) {
+            this.setActiveTabIndex(activePersona.tabs.length - 1)
+            const box = document.getElementById('address-text-' + activePersona._id)
+            box.focus()
+            box.select()
+          }
+        }
+      },
       focusAddressBox () {
         const activePersona = this.getActivePersona()
         if (activePersona) {
@@ -280,6 +317,9 @@
         }
       },
       zoomIn () {
+        if (this.zoomLevel === 8) {
+          return
+        }
         const activeTab = this.getActiveTab()
         if (activeTab && activeTab.webview) {
           this.zoomLevel = this.zoomLevel + 1
@@ -287,9 +327,19 @@
         }
       },
       zoomOut () {
+        if (this.zoomLevel === -8) {
+          return
+        }
         const activeTab = this.getActiveTab()
         if (activeTab && activeTab.webview) {
           this.zoomLevel = this.zoomLevel - 1
+          activeTab.webview.setZoomLevel(this.zoomLevel)
+        }
+      },
+      zoomDefault () {
+        const activeTab = this.getActiveTab()
+        if (activeTab && activeTab.webview) {
+          this.zoomLevel = 0
           activeTab.webview.setZoomLevel(this.zoomLevel)
         }
       }
