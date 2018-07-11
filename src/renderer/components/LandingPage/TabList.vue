@@ -36,7 +36,7 @@
 </template>
 
 <script>
-  const uuid = require('uuid/v4')
+  import uuid from 'uuid/v4'
 
   export default {
     props: {

@@ -20,6 +20,14 @@
         </tr>
         <tr>
           <td>
+            <label for="icon">Image</label>
+          </td>
+          <td>
+            <input id="icon" v-model="bookmark.icon" placeholder="Favicon">
+          </td>
+        </tr>
+        <tr>
+          <td>
             <label for="order">Order</label>
           </td>
           <td>

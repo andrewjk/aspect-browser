@@ -19,22 +19,20 @@
     </div>
     <div class="home-bookmarks">
       <button v-for="(item, index) in persona.bookmarks" :key="item._id" class="bookmark-button" @click="openBookmark(item, $event)">
-        <div class="bookmark-icon" :style="{ backgroundColor: getBackgroundColor(index) }">
-          G
-        </div>
+        <img class="bookmark-icon" :src="item.icon" :style="{ backgroundColor: getBackgroundColor(index) }">
         <div class="bookmark-title">{{ item.title }}</div>
         <div v-show="showEditBookmarkLinks" class="edit-bookmark-links">
           <a href="#" @click.stop="editBookmark(index)">Edit</a>
-          <span>|</span>
+          <span class="divider">|</span>
           <a href="#" class="delete-link" @click.stop="deleteBookmark(index)">Delete</a>
         </div>
       </button>
     </div>
     <div class="home-links">
       <a href="#" @click="addBookmark">Add a bookmark</a>
-      <span>|</span>
+      <span class="divider">|</span>
       <a href="#" v-show="persona.bookmarks.length" @click="editBookmarks">Edit bookmarks</a>
-      <span v-show="persona.bookmarks.length">|</span>
+      <span v-show="persona.bookmarks.length" class="divider">|</span>
       <a href="#" @click="editPersona">Edit persona</a>
     </div>
     <modal v-if="showBookmarkModal" @close="showBookmarkModal = false">
@@ -70,6 +68,8 @@
   import BookmarkForm from './BookmarkForm'
   import PersonaForm from './PersonaForm'
 
+  import finder from 'find-favicon'
+
   // NOTE: V4 uses random numbers
   import uuid from 'uuid/v4'
 
@@ -90,20 +90,38 @@
     },
     mounted: function () {
       this.sortBookmarks()
+
+      // this.persona.bookmarks.forEach(function (item) {
+      //   let url = item.url.trim()
+      //   if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
+      //     // If it has a dot and no spaces, treat it as a URL
+      //     // Might need to add http:// on the front there
+      //     if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+      //       url = 'https://' + url
+      //     }
+      //   }
+      //   item.url = url
+      //   console.log(item.title, item.icon)
+      //   if (!item.icon) {
+      //     finder(item.url, function (err, icon) {
+      //       if (err) {
+      //         alert('ERROR: ' + err)
+      //       }
+      //       console.log(icon)
+      //       if (icon) {
+      //         item.icon = icon.url
+      //       }
+      //     })
+      //   }
+      // })
     },
     methods: {
       getBackgroundColor (index) {
-        return 'red'
       },
       openBookmark (bookmark, e) {
-        let url = bookmark.url.trim()
-        if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
-          url = 'https://' + url
-        }
-
         // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
         if (e.ctrlKey || e.which === 2 || e.which === 4) {
-          this.$emit('open-new-window', url, true)
+          this.$emit('open-new-window', bookmark.url, true)
           return
         }
 
@@ -123,8 +141,8 @@
         activeTab.backHistoryNavigation = true
 
         activeTab.isLoading = true
-        activeTab.initialUrl = url
-        activeTab.url = url
+        activeTab.initialUrl = bookmark.url
+        activeTab.url = bookmark.url
       },
       editBookmarks () {
         this.showEditBookmarkLinks = !this.showEditBookmarkLinks
@@ -148,6 +166,7 @@
           _id: bookmark._id,
           url: bookmark.url,
           title: bookmark.title,
+          icon: bookmark.icon,
           order: bookmark.order
         }
         // Show the modal
@@ -161,6 +180,31 @@
         this.showBookmarkModal = true
       },
       commitBookmarkEdit () {
+        // Maybe fix up the URL
+        let url = this.newBookmark.url.trim()
+        if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
+          // If it has a dot and no spaces, treat it as a URL
+          // Might need to add http:// on the front there
+          if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+            url = 'https://' + url
+          }
+        }
+        this.newBookmark.url = url
+
+        // Maybe find the favicon
+        if (!this.newBookmark.icon) {
+          const self = this
+          finder(this.newBookmark.url, function (err, icon) {
+            if (err) {
+              alert('ERROR: ' + err)
+              return
+            }
+            if (icon) {
+              self.newBookmark.icon = icon.url
+            }
+          })
+        }
+
         if (this.newBookmark._id) {
           // Update the bookmark's details
           const self = this
@@ -169,12 +213,14 @@
           })
           bookmark.url = this.newBookmark.url
           bookmark.title = this.newBookmark.title
+          bookmark.icon = this.newBookmark.icon
           bookmark.order = this.newBookmark.order
         } else {
           // Add the bookmark to the persona
           this.newBookmark._id = uuid()
           this.persona.bookmarks.push(this.newBookmark)
         }
+
         // Save the persona to the database
         const self = this
         this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
@@ -282,7 +328,7 @@
     padding: 5px;
     text-align: center;
     width: 100%;
-    height: 80px;
+    height: 52px;
     padding: 10px;
   }
 
@@ -292,29 +338,25 @@
   }
 
   .bookmark-icon {
-    height: 60px;
-    width: 60px;
-    border-radius: 50%;
-    border: 2px solid #ddd;
-    color: white;
-    line-height: 60px; 
-    font-size: 18px;
+    height: 32px;
+    width: 32px;
+    border-radius: 2px;
     float: left;
   }
 
   .bookmark-title {
     float: left;
     margin-left: 20px;
-    height: 60px;
-    line-height: 60px;
+    height: 32px;
+    line-height: 32px;
     vertical-align: middle;
   }
 
   .edit-bookmark-links {
     float: right;
     margin-left: 40px;
-    height: 60px;
-    line-height: 60px;
+    height: 32px;
+    line-height: 32px;
     vertical-align: middle;
   }
 
@@ -335,6 +377,11 @@
 
   .delete-link {
     color: red;
+  }
+
+  .divider {
+    color: #aaa;
+    margin: 0 2px;
   }
 
 </style>
