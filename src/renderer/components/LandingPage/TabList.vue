@@ -150,11 +150,6 @@
 
 <style scoped>
 
-  button {
-    border: none;
-    background-color: inherit;
-  }
-
   .tab-list-wrapper {
     display: flex;
     background-color: #ccc;

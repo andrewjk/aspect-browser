@@ -395,6 +395,11 @@
     outline: 1px dotted;
   }
 
+  button {
+    border: none;
+    background-color: inherit;
+  }
+
   button:focus,
   button:active:focus,
   button.active:focus,

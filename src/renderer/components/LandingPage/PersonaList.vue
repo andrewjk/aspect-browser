@@ -131,11 +131,6 @@
 
 <style scoped>
 
-  button {
-    border: none;
-    background-color: inherit;
-  }
-
   .persona-list {
     padding: 10px 5px;
     background-color: #444;
@@ -166,8 +161,8 @@
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    border: 2px solid white;
-    color: white;
+    border: 2px solid #eee;
+    color: #eee;
     line-height: 60px; 
     margin-bottom: 10px;
     font-size: 18px;
@@ -199,6 +194,13 @@
 
   .modal-button-footer button {
     margin-left: 10px;
+    border: 1px solid #aaa;
+    border-radius: 10px;
+  }
+
+  .modal-button-footer button:hover,
+  .modal-button-footer button:focus {
+    background-color: #ddd;
   }
 
 </style>

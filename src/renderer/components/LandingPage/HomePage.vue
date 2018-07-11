@@ -250,6 +250,13 @@
 
   .modal-button-footer button {
     margin-left: 10px;
+    border: 1px solid #aaa;
+    border-radius: 10px;
+  }
+
+  .modal-button-footer button:hover,
+  .modal-button-footer button:focus {
+    background-color: #ddd;
   }
 
   .delete-link {
