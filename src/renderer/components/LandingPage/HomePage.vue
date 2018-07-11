@@ -210,7 +210,7 @@
   }
 
   .home-bookmarks {
-    margin-bottom: 20px;
+    margin: 40px 0;
   }
 
   .bookmark-button {

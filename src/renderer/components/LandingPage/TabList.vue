@@ -1,7 +1,12 @@
 <template>
-  <div class="tab-list-wrapper">
-    <div class="tab-list">
-      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" @click="setActiveIndex(index)">
+  <div :id="'tab-list-wrapper-' + persona._id" class="tab-list-wrapper">
+    <button class="tab-nav" v-show="showTabNavigation" @click="scrollTabsLeft()">
+      <button :class="['tab-nav-button', canScrollLeft ? '' : 'disabled']">
+        <fa icon="chevron-left"/>
+      </button>
+    </button>
+    <div :id="'tab-list-' + persona._id" class="tab-list" :style="{ maxWidth: maxTabListWidth }">
+      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click="setActiveIndex(index)" :title="item.title">
         <template v-if="item.url === 'home'">
           <fa icon="home" class="tab-icon"/>
         </template>
@@ -16,12 +21,17 @@
           <fa icon="times"/>
         </button>
       </button>
-      <button class="tab" @click="openNewTab()">
-        <button class="tab-new">
+      <button class="tab-nav" @click="openNewTab()">
+        <button class="tab-nav-button">
           <fa icon="plus"/>
         </button>
       </button>
     </div>
+    <button class="tab-nav" v-show="showTabNavigation" @click="scrollTabsRight()">
+      <button :class="['tab-nav-button', canScrollRight ? '' : 'disabled']">
+        <fa icon="chevron-right"/>
+      </button>
+    </button>
   </div>
 </template>
 
@@ -32,6 +42,39 @@
     props: {
       persona: null,
       tabs: Array
+    },
+    data () {
+      return {
+        canScrollLeft: true,
+        canScrollRight: false
+      }
+    },
+    computed: {
+      showTabNavigation () {
+        if (this.tabs.length > 1) {
+          const el = document.getElementById('tab-list-' + this.persona._id)
+          const width = el.getBoundingClientRect().width - 40 // For the plus button
+          const minWidth = this.tabs.length * 64 // TODO: factor out that magic number
+          return width < minWidth
+        }
+      },
+      tabWidth () {
+        if (this.tabs.length > 1) {
+          const el = document.getElementById('tab-list-' + this.persona._id)
+          const width = el.getBoundingClientRect().width - 40 // For the plus button
+          const tabWidth = width / this.tabs.length
+          return tabWidth
+        } else {
+          return 200 // TODO: factor out that magic number
+        }
+      },
+      maxTabListWidth () {
+        if (this.tabs.length > 1) {
+          const el = document.getElementById('tab-list-wrapper-' + this.persona._id)
+          const width = el.getBoundingClientRect().width - 80 // For the navigation buttons
+          return width
+        }
+      }
     },
     methods: {
       getActiveTab () {
@@ -83,6 +126,23 @@
         const box = document.getElementById('address-text-' + this.persona._id)
         box.focus()
         box.select()
+      },
+      scrollTabsLeft () {
+        const el = document.getElementById('tab-list-' + this.persona._id)
+        const scrollDistance = el.getBoundingClientRect().width / 4
+        const scrollTo = el.scrollLeft - scrollDistance
+        el.scrollLeft = Math.max(0, scrollTo)
+        this.canScrollLeft = scrollTo > 0
+        this.canScrollRight = true
+      },
+      scrollTabsRight () {
+        const el = document.getElementById('tab-list-' + this.persona._id)
+        const width = el.getBoundingClientRect().width
+        const scrollDistance = width / 4
+        const scrollTo = el.scrollLeft + scrollDistance
+        el.scrollLeft = Math.min(width, scrollTo)
+        this.canScrollLeft = true
+        this.canScrollRight = scrollTo < width
       }
     }
   }
@@ -96,17 +156,37 @@
   }
 
   .tab-list-wrapper {
+    display: flex;
     background-color: #ccc;
-    height: 28px;
     font-size: 13px;
   }
 
+  .tab-list {
+    display: flex;
+    height: 28px;
+    flex: 1 0 0;
+    overflow: hidden;
+    scroll-behavior: smooth;
+  }
+
   .tab {
-    display: inline-block;
-    padding: 0 5px;
+    display: inline-flex;
+    min-width: 64px;
+    max-width: 200px;
+    padding: 5px;
     border-right: 1px solid #aaa;
-    cursor: default;
-    line-height: 28px;
+    line-height: 18px;
+    height: 28px;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .tab-nav {
+    display: inline-block;
+    line-height: 18px;
+    height: 28px;
+    vertical-align: top;
+    text-align: left;
   }
 
   .tab.active {
@@ -125,20 +205,22 @@
   .tab-icon {
     height: 16px;
     width: 16px;
-    vertical-align: top;
-    margin: 6px 2px;
+    margin: 1px 5px 1px 0;
   }
 
   .tab-title {
-    /* display: inline-block;
-    max-width: 120px; */
     overflow: hidden;
     white-space: nowrap;
+    font-size: 12px;
+    flex: 1;
   }
 
   .tab-close {
     border-radius: 2px;
-    margin-left: 2px;
+    height: 18px;
+    width: 18px;
+    vertical-align: top;
+    margin-left: 3px;
     padding: 2px 4px;
   }
 
@@ -151,15 +233,26 @@
     display: none
   }
 
-  .tab-new {
+  .tab-nav-button {
     border-radius: 2px;
-    margin-left: 2px;
+    height: 18px;
+    width: 18px;
+    vertical-align: top;
     padding: 2px 4px;
   }
 
-  .tab-new:hover,
-  .tab-new:focus {
+  .tab-nav-button:hover,
+  .tab-nav-button:focus {
     background-color: #eee;
+  }
+
+  .tab-nav-button.disabled {
+    color: #bbb;
+  }
+
+  .tab-nav-button.disabled:hover,
+  .tab-nav-button.disabled:focus {
+    background-color: inherit;
   }
 
 </style>
