@@ -7,16 +7,16 @@
       <button :class="['address-button', canGoForward() ? '' : 'disabled']" :tabindex="canGoForward() ? '0' : '-1'" @click="goForward" :title="getForwardHistory()">
         <fa icon="arrow-right"/>
       </button>
-      <button class="address-button" @click="goHome">
+      <button class="address-button" @click="goHome" title="Open the home page for this persona">
         <fa icon="home"/>
       </button>
       <div class="address-input">
-        <input type="text" :id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" @keypress="keyPressed">
+        <input type="text" :id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" @keypress="keyPressed" title="Type a URL or something to search for">
       </div>
-      <button class="address-button" @click="editBookmark">
+      <button class="address-button" @click="editBookmark" title="Edit the current bookmark">
         <fa icon="star"/>
       </button>
-      <button class="address-button" @click="refresh">
+      <button class="address-button" @click="refresh" title = "Reload the current page">
         <fa icon="sync-alt"/>
       </button>
     </div>
