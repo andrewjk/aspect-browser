@@ -152,7 +152,7 @@
           _id: uuid(),
           name: 'Personal',
           shortName: 'P',
-          color: 'green',
+          color: '#009E49',
           order: 1,
           isActive: true,
           bookmarks: [],

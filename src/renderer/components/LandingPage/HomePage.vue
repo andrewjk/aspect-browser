@@ -23,14 +23,22 @@
           G
         </div>
         <div class="bookmark-title">{{ item.title }}</div>
+        <div v-show="showEditBookmarkLinks" class="edit-bookmark-links">
+          <a href="#" @click.stop="editBookmark(index)">Edit</a>
+          <span>|</span>
+          <a href="#" class="delete-link" @click.stop="deleteBookmark(index)">Delete</a>
+        </div>
       </button>
     </div>
     <div class="home-links">
-      <a href="#" @click="addBookmark">Add a bookmark</a> |
-      <a href="#" @click="editPersona">Edit this persona</a>
+      <a href="#" @click="addBookmark">Add a bookmark</a>
+      <span>|</span>
+      <a href="#" v-show="persona.bookmarks.length" @click="editBookmarks">Edit bookmarks</a>
+      <span v-show="persona.bookmarks.length">|</span>
+      <a href="#" @click="editPersona">Edit persona</a>
     </div>
     <modal v-if="showBookmarkModal" @close="showBookmarkModal = false">
-      <h3 slot="header">Add Bookmark:</h3>
+      <h3 slot="header">{{ newBookmark._id ? 'Edit Bookmark:' : 'Add Bookmark:' }} </h3>
       <bookmark-form slot="body" :bookmark="newBookmark"></bookmark-form>
       <div slot="footer" class="modal-button-footer">
         <button @click="commitBookmarkEdit">
@@ -73,12 +81,15 @@
     },
     data () {
       return {
+        showEditBookmarkLinks: false,
         showBookmarkModal: false,
-        oldBookmark: null,
         newBookmark: null,
         showPersonaModal: false,
         oldPersona: null
       }
+    },
+    mounted: function () {
+      this.sortBookmarks()
     },
     methods: {
       getBackgroundColor (index) {
@@ -115,17 +126,55 @@
         activeTab.initialUrl = url
         activeTab.url = url
       },
+      editBookmarks () {
+        this.showEditBookmarkLinks = !this.showEditBookmarkLinks
+      },
+      deleteBookmark (index) {
+        if (confirm('Are you sure you want to delete this bookmark?') && confirm('Are you really sure you want to delete this bookmark?')) {
+          // Remove the bookmark from the persona
+          this.persona.bookmarks.splice(index, 1)
+
+          // Save the persona to the database
+          this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
+            if (err) {
+              alert('ERROR: ' + err)
+            }
+          })
+        }
+      },
+      editBookmark (index) {
+        const bookmark = this.persona.bookmarks[index]
+        this.newBookmark = {
+          _id: bookmark._id,
+          url: bookmark.url,
+          title: bookmark.title,
+          order: bookmark.order
+        }
+        // Show the modal
+        this.showBookmarkModal = true
+      },
       addBookmark () {
         // TODO: Should I emit an event so that this gets done centrally in the landing page?
         this.newBookmark = {
-          _id: uuid(),
           order: this.persona.bookmarks.length + 1
         }
         this.showBookmarkModal = true
       },
       commitBookmarkEdit () {
-        // Add the bookmark to the persona
-        this.persona.bookmarks.push(this.newBookmark)
+        if (this.newBookmark._id) {
+          // Update the bookmark's details
+          const self = this
+          const bookmark = this.persona.bookmarks.find(function (item) {
+            return item._id === self.newBookmark._id
+          })
+          bookmark.url = this.newBookmark.url
+          bookmark.title = this.newBookmark.title
+          bookmark.order = this.newBookmark.order
+        } else {
+          // Add the bookmark to the persona
+          this.newBookmark._id = uuid()
+          this.persona.bookmarks.push(this.newBookmark)
+        }
         // Save the persona to the database
         const self = this
         this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
@@ -133,6 +182,9 @@
             alert('ERROR: ' + err)
             return
           }
+
+          self.sortBookmarks()
+
           // Close the modal
           self.showBookmarkModal = false
         })
@@ -140,6 +192,17 @@
       cancelBookmarkEdit () {
         // Close the modal
         this.showBookmarkModal = false
+      },
+      sortBookmarks () {
+        this.persona.bookmarks.sort(function (a, b) {
+          if (a.order < b.order) {
+            return -1
+          } else if (a.order > b.order) {
+            return 1
+          } else {
+            return 0
+          }
+        })
       },
       editPersona () {
         // Store the persona's details so they can be reset if the user presses the Cancel button
@@ -177,7 +240,7 @@
       },
       deletePersona () {
         if (confirm('Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.') && confirm('Are you really sure you want to delete this persona?')) {
-          // Remove the persona to the database
+          // Remove the persona from the database
           const self = this
           this.$db.remove({ _id: this.persona._id }, {}, function (err, numReplaced) {
             if (err) {
@@ -215,13 +278,12 @@
 
   .bookmark-button {
     border-radius: 2px;
-    border: inherit;
-    background-color: inherit;
-    display: inline-block;
-    margin-left: 10px;
     cursor: default;
     padding: 5px;
     text-align: center;
+    width: 100%;
+    height: 80px;
+    padding: 10px;
   }
 
   .bookmark-button:hover,
@@ -233,15 +295,27 @@
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid #ddd;
     color: white;
     line-height: 60px; 
-    margin-bottom: 10px;
     font-size: 18px;
+    float: left;
   }
 
   .bookmark-title {
-    font-size: 11px;
+    float: left;
+    margin-left: 20px;
+    height: 60px;
+    line-height: 60px;
+    vertical-align: middle;
+  }
+
+  .edit-bookmark-links {
+    float: right;
+    margin-left: 40px;
+    height: 60px;
+    line-height: 60px;
+    vertical-align: middle;
   }
 
   .modal-button-footer {
