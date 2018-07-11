@@ -1,6 +1,6 @@
 <template>
   <div class="tab-page-list-wrapper">
-      <div v-for="(item) in persona.tabs" v-show="item.isActive" :key="item._id" class="tab-page-list-item">
+      <div v-for="(item, index) in persona.tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
         <template v-if="item.url === 'home'">
           <home-page :persona="persona" :show-welcome="showWelcome" @persona-edited="$emit('persona-edited', persona)" @persona-deleted="$emit('persona-deleted', persona)" @open-new-window="openNewWindow"></home-page>
         </template>
@@ -22,6 +22,9 @@
       showWelcome: false
     },
     methods: {
+      getZIndex: function (index) {
+        return this.persona.tabs[index].isActive ? 99 : -99
+      },
       openNewWindow (url, background) {
         this.$emit('open-new-window', url, background)
       }
@@ -32,11 +35,16 @@
 <style scoped>
 
   .tab-page-list-wrapper {
-    display: flex;
+    position: relative;
   }
 
   .tab-page-list-item {
-    flex: 1;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
   }
 
 </style>

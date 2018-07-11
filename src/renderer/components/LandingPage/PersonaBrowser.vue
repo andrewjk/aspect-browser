@@ -1,7 +1,7 @@
 <template>
   <div class="persona-browser-wrapper">
     <div class="persona-browser">
-      <div v-for="(item) in personas" v-show="item.isActive" :key="item._id" class="persona">
+      <div v-for="(item, index) in personas" :key="item._id" class="persona" :style="{ zIndex: getZIndex(index) }">
         <tab-list :persona="item" :tabs="item.tabs" class="persona-tab-list"></tab-list>
         <address-bar :persona="item" :active-tab="getActiveTab()" class="persona-address-bar"></address-bar>
         <tab-page-list :persona="item" :show-welcome="personas.length === 1" class="persona-tab-page-list" @persona-edited="$emit('persona-edited', item)" @persona-deleted="$emit('persona-deleted', item)" @open-new-window="openNewWindow"></tab-page-list>
@@ -30,6 +30,9 @@
         })
         return activeTab
       },
+      getZIndex: function (index) {
+        return this.personas[index].isActive ? 99 : -99
+      },
       openNewWindow (url, background) {
         this.$emit('open-new-window', url, background)
       }
@@ -39,7 +42,16 @@
 
 <style scoped>
 
+  .persona-browser {
+    position: relative;
+  }
+
   .persona {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     height: 100vh;
     display: flex;
     flex-direction: column;
