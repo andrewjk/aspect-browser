@@ -32,13 +32,17 @@
         <fa icon="chevron-right"/>
       </button>
     </button>
+    <window-buttons></window-buttons>
   </div>
 </template>
 
 <script>
+  import WindowButtons from './WindowButtons'
+
   import uuid from 'uuid/v4'
 
   export default {
+    components: { WindowButtons },
     props: {
       persona: null,
       tabs: Array
@@ -162,6 +166,8 @@
     flex: 1 0 0;
     overflow: hidden;
     scroll-behavior: smooth;
+    -ms-overflow-style: scrollbar;
+    -webkit-app-region: drag;
   }
 
   .tab {
@@ -174,6 +180,7 @@
     height: 28px;
     vertical-align: top;
     text-align: left;
+    -webkit-app-region: nodrag;
   }
 
   .tab-nav {

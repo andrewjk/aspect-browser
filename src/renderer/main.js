@@ -11,7 +11,7 @@ import db from './datastore'
 // FontAwesome icons
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSearch, faCog, faHome, faPlus, faArrowLeft, faArrowRight, faStar, faSyncAlt, faSpinner, faTimes, faChevronLeft, faChevronRight, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
-import { faStar as faRegStar } from '@fortawesome/free-regular-svg-icons'
+import { faWindowMinimize, faWindowMaximize, faWindowRestore, faWindowClose } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // Normalize.css
@@ -29,7 +29,6 @@ library.add(faPlus)
 library.add(faArrowLeft)
 library.add(faArrowRight)
 library.add(faStar)
-library.add(faRegStar)
 library.add(faSyncAlt)
 library.add(faSpinner)
 library.add(faTimes)
@@ -37,6 +36,10 @@ library.add(faChevronLeft)
 library.add(faChevronRight)
 library.add(faChevronUp)
 library.add(faChevronDown)
+library.add(faWindowMinimize)
+library.add(faWindowMaximize)
+library.add(faWindowRestore)
+library.add(faWindowClose)
 
 Vue.component('fa', FontAwesomeIcon)
 

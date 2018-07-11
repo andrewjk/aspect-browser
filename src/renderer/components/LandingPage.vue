@@ -409,6 +409,16 @@
     outline: none !important;
   }
 
+  a,
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  input[type="text"],
+  button,
+  textarea {
+    -webkit-app-region: no-drag;
+  }
+
 </style>
 
 <style scoped>

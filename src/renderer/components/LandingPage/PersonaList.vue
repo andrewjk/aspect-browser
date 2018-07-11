@@ -137,6 +137,8 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
+    -ms-overflow-style: scrollbar;
+    -webkit-app-region: drag;
   }
 
   .list {
