@@ -16,6 +16,14 @@
         personas to store your work login details. Or you can edit this persona to store something else.
         It's up to you!
       </p>
+      <p>
+        To start adding bookmarks, search for a site using the address bar above and then press the star button.
+      </p>
+    </div>
+    <div class="welcome" v-else-if="!persona.bookmarks.length">
+      <p>
+        To start adding bookmarks, search for a site using the address bar above and then press the star button.
+      </p>
     </div>
     <div class="home-bookmarks">
       <button v-for="(item, index) in persona.bookmarks" :key="item._id" class="bookmark-button" @click="openBookmark(item, $event)">
@@ -29,8 +37,6 @@
       </button>
     </div>
     <div class="home-links">
-      <a href="#" @click="addBookmark">Add a bookmark</a>
-      <span class="divider">|</span>
       <a href="#" v-show="persona.bookmarks.length" @click="editBookmarks">Edit bookmarks</a>
       <span v-show="persona.bookmarks.length" class="divider">|</span>
       <a href="#" @click="editPersona">Edit persona</a>
@@ -68,8 +74,6 @@
   import BookmarkForm from './BookmarkForm'
   import PersonaForm from './PersonaForm'
 
-  import finder from 'find-favicon'
-
   // NOTE: V4 uses random numbers
   import uuid from 'uuid/v4'
 
@@ -90,30 +94,6 @@
     },
     mounted: function () {
       this.sortBookmarks()
-
-      // this.persona.bookmarks.forEach(function (item) {
-      //   let url = item.url.trim()
-      //   if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
-      //     // If it has a dot and no spaces, treat it as a URL
-      //     // Might need to add http:// on the front there
-      //     if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
-      //       url = 'https://' + url
-      //     }
-      //   }
-      //   item.url = url
-      //   console.log(item.title, item.icon)
-      //   if (!item.icon) {
-      //     finder(item.url, function (err, icon) {
-      //       if (err) {
-      //         alert('ERROR: ' + err)
-      //       }
-      //       console.log(icon)
-      //       if (icon) {
-      //         item.icon = icon.url
-      //       }
-      //     })
-      //   }
-      // })
     },
     methods: {
       getBackgroundColor (index) {
@@ -172,39 +152,7 @@
         // Show the modal
         this.showBookmarkModal = true
       },
-      addBookmark () {
-        // TODO: Should I emit an event so that this gets done centrally in the landing page?
-        this.newBookmark = {
-          order: this.persona.bookmarks.length + 1
-        }
-        this.showBookmarkModal = true
-      },
       commitBookmarkEdit () {
-        // Maybe fix up the URL
-        let url = this.newBookmark.url.trim()
-        if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
-          // If it has a dot and no spaces, treat it as a URL
-          // Might need to add http:// on the front there
-          if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
-            url = 'https://' + url
-          }
-        }
-        this.newBookmark.url = url
-
-        // Maybe find the favicon
-        if (!this.newBookmark.icon) {
-          const self = this
-          finder(this.newBookmark.url, function (err, icon) {
-            if (err) {
-              alert('ERROR: ' + err)
-              return
-            }
-            if (icon) {
-              self.newBookmark.icon = icon.url
-            }
-          })
-        }
-
         if (this.newBookmark._id) {
           // Update the bookmark's details
           const self = this
@@ -316,6 +264,10 @@
   .title {
     font-size: 42px;
     margin-bottom: 10px;
+  }
+
+  .welcome {
+    margin: 40px 0;
   }
 
   .home-bookmarks {

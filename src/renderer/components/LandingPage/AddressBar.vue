@@ -39,7 +39,7 @@
   import Modal from './Modal'
   import BookmarkForm from './BookmarkForm'
 
-  // NOTE: V4 uses random numbers
+// NOTE: V4 uses random numbers
   import uuid from 'uuid/v4'
 
   export default {
@@ -154,6 +154,7 @@
           _id: uuid(),
           url: this.activeTab.url,
           title: this.activeTab.title,
+          icon: this.activeTab.icon,
           order: this.persona.bookmarks.length + 1
         }
         this.showBookmarkModal = true

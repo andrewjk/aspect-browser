@@ -82,7 +82,16 @@
       },
       pageIconUpdated (e) {
         if (e.favicons.length) {
-          this.tab.icon = e.favicons[0]
+          let icon
+          e.favicons.forEach(function (item) {
+            if (item.indexOf('.ico') > 0) {
+              icon = item
+            }
+          })
+          if (!icon) {
+            icon = e.favicons[0]
+          }
+          this.tab.icon = icon
         }
       },
       willNavigate () {
