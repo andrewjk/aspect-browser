@@ -1,6 +1,7 @@
 <template>
   <div class="tab-page-wrapper">
       <webview :id="tab._id" class="tab-page-view" :partition="getPartition()" :src="tab.initialUrl" :preload="preload"></webview>
+      <div class="target-url" v-show="targetUrl">{{ targetUrl }}</div>
   </div>
 </template>
 
@@ -14,6 +15,7 @@
     },
     data () {
       return {
+        targetUrl: '',
         // Per https://github.com/SimulatedGREG/electron-vue/issues/239
         preload: 'file://' + path.join(__static, '/webview-preload.js')
       }
@@ -32,6 +34,7 @@
 
       webview.addEventListener('page-title-updated', this.pageTitleUpdated)
       webview.addEventListener('page-favicon-updated', this.pageIconUpdated)
+      webview.addEventListener('update-target-url', this.targetUrlUpdated)
 
       webview.addEventListener('will-navigate', this.willNavigate)
       webview.addEventListener('did-navigate', this.didNavigate)
@@ -94,6 +97,9 @@
           this.tab.icon = icon
         }
       },
+      targetUrlUpdated (e) {
+        this.targetUrl = e.url
+      },
       willNavigate () {
         // TODO:
       },
@@ -121,6 +127,19 @@
   .tab-page-view {
     height: 100%;
     width: 100%;
+  }
+
+  .target-url {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: #f8f8f8;
+    color: #444;
+    font-size: 12px;
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-top-right-radius: 2px;
+    padding: 4px 4px 2px;
   }
 
 </style>
