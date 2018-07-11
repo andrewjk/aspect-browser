@@ -13,25 +13,46 @@
       <div class="address-input">
         <input type="text" :id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" @keypress="keyPressed" title="Type a URL or something to search for">
       </div>
-      <button class="address-button" @click="editBookmark" title="Edit the current bookmark">
+      <button class="address-button" @click="addBookmark" title="Add the current page to this persona's bookmarks">
         <fa icon="star"/>
       </button>
-      <button class="address-button" @click="refresh" title = "Reload the current page">
+      <button class="address-button" @click="reload" title = "Reload the current page">
         <fa icon="sync-alt"/>
       </button>
     </div>
+    <modal v-if="showBookmarkModal" @close="showBookmarkModal = false">
+      <h3 slot="header">Add Bookmark:</h3>
+      <bookmark-form slot="body" :bookmark="newBookmark"></bookmark-form>
+      <div slot="footer" class="modal-button-footer">
+        <button @click="commitBookmarkEdit">
+          Save
+        </button>
+        <button @click="cancelBookmarkEdit">
+          Cancel
+        </button>
+      </div>
+    </modal>
   </div>
 </template>
 
 <script>
+  import Modal from './Modal'
+  import BookmarkForm from './BookmarkForm'
+
+  // NOTE: V4 uses random numbers
+  import uuid from 'uuid/v4'
+
   export default {
+    components: { Modal, BookmarkForm },
     props: {
       persona: null,
       activeTab: null
     },
     data () {
       return {
-        isTextSelected: false
+        isTextSelected: false,
+        showBookmarkModal: false,
+        newBookmark: null
       }
     },
     beforeUpdate: function () {
@@ -127,10 +148,38 @@
           }
         }
       },
-      editBookmark () {
-        // TODO:
+      addBookmark () {
+        // TODO: Should I emit an event so that this gets done centrally in the landing page?
+        this.newBookmark = {
+          _id: uuid(),
+          url: this.activeTab.url,
+          title: this.activeTab.title,
+          order: this.persona.bookmarks.length + 1
+        }
+        this.showBookmarkModal = true
       },
-      refresh () {
+      commitBookmarkEdit () {
+        // Add the bookmark to the persona
+        this.persona.bookmarks.push(this.newBookmark)
+
+        // Save the persona to the database
+        const self = this
+        this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
+          if (err) {
+            alert('ERROR: ' + err)
+            return
+          }
+          // Close the modal
+          self.newBookmark = null
+          self.showBookmarkModal = false
+        })
+      },
+      cancelBookmarkEdit () {
+        //  Close the modal
+        this.newBookmark = null
+        this.showBookmarkModal = false
+      },
+      reload () {
         if (this.activeTab.webview) {
           this.activeTab.webview.reload()
         }
@@ -182,6 +231,25 @@
 
   .address-input > input {
     width: 100%;
+  }
+
+  .modal-button-footer {
+    text-align: right;
+  }
+
+  .modal-button-footer button {
+    margin-left: 10px;
+    border: 1px solid #aaa;
+    border-radius: 10px;
+  }
+
+  .modal-button-footer button:hover,
+  .modal-button-footer button:focus {
+    background-color: #ddd;
+  }
+
+  .delete-link {
+    color: red;
   }
 
 </style>
