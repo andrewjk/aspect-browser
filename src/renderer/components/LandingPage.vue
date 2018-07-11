@@ -377,6 +377,33 @@
     width: 100%;
   }
 
+  a {
+    color: #0077cc;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  a:focus,
+  a:active:focus,
+  a.active:focus,
+  a.focus,
+  a:active.focus,
+  a.active.focus {
+    outline: 1px dotted;
+  }
+
+  button:focus,
+  button:active:focus,
+  button.active:focus,
+  button.focus,
+  button:active.focus,
+  button.active.focus {
+    outline: none !important;
+  }
+
 </style>
 
 <style scoped>

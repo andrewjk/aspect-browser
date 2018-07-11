@@ -1,11 +1,11 @@
 <template>
   <div class="persona-browser-wrapper">
     <div class="persona-browser">
-      <a v-for="(item) in personas" v-show="item.isActive" :key="item._id" class="persona">
+      <div v-for="(item) in personas" v-show="item.isActive" :key="item._id" class="persona">
         <tab-list :persona="item" :tabs="item.tabs" class="persona-tab-list"></tab-list>
         <address-bar :persona="item" :active-tab="getActiveTab()" class="persona-address-bar"></address-bar>
         <tab-page-list :persona="item" :show-welcome="personas.length === 1" class="persona-tab-page-list" @persona-edited="$emit('persona-edited', item)" @persona-deleted="$emit('persona-deleted', item)" @open-new-window="openNewWindow"></tab-page-list>
-      </a>
+      </div>
     </div>
   </div>
 </template>

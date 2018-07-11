@@ -131,6 +131,11 @@
 
 <style scoped>
 
+  button {
+    border: none;
+    background-color: inherit;
+  }
+
   .persona-list {
     padding: 10px 5px;
     background-color: #444;
@@ -145,8 +150,6 @@
 
   .persona {
     border-radius: 2px;
-    border: inherit;
-    background-color: inherit;
     display: block;
     margin-bottom: 10px;
     cursor: default;
@@ -177,8 +180,6 @@
 
   .persona-button {
     border-radius: 2px;
-    border: none;
-    background-color: inherit;
     height: 30px;
     color: white;
     line-height: 30px;

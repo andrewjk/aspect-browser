@@ -1,7 +1,7 @@
 <template>
   <div class="tab-list-wrapper">
     <div class="tab-list">
-      <a v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" @click="setActiveIndex(index)">
+      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" @click="setActiveIndex(index)">
         <template v-if="item.url === 'home'">
           <fa icon="home" class="tab-icon"/>
         </template>
@@ -12,15 +12,15 @@
           <img class="tab-icon" :src="item.icon">
         </template>
         <span class="tab-title">{{ item.title }}</span>
-        <a class="tab-close" @click.stop="closeTab(index)">
+        <button class="tab-close" @click.stop="closeTab(index)">
           <fa icon="times"/>
-        </a>
-      </a>
-      <a class="tab" @click="openNewTab()">
-        <a class="tab-new">
+        </button>
+      </button>
+      <button class="tab" @click="openNewTab()">
+        <button class="tab-new">
           <fa icon="plus"/>
-        </a>
-      </a>
+        </button>
+      </button>
     </div>
   </div>
 </template>
@@ -90,6 +90,11 @@
 
 <style scoped>
 
+  button {
+    border: none;
+    background-color: inherit;
+  }
+
   .tab-list-wrapper {
     background-color: #ccc;
     height: 28px;
@@ -112,7 +117,8 @@
     background-color: #ccc;
   }
 
-  .tab.inactive:hover {
+  .tab.inactive:hover,
+  .tab.inactive:focus {
     background-color: #ddd;
   }
 
@@ -136,7 +142,8 @@
     padding: 2px 4px;
   }
 
-  .tab-close:hover {
+  .tab-close:hover,
+  .tab-close:focus {
     background-color: #ccc;
   }
 
@@ -150,7 +157,8 @@
     padding: 2px 4px;
   }
 
-  .tab-new:hover {
+  .tab-new:hover,
+  .tab-new:focus {
     background-color: #eee;
   }
 
