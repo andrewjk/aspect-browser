@@ -1,6 +1,6 @@
 <template>
   <div class="tab-page-wrapper">
-      <webview :id="tab._id" class="tab-page-view" :partition="getPartition()" :src="tab.initialUrl" :preload="preload"></webview>
+      <webview :id="tab._id" class="tab-page-view" :partition="getPartition()" :src="initialUrl" :preload="preload"></webview>
       <div class="target-url" v-show="targetUrl">{{ targetUrl }}</div>
   </div>
 </template>
@@ -15,6 +15,9 @@
     },
     data () {
       return {
+        // HACK: We need to set src to something so that the webview initializes correctly, but we only want to set it once
+        // If we set <webview src="tab.url">, Vue reloads the component every time the url changes
+        initialUrl: this.tab.url,
         targetUrl: '',
         // Per https://github.com/SimulatedGREG/electron-vue/issues/239
         preload: 'file://' + path.join(__static, '/webview-preload.js')
@@ -70,7 +73,6 @@
 
         this.tab.isLoading = false
         this.tab.url = url
-        this.tab.initialUrl = url
         this.tab.addressText = url
         this.tab.title = title
       },

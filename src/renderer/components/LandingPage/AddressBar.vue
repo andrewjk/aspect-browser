@@ -145,7 +145,6 @@
             if (this.activeTab.webview) {
               this.activeTab.webview.loadURL(url)
             } else {
-              this.activeTab.initialUrl = url
               this.activeTab.url = url
             }
           }

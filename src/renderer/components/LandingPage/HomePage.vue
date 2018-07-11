@@ -128,7 +128,6 @@
         activeTab.backHistoryNavigation = true
 
         activeTab.isLoading = true
-        activeTab.initialUrl = bookmark.url
         activeTab.url = bookmark.url
       },
       editBookmarks () {

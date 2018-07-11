@@ -291,7 +291,6 @@
         if (activePersona) {
           activePersona.tabs.push({
             _id: uuid(),
-            initialUrl: url,
             url: url,
             addressText: url,
             title: url.replace('http://', '').replace('https://', ''),
