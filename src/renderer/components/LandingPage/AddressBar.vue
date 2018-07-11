@@ -16,7 +16,10 @@
       <button class="address-button" @click="addBookmark" title="Add the current page to this persona's bookmarks">
         <fa icon="star"/>
       </button>
-      <button class="address-button" @click="reload" title = "Reload the current page">
+      <button v-if="activeTab.isLoading" class="address-button" @click="stopLoad" title = "Stop loading the current page">
+        <fa icon="times"/>
+      </button>
+      <button v-else class="address-button" @click="reload" title = "Reload the current page">
         <fa icon="sync-alt"/>
       </button>
     </div>
@@ -39,7 +42,7 @@
   import Modal from './Modal'
   import BookmarkForm from './BookmarkForm'
 
-// NOTE: V4 uses random numbers
+  // NOTE: V4 uses random numbers
   import uuid from 'uuid/v4'
 
   export default {
@@ -179,6 +182,11 @@
         //  Close the modal
         this.newBookmark = null
         this.showBookmarkModal = false
+      },
+      stopLoad () {
+        if (this.activeTab.webview) {
+          this.activeTab.webview.stop()
+        }
       },
       reload () {
         if (this.activeTab.webview) {
