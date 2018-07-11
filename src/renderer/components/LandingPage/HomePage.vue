@@ -30,6 +30,13 @@
         <img class="bookmark-icon" :src="item.icon" :style="{ backgroundColor: getBackgroundColor(index) }">
         <div class="bookmark-title">{{ item.title }}</div>
         <div v-show="showEditBookmarkLinks" class="edit-bookmark-links">
+          <a href="#" @click.stop="moveBookmarkUp(index)">
+            <fa icon="chevron-up"/>
+          </a>
+          <a href="#" @click.stop="moveBookmarkDown(index)">
+            <fa icon="chevron-down"/>
+          </a>
+          <span class="divider">|</span>
           <a href="#" @click.stop="editBookmark(index)">Edit</a>
           <span class="divider">|</span>
           <a href="#" class="delete-link" @click.stop="deleteBookmark(index)">Delete</a>
@@ -127,6 +134,38 @@
       editBookmarks () {
         this.showEditBookmarkLinks = !this.showEditBookmarkLinks
       },
+      moveBookmarkUp (index) {
+        if (index === 0) {
+          return
+        }
+        // Swap this bookmark's order with the next bookmark's order
+        const thisOrder = this.persona.bookmarks[index].order
+        const prevOrder = this.persona.bookmarks[index - 1].order
+        this.persona.bookmarks[index].order = prevOrder
+        this.persona.bookmarks[index - 1].order = thisOrder
+        this.sanitizeBookmarkOrders()
+      },
+      moveBookmarkDown (index) {
+        if (index === this.persona.bookmarks.length - 1) {
+          return
+        }
+        // Swap this bookmark's order with the next bookmark's order
+        const thisOrder = this.persona.bookmarks[index].order
+        const nextOrder = this.persona.bookmarks[index + 1].order
+        this.persona.bookmarks[index].order = nextOrder
+        this.persona.bookmarks[index + 1].order = thisOrder
+        this.sanitizeBookmarkOrders()
+      },
+      sanitizeBookmarkOrders () {
+        // Sort the bookmarks
+        this.sortBookmarks()
+        // Renumber everything, just in case something funny has gone on
+        for (var i = 0; i < this.persona.bookmarks.length; i++) {
+          this.persona.bookmarks[i].order = i + 1
+        }
+        // Save the persona
+        this.savePersona()
+      },
       deleteBookmark (index) {
         if (confirm('Are you sure you want to delete this bookmark?') && confirm('Are you really sure you want to delete this bookmark?')) {
           // Remove the bookmark from the persona
@@ -168,20 +207,7 @@
           this.newBookmark._id = uuid()
           this.persona.bookmarks.push(this.newBookmark)
         }
-
-        // Save the persona to the database
-        const self = this
-        this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-
-          self.sortBookmarks()
-
-          // Close the modal
-          self.showBookmarkModal = false
-        })
+        this.savePersona()
       },
       cancelBookmarkEdit () {
         // Close the modal
@@ -231,6 +257,20 @@
         //  Close the modal
         this.oldPersona = null
         this.showPersonaModal = false
+      },
+      savePersona () {
+        // Save the persona to the database
+        const self = this
+        this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
+          if (err) {
+            alert('ERROR: ' + err)
+            return
+          }
+          // Sort bookmarks
+          self.sortBookmarks()
+          // Close the modal
+          self.showBookmarkModal = false
+        })
       },
       deletePersona () {
         if (confirm('Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.') && confirm('Are you really sure you want to delete this persona?')) {
