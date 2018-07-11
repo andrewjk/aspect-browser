@@ -133,7 +133,9 @@
             if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
               // If it has a dot and no spaces, treat it as a URL
               // Might need to add http:// on the front there
-              if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+              console.log('testing')
+              if (!/http[s]*:\/\//.test(url)) {
+                console.log('adding https')
                 url = 'https://' + url
               }
             } else {

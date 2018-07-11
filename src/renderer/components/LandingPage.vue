@@ -293,7 +293,7 @@
             _id: uuid(),
             url: url,
             addressText: url,
-            title: url.replace('http://', '').replace('https://', ''),
+            title: url.replace(/http[s]*:\/\/[www.]*/, ''),
             icon: null,
             isActive: false,
             isLoading: false,
