@@ -1,10 +1,10 @@
 <template>
   <main>
     <div class="persona-list-container">
-      <persona-list v-bind:personas="personas" v-on:persona-added="personaAdded"></persona-list>
+      <persona-list :personas="personas" @persona-added="personaAdded"></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser v-bind:personas="personas" v-on:persona-edited="personaEdited" v-on:persona-deleted="personaDeleted" v-on:open-new-window="openNewWindow"></persona-browser>
+      <persona-browser :personas="personas" @persona-edited="personaEdited" @persona-deleted="personaDeleted" @open-new-window="openNewWindow"></persona-browser>
     </div>
   </main>
 </template>

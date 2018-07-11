@@ -1,7 +1,7 @@
 <template>
   <div class="tab-list-wrapper">
     <div class="tab-list">
-      <a v-for="(item, index) in tabs" v-bind:key="item._id" v-bind:class="['tab', item.isActive ? 'active' : 'inactive']" v-on:click="setActiveIndex(index)">
+      <a v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" @click="setActiveIndex(index)">
         <template v-if="item.url === 'home'">
           <fa icon="home" class="tab-icon"/>
         </template>
@@ -9,14 +9,14 @@
           <fa icon="spinner" class="tab-icon" spin/>
         </template>
         <template v-else-if="item.icon">
-          <img class="tab-icon" v-bind:src="item.icon">
+          <img class="tab-icon" :src="item.icon">
         </template>
         <span class="tab-title">{{ item.title }}</span>
-        <a class="tab-close" v-on:click.stop="closeTab(index)">
+        <a class="tab-close" @click.stop="closeTab(index)">
           <fa icon="times"/>
         </a>
       </a>
-      <a class="tab" v-on:click="openNewTab()">
+      <a class="tab" @click="openNewTab()">
         <a class="tab-new">
           <fa icon="plus"/>
         </a>

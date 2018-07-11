@@ -1,6 +1,6 @@
 <template>
   <div class="tab-page-wrapper">
-      <webview v-bind:id="tab._id" class="tab-page-view" v-bind:partition="getPartition()" v-bind:src="tab.initialUrl" v-bind:preload="preload"></webview>
+      <webview :id="tab._id" class="tab-page-view" :partition="getPartition()" :src="tab.initialUrl" :preload="preload"></webview>
   </div>
 </template>
 

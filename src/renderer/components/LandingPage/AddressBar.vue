@@ -1,22 +1,22 @@
 <template>
   <div class="address-bar-wrapper">
     <div class="address-bar">
-      <button v-bind:class="['address-button', canGoBack() ? '' : 'disabled']" v-bind:tabindex="canGoBack() ? '0' : '-1'" v-on:click="goBack" v-bind:title="getBackHistory()">
+      <button :class="['address-button', canGoBack() ? '' : 'disabled']" :tabindex="canGoBack() ? '0' : '-1'" @click="goBack" :title="getBackHistory()">
         <fa icon="arrow-left"/>
       </button>
-      <button v-bind:class="['address-button', canGoForward() ? '' : 'disabled']" v-bind:tabindex="canGoForward() ? '0' : '-1'" v-on:click="goForward" v-bind:title="getForwardHistory()">
+      <button :class="['address-button', canGoForward() ? '' : 'disabled']" :tabindex="canGoForward() ? '0' : '-1'" @click="goForward" :title="getForwardHistory()">
         <fa icon="arrow-right"/>
       </button>
-      <button class="address-button" v-on:click="goHome">
+      <button class="address-button" @click="goHome">
         <fa icon="home"/>
       </button>
       <div class="address-input">
-        <input type="text" v-bind:id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" v-on:keypress="keyPressed">
+        <input type="text" :id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" @keypress="keyPressed">
       </div>
-      <button class="address-button" v-on:click="editBookmark">
+      <button class="address-button" @click="editBookmark">
         <fa icon="star"/>
       </button>
-      <button class="address-button" v-on:click="refresh">
+      <button class="address-button" @click="refresh">
         <fa icon="sync-alt"/>
       </button>
     </div>

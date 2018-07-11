@@ -1,11 +1,11 @@
 <template>
   <div class="tab-page-list-wrapper">
-      <div v-for="(item) in persona.tabs" v-show="item.isActive" v-bind:key="item._id" class="tab-page-list-item">
+      <div v-for="(item) in persona.tabs" v-show="item.isActive" :key="item._id" class="tab-page-list-item">
         <template v-if="item.url === 'home'">
-          <home-page v-bind:persona="persona" v-bind:show-welcome="showWelcome" v-on:persona-edited="$emit('persona-edited', persona)" v-on:persona-deleted="$emit('persona-deleted', persona)" v-on:open-new-window="openNewWindow"></home-page>
+          <home-page :persona="persona" :show-welcome="showWelcome" @persona-edited="$emit('persona-edited', persona)" @persona-deleted="$emit('persona-deleted', persona)" @open-new-window="openNewWindow"></home-page>
         </template>
         <template v-else>
-          <tab-page v-bind:tab="item" v-bind:partition="persona._id" v-on:open-new-window="openNewWindow"></tab-page>
+          <tab-page :tab="item" :partition="persona._id" @open-new-window="openNewWindow"></tab-page>
         </template>
       </div>
   </div>

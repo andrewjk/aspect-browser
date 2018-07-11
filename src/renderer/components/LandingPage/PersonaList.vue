@@ -2,8 +2,8 @@
   <div class="persona-list-wrapper">
     <div class="persona-list">
       <div class="list">
-        <button v-for="(item, index) in personas" v-bind:key="item._id" class="persona" v-on:click="setActiveIndex(index)">
-          <div class="persona-icon" v-bind:style="{ backgroundColor: getBackgroundColor(index) }">
+        <button v-for="(item, index) in personas" :key="item._id" class="persona" @click="setActiveIndex(index)">
+          <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(index) }">
             {{ item.shortName }}
           </div>
           <div class="persona-name">{{ item.name }}</div>
@@ -21,7 +21,7 @@
     </div>
     <modal v-if="showPersonaModal" @close="showPersonaModal = false">
       <h3 slot="header">Add Persona:</h3>
-      <persona-form slot="body" v-bind:persona="newPersona"></persona-form>
+      <persona-form slot="body" :persona="newPersona"></persona-form>
       <div slot="footer" class="modal-button-footer">
         <button @click="commitPersonaAdd">
           Save

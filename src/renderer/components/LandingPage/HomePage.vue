@@ -18,20 +18,20 @@
       </p>
     </div>
     <div class="home-bookmarks">
-      <button v-for="(item, index) in persona.bookmarks" v-bind:key="item._id" class="bookmark-button" v-on:click="openBookmark(item, $event)">
-        <div class="bookmark-icon" v-bind:style="{ backgroundColor: getBackgroundColor(index) }">
+      <button v-for="(item, index) in persona.bookmarks" :key="item._id" class="bookmark-button" @click="openBookmark(item, $event)">
+        <div class="bookmark-icon" :style="{ backgroundColor: getBackgroundColor(index) }">
           G
         </div>
         <div class="bookmark-title">{{ item.title }}</div>
       </button>
     </div>
     <div class="home-links">
-      <a href="#" v-on:click="addBookmark">Add a bookmark</a> |
-      <a href="#" v-on:click="editPersona">Edit this persona</a>
+      <a href="#" @click="addBookmark">Add a bookmark</a> |
+      <a href="#" @click="editPersona">Edit this persona</a>
     </div>
     <modal v-if="showBookmarkModal" @close="showBookmarkModal = false">
       <h3 slot="header">Add Bookmark:</h3>
-      <bookmark-form slot="body" v-bind:bookmark="newBookmark"></bookmark-form>
+      <bookmark-form slot="body" :bookmark="newBookmark"></bookmark-form>
       <div slot="footer" class="modal-button-footer">
         <button @click="commitBookmarkEdit">
           Save
@@ -43,7 +43,7 @@
     </modal>
     <modal v-if="showPersonaModal" @close="showPersonaModal = false">
       <h3 slot="header">Edit Persona:</h3>
-      <persona-form slot="body" v-bind:persona="persona"></persona-form>
+      <persona-form slot="body" :persona="persona"></persona-form>
       <div slot="footer" class="modal-button-footer">
         <a href="#" class="delete-link" @click="deletePersona">Delete persona</a>
         <button @click="commitPersonaEdit">
