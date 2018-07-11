@@ -26,6 +26,9 @@
           <fa icon="plus"/>
         </button>
       </button>
+      <!-- <button class="tab-dragger">
+        &nbsp;
+      </button> -->
     </div>
     <button class="tab-nav" v-show="showTabNavigation" @click="scrollTabsRight()">
       <button :class="['tab-nav-button', canScrollRight ? '' : 'disabled']">
@@ -166,8 +169,6 @@
     flex: 1 0 0;
     overflow: hidden;
     scroll-behavior: smooth;
-    -ms-overflow-style: scrollbar;
-    -webkit-app-region: drag;
   }
 
   .tab {
@@ -189,6 +190,22 @@
     height: 28px;
     vertical-align: top;
     text-align: left;
+  }
+
+  /* HACK: the element with -webkit-app-region: drag; only seems to get calculated on load, which is no good for us as we want a dynamic width! */
+  /* Apart from that, putting this in the tab-list works nicely */
+  .tab-dragger {
+    background-color: green;
+    display: inline-block;
+    line-height: 18px;
+    height: 28px;
+    min-width: 30px;
+    vertical-align: top;
+    text-align: left;
+    flex: 1;
+    border-right: 1px solid #aaa;
+    -ms-overflow-style: scrollbar;
+    -webkit-app-region: drag;
   }
 
   .tab.active {
