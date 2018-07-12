@@ -1,10 +1,10 @@
 <template>
   <main>
     <div class="persona-list-container">
-      <persona-list :personas="personas" @persona-added="personaAdded"></persona-list>
+      <persona-list :personas="personas" :activity="activity" @persona-added="personaAdded"></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser :personas="personas" @persona-edited="personaEdited" @persona-deleted="personaDeleted" @open-new-window="openNewWindow"></persona-browser>
+      <persona-browser :personas="personas" :activity="activity" @persona-edited="personaEdited" @persona-deleted="personaDeleted" @open-new-window="openNewWindow"></persona-browser>
     </div>
   </main>
 </template>
@@ -22,7 +22,6 @@
     data () {
       return {
         personas: [],
-        // TODO: tabs and history per persona:
         activity: {},
         zoomLevel: 0
       }
@@ -42,20 +41,12 @@
         // HACK: The sort function doesn't seem to work?
         self.sortPersonas()
 
-        // Ensure that the first persona is active and reset the tabs for each persona
+        // Ensure that the first persona is active and create the tabs for each persona
         self.personas.forEach(function (item, i) {
           item.isActive = (i === 0)
-          item.tabs = [
-            {
-              _id: uuid(),
-              url: 'home',
-              addressText: 'home',
-              title: 'Home',
-              isActive: true,
-              backHistory: [],
-              forwardHistory: []
-            }
-          ]
+          // HACK: ANDREW
+          item.tabs = undefined
+          self.addHomeTab(item)
         })
 
         // If there are no personas, add a default one that the user can edit
@@ -82,10 +73,11 @@
       setActiveTabIndex (index) {
         const activePersona = this.getActivePersona()
         if (activePersona) {
-          if (index < 0 || index >= activePersona.tabs.length) {
+          const tabs = this.activity[activePersona._id].tabs
+          if (index < 0 || index >= tabs.length) {
             return
           }
-          activePersona.tabs.forEach(function (item, i) {
+          tabs.forEach(function (item, i) {
             item.isActive = (i === index)
           })
         }
@@ -105,7 +97,8 @@
       getActiveTab () {
         const activePersona = this.getActivePersona()
         if (activePersona) {
-          return activePersona.tabs.find(function (item) {
+          const tabs = this.activity[activePersona._id].tabs
+          return tabs.find(function (item) {
             return item.isActive
           })
         }
@@ -113,8 +106,9 @@
       getActiveTabIndex () {
         const activePersona = this.getActivePersona()
         if (activePersona) {
-          for (let i = 0; i < activePersona.tabs.length; i++) {
-            if (activePersona.tabs[i].isActive) {
+          const tabs = this.activity[activePersona._id].tabs
+          for (let i = 0; i < tabs.length; i++) {
+            if (tabs[i].isActive) {
               return i
             }
           }
@@ -131,8 +125,26 @@
           }
         })
       },
+      addHomeTab (persona) {
+        this.activity[persona._id] = {
+          tabs: [
+            {
+              _id: uuid(),
+              url: 'home',
+              addressText: 'home',
+              title: 'Home',
+              icon: null,
+              isActive: true,
+              isLoading: false,
+              backHistory: [],
+              forwardHistory: []
+            }
+          ]
+        }
+      },
       personaAdded (persona) {
         this.personas.push(persona)
+        this.addHomeTab(persona)
         this.setActiveIndex(this.personas.length - 1)
         this.sortPersonas()
       },
@@ -155,17 +167,7 @@
           color: '#009E49',
           order: 1,
           isActive: true,
-          bookmarks: [],
-          tabs: [
-            {
-              _id: uuid(),
-              url: 'home',
-              title: 'Home',
-              isActive: true,
-              backHistory: [],
-              forwardHistory: []
-            }
-          ]
+          bookmarks: []
         }
         const self = this
         this.$db.insert(defaultPersona, function (err, dbPersona) {
@@ -174,11 +176,12 @@
             return
           }
           self.personas = [ dbPersona ]
+          self.addHomeTab(dbPersona)
         })
       },
       keyDown (e) {
         // Have to listen for Ctrl + Tab in keyDown because it doesn't work in keyPress
-        console.log(e.keyCode)
+        // console.log(e.keyCode)
         if (e.ctrlKey || e.metaKey) {
           if (e.keyCode === 9) { // Tab
             if (e.shiftKey) {
@@ -208,7 +211,7 @@
         }
       },
       keyPress (e) {
-        console.log(e.keyCode)
+        // console.log(e.keyCode)
         if (e.ctrlKey || e.metaKey) {
           if (e.keyCode === 12) { // L
             this.focusAddressBox()
@@ -232,44 +235,38 @@
       nextTab () {
         const activePersona = this.getActivePersona()
         if (activePersona) {
+          const tabs = this.activity[activePersona._id].tabs
           const index = this.getActiveTabIndex()
-          const newIndex = index < activePersona.tabs.length - 1 ? index + 1 : 0
+          const newIndex = index < tabs.length - 1 ? index + 1 : 0
           this.setActiveTabIndex(newIndex)
         }
       },
       previousTab () {
         const activePersona = this.getActivePersona()
         if (activePersona) {
+          const tabs = this.activity[activePersona._id].tabs
           const index = this.getActiveTabIndex()
-          const newIndex = index > 0 ? index - 1 : activePersona.tabs.length - 1
+          const newIndex = index > 0 ? index - 1 : tabs.length - 1
           this.setActiveTabIndex(newIndex)
         }
       },
       closeTab () {
         const activePersona = this.getActivePersona()
         if (activePersona) {
+          const tabs = this.activity[activePersona._id].tabs
           const index = this.getActiveTabIndex()
-          activePersona.tabs.splice(index, 1)
-          if (!activePersona.tabs.length) {
-            activePersona.tabs.push({
-              _id: uuid(),
-              url: 'home',
-              addressText: 'home',
-              title: 'Home',
-              icon: null,
-              isActive: true,
-              isLoading: false,
-              backHistory: [],
-              forwardHistory: []
-            })
+          tabs.splice(index, 1)
+          if (!tabs.length) {
+            this.addHomeTab(activePersona)
           }
-          this.setActiveTabIndex(Math.min(index, activePersona.tabs.length - 1))
+          this.setActiveTabIndex(Math.min(index, tabs.length - 1))
         }
       },
       openNewTab () {
         const activePersona = this.getActivePersona()
         if (activePersona) {
-          activePersona.tabs.push({
+          const tabs = this.activity[activePersona._id].tabs
+          tabs.push({
             _id: uuid(),
             url: 'home',
             addressText: 'home',
@@ -280,7 +277,7 @@
             backHistory: [],
             forwardHistory: []
           })
-          this.setActiveTabIndex(activePersona.tabs.length - 1)
+          this.setActiveTabIndex(tabs.length - 1)
           const box = document.getElementById('address-text-' + activePersona._id)
           box.focus()
           box.select()
@@ -289,7 +286,8 @@
       openNewWindow (url, background) {
         const activePersona = this.getActivePersona()
         if (activePersona) {
-          activePersona.tabs.push({
+          const tabs = this.activity[activePersona._id].tabs
+          tabs.push({
             _id: uuid(),
             url: url,
             addressText: url,
@@ -301,7 +299,7 @@
             forwardHistory: []
           })
           if (!background) {
-            this.setActiveTabIndex(activePersona.tabs.length - 1)
+            this.setActiveTabIndex(tabs.length - 1)
             const box = document.getElementById('address-text-' + activePersona._id)
             box.focus()
             box.select()

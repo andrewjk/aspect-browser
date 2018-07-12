@@ -1,8 +1,8 @@
 <template>
   <div class="tab-page-list-wrapper">
-      <div v-for="(item, index) in persona.tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
+      <div v-for="(item, index) in tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
         <template v-if="item.url === 'home'">
-          <home-page :persona="persona" :show-welcome="showWelcome" @persona-edited="$emit('persona-edited', persona)" @persona-deleted="$emit('persona-deleted', persona)" @open-new-window="openNewWindow"></home-page>
+          <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome" @persona-edited="$emit('persona-edited', persona)" @persona-deleted="$emit('persona-deleted', persona)" @open-new-window="openNewWindow"></home-page>
         </template>
         <template v-else>
           <tab-page :tab="item" :partition="persona._id" @open-new-window="openNewWindow"></tab-page>
@@ -19,11 +19,17 @@
     components: { HomePage, TabPage },
     props: {
       persona: null,
+      activity: null,
       showWelcome: false
+    },
+    data () {
+      return {
+        tabs: this.activity[this.persona._id].tabs
+      }
     },
     methods: {
       getZIndex: function (index) {
-        return this.persona.tabs[index].isActive ? 99 : -99
+        return this.tabs[index].isActive ? 99 : -99
       },
       openNewWindow (url, background) {
         this.$emit('open-new-window', url, background)

@@ -44,7 +44,8 @@
   export default {
     components: { Modal, PersonaForm },
     props: {
-      personas: Array
+      personas: Array,
+      activity: null
     },
     data () {
       return {
@@ -58,7 +59,8 @@
         this.personas.forEach(function (item, i) {
           if (item.isActive && i === index) {
             // If it's already the active item, go to the home page
-            const activeTab = item.tabs.find(function (titem) {
+            const tabs = this.activity[item._id].tabs
+            const activeTab = tabs.find(function (titem) {
               return titem.isActive
             })
             if (activeTab) {

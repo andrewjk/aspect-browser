@@ -48,12 +48,13 @@
     components: { WindowButtons },
     props: {
       persona: null,
-      tabs: Array
+      activity: null
     },
     data () {
       return {
         canScrollLeft: true,
-        canScrollRight: false
+        canScrollRight: false,
+        tabs: this.activity[this.persona._id].tabs
       }
     },
     computed: {

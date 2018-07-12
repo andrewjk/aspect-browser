@@ -49,13 +49,22 @@
     components: { Modal, BookmarkForm },
     props: {
       persona: null,
-      activeTab: null
+      activity: null
     },
     data () {
       return {
         isTextSelected: false,
         showBookmarkModal: false,
         newBookmark: null
+      }
+    },
+    computed: {
+      activeTab () {
+        const tabs = this.activity[this.persona._id].tabs
+        const activeTab = tabs.find(function (item) {
+          return item.isActive
+        })
+        return activeTab
       }
     },
     beforeUpdate: function () {
@@ -124,6 +133,7 @@
           this.activeTab.url = 'home'
           this.activeTab.addressText = 'home'
           this.activeTab.title = 'Home'
+          this.activeTab.webview = null
         }
       },
       keyPressed (e) {
@@ -133,9 +143,7 @@
             if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
               // If it has a dot and no spaces, treat it as a URL
               // Might need to add http:// on the front there
-              console.log('testing')
               if (!/http[s]*:\/\//.test(url)) {
-                console.log('adding https')
                 url = 'https://' + url
               }
             } else {

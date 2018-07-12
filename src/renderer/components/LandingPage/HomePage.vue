@@ -27,7 +27,7 @@
     </div>
     <div class="home-bookmarks">
       <button v-for="(item, index) in persona.bookmarks" :key="item._id" class="bookmark-button" @click="openBookmark(item, $event)">
-        <img class="bookmark-icon" :src="item.icon" :style="{ backgroundColor: getBackgroundColor(index) }">
+        <img class="bookmark-icon" :src="item.icon">
         <div class="bookmark-title">{{ item.title }}</div>
         <div v-show="showEditBookmarkLinks" class="edit-bookmark-links">
           <a href="#" @click.stop="moveBookmarkUp(index)">
@@ -88,6 +88,7 @@
     components: { Modal, BookmarkForm, PersonaForm },
     props: {
       persona: null,
+      tabs: Array,
       showWelcome: false
     },
     data () {
@@ -103,8 +104,6 @@
       this.sortBookmarks()
     },
     methods: {
-      getBackgroundColor (index) {
-      },
       openBookmark (bookmark, e) {
         // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
         if (e.ctrlKey || e.which === 2 || e.which === 4) {
@@ -112,7 +111,7 @@
           return
         }
 
-        const activeTab = this.persona.tabs.find(function (item) {
+        const activeTab = this.tabs.find(function (item) {
           return item.isActive
         })
 
