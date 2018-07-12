@@ -1,6 +1,9 @@
 <template>
   <div class="persona-list-wrapper">
     <div class="persona-list">
+      <div class="drag-indicator">
+        <fa icon="bars"/>
+      </div>
       <div class="list">
         <button v-for="(item, index) in personas" :key="item._id" class="persona" @click="setActiveIndex(index)">
           <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(index) }">
@@ -133,10 +136,19 @@
 
 <style scoped>
 
+  .drag-indicator {
+    color: white;
+    height: 28px;
+    line-height: 28px;
+    font-size: 11px;
+    text-align: center;
+  }
+
   .persona-list {
-    padding: 10px 5px;
+    padding: 0 5px 10px;
     background-color: #444;
     height: 100vh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     -ms-overflow-style: scrollbar;

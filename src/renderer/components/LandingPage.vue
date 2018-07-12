@@ -352,6 +352,7 @@
 
   body {
     font-family: sans-serif;
+    overflow: hidden;
   }
 
   p {
