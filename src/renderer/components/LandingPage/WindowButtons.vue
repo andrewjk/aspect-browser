@@ -71,7 +71,7 @@
 
   .window-button {
     height: 100%;
-    padding: 1px 16px;
+    width: 45px;
   }
 
   .window-button:hover,
