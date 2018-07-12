@@ -120,7 +120,7 @@
           activeTab.backHistory = []
         }
         activeTab.backHistory.push({
-          url: 'home',
+          url: null,
           title: 'Home'
         })
         activeTab.forwardHistory = []

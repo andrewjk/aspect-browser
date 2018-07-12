@@ -7,7 +7,7 @@
     </button>
     <div :id="'tab-list-' + persona._id" class="tab-list" :style="{ maxWidth: maxTabListWidth }">
       <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click="setActiveIndex(index)" :title="item.title">
-        <template v-if="item.url === 'home'">
+        <template v-if="!item.url">
           <fa icon="home" class="tab-icon"/>
         </template>
         <template v-else-if="item.isLoading">
@@ -104,8 +104,8 @@
         if (!this.tabs.length) {
           this.tabs.push({
             _id: uuid(),
-            url: 'home',
-            addressText: 'home',
+            url: null,
+            addressText: null,
             title: 'Home',
             icon: null,
             isActive: true,
@@ -121,8 +121,8 @@
       openNewTab () {
         this.tabs.push({
           _id: uuid(),
-          url: 'home',
-          addressText: 'home',
+          url: null,
+          addressText: null,
           title: 'New tab',
           icon: null,
           isActive: true,

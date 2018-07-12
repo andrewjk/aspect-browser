@@ -1,7 +1,7 @@
 <template>
   <div class="tab-page-list-wrapper">
       <div v-for="(item, index) in tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
-        <template v-if="item.url === 'home'">
+        <template v-if="!item.url">
           <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome" @persona-edited="$emit('persona-edited', persona)" @persona-deleted="$emit('persona-deleted', persona)" @open-new-window="openNewWindow"></home-page>
         </template>
         <template v-else>

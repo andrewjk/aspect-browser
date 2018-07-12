@@ -73,8 +73,8 @@
                 title: activeTab.title
               })
               activeTab.forwardHistory = []
-              activeTab.url = 'home'
-              activeTab.addressText = 'home'
+              activeTab.url = null
+              activeTab.addressText = null
               activeTab.title = 'Home'
             }
           }
@@ -102,7 +102,7 @@
           tabs: [
             {
               _id: uuid(),
-              url: 'home',
+              url: null,
               title: 'Home',
               isActive: true,
               backHistory: [],

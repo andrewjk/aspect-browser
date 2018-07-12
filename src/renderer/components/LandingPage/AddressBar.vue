@@ -11,7 +11,7 @@
         <fa icon="home"/>
       </button>
       <div class="address-input">
-        <input type="text" :id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" @keypress="keyPressed" title="Type a URL or something to search for">
+        <input type="text" :id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" @keypress="keyPressed" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
       </div>
       <button class="address-button" @click="addBookmark" title="Add the current page to this persona's bookmarks">
         <fa icon="star"/>
@@ -130,8 +130,8 @@
             title: this.activeTab.title
           })
           this.activeTab.forwardHistory = []
-          this.activeTab.url = 'home'
-          this.activeTab.addressText = 'home'
+          this.activeTab.url = null
+          this.activeTab.addressText = null
           this.activeTab.title = 'Home'
           this.activeTab.webview = null
         }

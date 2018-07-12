@@ -130,8 +130,8 @@
           tabs: [
             {
               _id: uuid(),
-              url: 'home',
-              addressText: 'home',
+              url: null,
+              addressText: null,
               title: 'Home',
               icon: null,
               isActive: true,
@@ -268,8 +268,8 @@
           const tabs = this.activity[activePersona._id].tabs
           tabs.push({
             _id: uuid(),
-            url: 'home',
-            addressText: 'home',
+            url: null,
+            addressText: null,
             title: 'New tab',
             icon: null,
             isActive: true,
