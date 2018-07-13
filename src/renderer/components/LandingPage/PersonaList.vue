@@ -59,10 +59,11 @@
     methods: {
       setActiveIndex (index) {
         // TODO: Emit an event to be handled in LandingPage
+        const self = this
         this.personas.forEach(function (item, i) {
           if (item.isActive && i === index) {
             // If it's already the active item, go to the home page
-            const tabs = this.activity[item._id].tabs
+            const tabs = self.activity[item._id].tabs
             const activeTab = tabs.find(function (titem) {
               return titem.isActive
             })
