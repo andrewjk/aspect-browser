@@ -32,6 +32,7 @@
 
       // Listen to webview events
       webview.addEventListener('did-start-loading', this.loadStarted)
+      webview.addEventListener('load-commit', this.loadCommitted)
       webview.addEventListener('did-stop-loading', this.loadFinished)
       webview.addEventListener('did-fail-load', this.loadFailed)
 
@@ -55,6 +56,16 @@
         console.log('load started')
         this.tab.isLoading = true
       },
+      loadCommitted () {
+        console.log('load committed')
+
+        const url = this.tab.webview.getURL()
+        const title = this.tab.webview.getTitle()
+
+        this.tab.url = url
+        this.tab.addressText = url
+        this.tab.title = title
+      },
       loadFinished () {
         console.log('load finished: ' + this.tab.webview.getURL())
 
@@ -68,13 +79,7 @@
         }
         this.tab.backHistoryNavigation = false
 
-        const url = this.tab.webview.getURL()
-        const title = this.tab.webview.getTitle()
-
         this.tab.isLoading = false
-        this.tab.url = url
-        this.tab.addressText = url
-        this.tab.title = title
       },
       loadFailed () {
         console.log('load failed: ' + this.tab.webview.getURL())
