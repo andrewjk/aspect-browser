@@ -6,7 +6,7 @@
       </button>
     </button>
     <div :id="'tab-list-' + persona._id" class="tab-list" :style="{ maxWidth: maxTabListWidth }">
-      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click="setActiveIndex(index)" :title="item.title">
+      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveIndex(index)" @click.middle="closeTab(index)" :title="item.title">
         <template v-if="!item.url">
           <fa icon="home" class="tab-icon"/>
         </template>
