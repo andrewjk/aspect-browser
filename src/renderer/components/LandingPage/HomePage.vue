@@ -26,49 +26,41 @@
       </p>
     </div>
     <div class="home-bookmarks">
-      <button v-for="(item, index) in persona.bookmarks" :key="item._id" class="bookmark-button" @click="openBookmark(item, $event)">
+      <button v-for="(item, index) in persona.bookmarks" :key="item._id" :class="['bookmark-button', showEditBookmarkLinks ? 'editing' : '']" @click="openBookmark(item, $event)">
         <img class="bookmark-icon" :src="item.icon">
         <div class="bookmark-title">{{ item.title }}</div>
         <div v-show="showEditBookmarkLinks" class="edit-bookmark-links">
-          <a href="#" @click.stop="moveBookmarkUp(index)">
+          <button class="bookmark-edit-button" @click.stop="moveBookmarkUp(index)" title="Move this bookmark up">
             <fa icon="chevron-up"/>
-          </a>
-          <a href="#" @click.stop="moveBookmarkDown(index)">
+          </button>
+          <button class="bookmark-edit-button" @click.stop="moveBookmarkDown(index)" title="Move this bookmark down">
             <fa icon="chevron-down"/>
-          </a>
-          <span class="divider">|</span>
-          <a href="#" @click.stop="editBookmark(index)">Edit</a>
-          <span class="divider">|</span>
-          <a href="#" class="delete-link" @click.stop="deleteBookmark(index)">Delete</a>
+          </button>
+          <button class="bookmark-edit-button" @click.stop="editBookmark(index)" title="Edit this bookmark">
+            <fa icon="edit"/>
+          </button>
+          <button class="bookmark-edit-button delete-link" @click.stop="deleteBookmark(index)" title="Delete this bookmark">
+            <fa icon="trash"/>
+          </button>
         </div>
       </button>
     </div>
-    <div class="home-links">
-      <a href="#" v-show="persona.bookmarks.length" @click="editBookmarks">Edit bookmarks</a>
-      <span v-show="persona.bookmarks.length" class="divider">|</span>
-      <a href="#" @click="editPersona">Edit persona</a>
+    <div class="home-links" v-show="persona.bookmarks.length">
+      <fa v-if="showEditBookmarkLinks" class="editing-icon" icon="check"/>
+      <fa v-else class="editing-icon" icon="edit"/>
+      <a href="#" v-show="persona.bookmarks.length" @click="editBookmarks">
+        {{ showEditBookmarkLinks ? 'Done editing' : 'Edit bookmarks' }}
+      </a>
     </div>
     <modal v-if="showBookmarkModal" @close="showBookmarkModal = false">
       <h3 slot="header">{{ newBookmark._id ? 'Edit Bookmark:' : 'Add Bookmark:' }} </h3>
       <bookmark-form slot="body" :bookmark="newBookmark"></bookmark-form>
       <div slot="footer" class="modal-button-footer">
+        <a href="#" class="delete-link" @click="deleteBookmark">Delete bookmark</a>
         <button @click="commitBookmarkEdit">
           Save
         </button>
         <button @click="cancelBookmarkEdit">
-          Cancel
-        </button>
-      </div>
-    </modal>
-    <modal v-if="showPersonaModal" @close="showPersonaModal = false">
-      <h3 slot="header">Edit Persona:</h3>
-      <persona-form slot="body" :persona="persona"></persona-form>
-      <div slot="footer" class="modal-button-footer">
-        <a href="#" class="delete-link" @click="deletePersona">Delete persona</a>
-        <button @click="commitPersonaEdit">
-          Save
-        </button>
-        <button @click="cancelPersonaEdit">
           Cancel
         </button>
       </div>
@@ -79,13 +71,12 @@
 <script>
   import Modal from './Modal'
   import BookmarkForm from './BookmarkForm'
-  import PersonaForm from './PersonaForm'
 
   // NOTE: V4 uses random numbers
   import uuid from 'uuid/v4'
 
   export default {
-    components: { Modal, BookmarkForm, PersonaForm },
+    components: { Modal, BookmarkForm },
     props: {
       persona: null,
       tabs: Array,
@@ -95,9 +86,7 @@
       return {
         showEditBookmarkLinks: false,
         showBookmarkModal: false,
-        newBookmark: null,
-        showPersonaModal: false,
-        oldPersona: null
+        newBookmark: null
       }
     },
     mounted: function () {
@@ -105,6 +94,9 @@
     },
     methods: {
       openBookmark (bookmark, e) {
+        if (this.showEditBookmarkLinks) {
+          return
+        }
         // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
         if (e.ctrlKey || e.which === 2 || e.which === 4) {
           this.$emit('open-new-window', bookmark.url, true)
@@ -222,40 +214,6 @@
           }
         })
       },
-      editPersona () {
-        // Store the persona's details so they can be reset if the user presses the Cancel button
-        this.oldPersona = {
-          name: this.persona.name,
-          shortName: this.persona.shortName,
-          color: this.persona.color
-        }
-        // Show the modal
-        this.showPersonaModal = true
-      },
-      commitPersonaEdit () {
-        // Save the persona to the database
-        const self = this
-        this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          // Do things further up the chain
-          self.$emit('persona-edited', self.persona)
-          // Close the modal
-          self.oldPersona = null
-          self.showPersonaModal = false
-        })
-      },
-      cancelPersonaEdit () {
-        // Reset the persona's details
-        this.persona.name = this.oldPersona.name
-        this.persona.shortName = this.oldPersona.shortName
-        this.persona.color = this.oldPersona.color
-        //  Close the modal
-        this.oldPersona = null
-        this.showPersonaModal = false
-      },
       savePersona () {
         // Save the persona to the database
         const self = this
@@ -269,23 +227,6 @@
           // Close the modal
           self.showBookmarkModal = false
         })
-      },
-      deletePersona () {
-        if (confirm('Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.') && confirm('Are you really sure you want to delete this persona?')) {
-          // Remove the persona from the database
-          const self = this
-          this.$db.remove({ _id: this.persona._id }, {}, function (err, numReplaced) {
-            if (err) {
-              alert('ERROR: ' + err)
-              return
-            }
-            // Do things further up the chain
-            self.$emit('persona-deleted', self.persona)
-            // Close the modal
-            self.oldPersona = null
-            self.showPersonaModal = false
-          })
-        }
       }
     }
   }
@@ -327,6 +268,11 @@
     background-color: #ddd;
   }
 
+  .bookmark-button.editing:hover,
+  .bookmark-button.editing:focus {
+    background-color: inherit;
+  }
+
   .bookmark-icon {
     height: 32px;
     width: 32px;
@@ -350,6 +296,25 @@
     vertical-align: middle;
   }
 
+  .bookmark-edit-button {
+    border-radius: 2px;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    text-align: center;
+    color: #444;
+  }
+
+  .editing-icon {
+    color: #0077cc;
+    margin-right: 5px;
+  }
+
+  .bookmark-edit-button:hover,
+  .bookmark-edit-button:focus {
+    background-color: #ddd;
+  }
+
   .modal-button-footer {
     text-align: right;
   }
@@ -367,11 +332,6 @@
 
   .delete-link {
     color: red;
-  }
-
-  .divider {
-    color: #aaa;
-    margin: 0 2px;
   }
 
 </style>

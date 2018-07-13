@@ -1,10 +1,10 @@
 <template>
   <main>
     <div class="persona-list-container">
-      <persona-list :personas="personas" :activity="activity" @persona-added="personaAdded"></persona-list>
+      <persona-list :personas="personas" :activity="activity" @persona-added="personaAdded" @persona-edited="personaEdited" @persona-deleted="personaDeleted"></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser :personas="personas" :activity="activity" @persona-edited="personaEdited" @persona-deleted="personaDeleted" @open-new-window="openNewWindow"></persona-browser>
+      <persona-browser :personas="personas" :activity="activity" @open-new-window="openNewWindow"></persona-browser>
     </div>
   </main>
 </template>
@@ -418,7 +418,6 @@
 <style scoped>
 
   .persona-list-container {
-    width: 80px;
     height: 100vh;
   }
 

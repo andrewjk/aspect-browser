@@ -10,7 +10,7 @@ import db from './datastore'
 
 // FontAwesome icons
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSearch, faCog, faHome, faPlus, faArrowLeft, faArrowRight, faStar, faSyncAlt, faSpinner, faTimes, faChevronLeft, faChevronRight, faChevronUp, faChevronDown, faBars } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faCog, faEdit, faUserEdit, faPlus, faTrash, faCheck, faHome, faArrowLeft, faArrowRight, faStar, faSyncAlt, faSpinner, faTimes, faChevronLeft, faChevronRight, faChevronUp, faChevronDown, faBars } from '@fortawesome/free-solid-svg-icons'
 import { faWindowMinimize, faWindowMaximize, faWindowRestore, faWindowClose } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -24,8 +24,12 @@ Vue.prototype.$db = db
 // Add the FontAwesome icons that we will use
 library.add(faSearch)
 library.add(faCog)
-library.add(faHome)
+library.add(faEdit)
+library.add(faUserEdit)
 library.add(faPlus)
+library.add(faTrash)
+library.add(faCheck)
+library.add(faHome)
 library.add(faArrowLeft)
 library.add(faArrowRight)
 library.add(faStar)

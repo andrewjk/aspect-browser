@@ -10,14 +10,6 @@
             <input id="title" v-model="bookmark.title" placeholder="Title">
           </td>
         </tr>
-        <tr>
-          <td>
-            <label for="order">Order</label>
-          </td>
-          <td>
-            <input id="order" v-model="bookmark.order" placeholder="Order">
-          </td>
-        </tr>
       </tbody>
     </table>
   </form>

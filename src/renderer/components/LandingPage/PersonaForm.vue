@@ -26,14 +26,6 @@
             <input id="color" v-model="persona.color" placeholder="Color">
           </td>
         </tr>
-        <tr>
-          <td>
-            <label for="order">Order</label>
-          </td>
-          <td>
-            <input id="order" v-model="persona.order" placeholder="Order">
-          </td>
-        </tr>
       </tbody>
     </table>
   </form>
