@@ -49,7 +49,8 @@
     components: { Modal, BookmarkForm },
     props: {
       persona: null,
-      activity: null
+      activity: null,
+      settings: null
     },
     data () {
       return {
@@ -126,6 +127,11 @@
         if (e.keyCode === 13) {
           if (this.activeTab) {
             let url = this.activeTab.addressText.trim()
+            if (!url) {
+              this.goHome()
+              return
+            }
+
             if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
               // If it has a dot and no spaces, treat it as a URL
               // Might need to add http:// on the front there
@@ -134,7 +140,7 @@
               }
             } else {
               // Search for whatever was typed in
-              url = 'https://duckduckgo.com/?q=' + url
+              url = this.settings.searchProvider.replace('{0}', url)
             }
             this.activeTab.addressText = url
 
@@ -163,7 +169,7 @@
 
         // Save the persona to the database
         const self = this
-        this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
+        this.$pdb.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
           if (err) {
             alert('ERROR: ' + err)
             return

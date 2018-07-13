@@ -1,10 +1,10 @@
 <template>
   <main>
     <div class="persona-list-container">
-      <persona-list :personas="personas" :activity="activity" @persona-added="personaAdded" @persona-edited="personaEdited" @persona-deleted="personaDeleted"></persona-list>
+      <persona-list :personas="personas" :activity="activity" :settings="settings" @persona-added="personaAdded" @persona-edited="personaEdited" @persona-deleted="personaDeleted"></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser :personas="personas" :activity="activity" @open-new-window="openNewWindow"></persona-browser>
+      <persona-browser :personas="personas" :activity="activity" :settings="settings" @open-new-window="openNewWindow"></persona-browser>
     </div>
   </main>
 </template>
@@ -23,14 +23,15 @@
       return {
         personas: [],
         activity: {},
+        settings: {},
         zoomLevel: 0
       }
     },
     created: function () {
-      // Load the personas from the database
-      // HACK: Should be some way to bind 'this'...
       const self = this
-      this.$db.find({}).sort({ order: 1 }).exec(function (err, dbPersonas) {
+
+      // Load the personas from the database
+      this.$pdb.find({}).sort({ order: 1 }).exec(function (err, dbPersonas) {
         if (err) {
           alert('ERROR: ' + err)
           return
@@ -44,8 +45,6 @@
         // Ensure that the first persona is active and create the tabs for each persona
         self.personas.forEach(function (item, i) {
           item.isActive = (i === 0)
-          // HACK: ANDREW
-          item.tabs = undefined
           self.addHomeTab(item)
         })
 
@@ -56,6 +55,21 @@
       })
 
       // TODO: Load history from the database
+
+      // Load the settings from the database
+      this.$sdb.find({}).exec(function (err, dbSettings) {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+
+        // Create default settings if nothing was loaded
+        if (dbSettings && dbSettings.length) {
+          self.settings = dbSettings[0]
+        } else {
+          self.createDefaultSettings()
+        }
+      })
     },
     mounted: function () {
       document.addEventListener('keydown', this.keyDown)
@@ -170,13 +184,27 @@
           bookmarks: []
         }
         const self = this
-        this.$db.insert(defaultPersona, function (err, dbPersona) {
+        this.$pdb.insert(defaultPersona, function (err, dbPersona) {
           if (err) {
             alert('ERROR: ' + err)
             return
           }
           self.personas = [ dbPersona ]
           self.addHomeTab(dbPersona)
+        })
+      },
+      createDefaultSettings () {
+        const defaultSettings = {
+          _id: uuid(),
+          searchProvider: 'https://duckduckgo.com/?q={0}'
+        }
+        const self = this
+        this.$sdb.insert(defaultSettings, function (err, dbSettings) {
+          if (err) {
+            alert('ERROR: ' + err)
+            return
+          }
+          self.settings = dbSettings
         })
       },
       keyDown (e) {

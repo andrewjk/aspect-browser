@@ -3,7 +3,7 @@
     <div class="persona-browser">
       <div v-for="(item, index) in personas" :key="item._id" class="persona" :style="{ zIndex: getZIndex(index) }">
         <tab-list :persona="item" :activity="activity" class="persona-tab-list"></tab-list>
-        <address-bar :persona="item" :activity="activity" class="persona-address-bar"></address-bar>
+        <address-bar :persona="item" :activity="activity" :settings="settings" class="persona-address-bar"></address-bar>
         <tab-page-list :persona="item" :activity="activity" :show-welcome="personas.length === 1" class="persona-tab-page-list" @persona-edited="$emit('persona-edited', item)" @persona-deleted="$emit('persona-deleted', item)" @open-new-window="openNewWindow"></tab-page-list>
       </div>
     </div>
@@ -19,7 +19,8 @@
     components: { TabList, AddressBar, TabPageList },
     props: {
       personas: Array,
-      activity: null
+      activity: null,
+      settings: null
     },
     methods: {
       getZIndex: function (index) {

@@ -162,7 +162,7 @@
           this.persona.bookmarks.splice(index, 1)
 
           // Save the persona to the database
-          this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
+          this.$pdb.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
             if (err) {
               alert('ERROR: ' + err)
             }
@@ -217,7 +217,7 @@
       savePersona () {
         // Save the persona to the database
         const self = this
-        this.$db.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
+        this.$pdb.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
           if (err) {
             alert('ERROR: ' + err)
             return

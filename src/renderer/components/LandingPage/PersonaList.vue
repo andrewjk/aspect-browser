@@ -28,7 +28,7 @@
       <button v-if="!showEditPersonaLinks" class="persona-button" @click="search" title="Search personas and bookmarks">
         <fa icon="search"/>
       </button>
-      <button v-if="!showEditPersonaLinks" class="persona-button" @click="settings" title="Edit application settings">
+      <button v-if="!showEditPersonaLinks" class="persona-button" @click="editSettings" title="Edit application settings">
         <fa icon="cog"/>
       </button>
       <button v-if="showEditPersonaLinks" class="persona-button" @click="addPersona" title="Add a persona">
@@ -66,28 +66,43 @@
         </button>
       </div>
     </modal>
+    <modal v-if="showEditSettingsModal" @close="showEditSettingsModal = false">
+      <h3 slot="header">Settings:</h3>
+      <settings-form slot="body" :settings="settings"></settings-form>
+      <div slot="footer" class="modal-button-footer">
+        <button @click="commitSettingsEdit">
+          Save
+        </button>
+        <button @click="cancelSettingsEdit">
+          Cancel
+        </button>
+      </div>
+    </modal>
   </div>
 </template>
 
 <script>
   import Modal from './Modal'
   import PersonaForm from './PersonaForm'
+  import SettingsForm from './SettingsForm'
 
   // NOTE: V4 uses random numbers
   import uuid from 'uuid/v4'
 
   export default {
-    components: { Modal, PersonaForm },
+    components: { Modal, PersonaForm, SettingsForm },
     props: {
       personas: Array,
-      activity: null
+      activity: null,
+      settings: null
     },
     data () {
       return {
         showEditPersonaLinks: false,
         showEditPersonaModal: false,
         showAddPersonaModal: false,
-        newPersona: {}
+        newPersona: {},
+        showEditSettingsModal: false
       }
     },
     methods: {
@@ -125,9 +140,6 @@
         }
       },
       search () {
-        // TODO:
-      },
-      settings () {
         // TODO:
       },
       editPersonas () {
@@ -188,7 +200,7 @@
       commitPersonaAdd () {
         // Save the persona to the database
         const self = this
-        this.$db.insert(this.newPersona, function (err, dbPersona) {
+        this.$pdb.insert(this.newPersona, function (err, dbPersona) {
           if (err) {
             alert('ERROR: ' + err)
             return
@@ -218,7 +230,7 @@
         // Save the persona to the database
         const self = this
         const persona = this.newPersona
-        this.$db.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
+        this.$pdb.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
           if (err) {
             alert('ERROR: ' + err)
             return
@@ -245,7 +257,7 @@
         const self = this
         this.personas.forEach(function (persona) {
           // Save the persona to the database
-          self.$db.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
+          self.$pdb.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
             if (err) {
               alert('ERROR: ' + err)
             }
@@ -257,7 +269,7 @@
           // Remove the persona from the database
           const self = this
           const persona = this.newPersona
-          this.$db.remove({ _id: persona._id }, {}, function (err, numReplaced) {
+          this.$pdb.remove({ _id: persona._id }, {}, function (err, numReplaced) {
             if (err) {
               alert('ERROR: ' + err)
               return
@@ -270,6 +282,34 @@
             self.showEditPersonaModal = false
           })
         }
+      },
+      editSettings (index) {
+        // Store the settings's details so they can be reset if the user presses the Cancel button
+        this.oldSettings = {
+          searchProvider: this.settings.searchProvider
+        }
+        // Show the modal
+        this.showEditSettingsModal = true
+      },
+      commitSettingsEdit () {
+        // Save the settings to the database
+        const self = this
+        this.$sdb.update({ _id: this.settings._id }, this.settings, {}, function (err, numReplaced) {
+          if (err) {
+            alert('ERROR: ' + err)
+            return
+          }
+          // Close the modal
+          self.oldSettings = null
+          self.showEditSettingsModal = false
+        })
+      },
+      cancelSettingsEdit () {
+        // Reset the settings's details
+        this.settings.searchProvider = this.oldSettings.searchProvider
+        //  Close the modal
+        this.oldSettings = null
+        this.showEditSettingsModal = false
       }
     }
   }
@@ -386,4 +426,8 @@
     background-color: #ddd;
   }
 
+  .delete-link {
+    color: red;
+  }
+  
 </style>

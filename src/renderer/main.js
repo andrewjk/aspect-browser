@@ -6,7 +6,8 @@ import router from './router'
 import store from './store'
 
 // Data storage via nedb
-import db from './datastore'
+import pdb from './personas-db'
+import sdb from './settings-db'
 
 // FontAwesome icons
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -19,7 +20,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 require('../../node_modules/normalize.css/normalize.css')
 
 // Setup the data storage so that it can be accessed from any Vue component
-Vue.prototype.$db = db
+Vue.prototype.$pdb = pdb
+Vue.prototype.$sdb = sdb
 
 // Add the FontAwesome icons that we will use
 library.add(faSearch)
