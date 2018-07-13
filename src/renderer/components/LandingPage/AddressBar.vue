@@ -53,7 +53,6 @@
     },
     data () {
       return {
-        isTextSelected: false,
         showBookmarkModal: false,
         newBookmark: null
       }
@@ -65,19 +64,6 @@
           return item.isActive
         })
         return activeTab
-      }
-    },
-    beforeUpdate: function () {
-      // HACK: In various places we set some text and call select() on the address text box, which gets overridden when redrawing
-      // This is the only way I can figure out how to maintain the selection before and after redrawing
-      const box = document.getElementById('address-text-' + this.persona._id)
-      this.isTextSelected = box.selectionStart === 0 && box.selectionEnd === box.value.length
-    },
-    updated: function () {
-      if (this.isTextSelected) {
-        const box = document.getElementById('address-text-' + this.persona._id)
-        box.select()
-        this.isTextSelected = false
       }
     },
     methods: {

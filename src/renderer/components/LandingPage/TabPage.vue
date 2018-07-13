@@ -18,6 +18,7 @@
         // HACK: We need to set src to something so that the webview initializes correctly, but we only want to set it once
         // If we set <webview src="tab.url">, Vue reloads the component every time the url changes
         initialUrl: this.tab.url,
+        previousUrl: '',
         targetUrl: '',
         // Per https://github.com/SimulatedGREG/electron-vue/issues/239
         preload: 'file://' + path.join(__static, '/webview-preload.js')
@@ -27,6 +28,10 @@
       const webview = document.getElementById(this.tab._id)
 
       this.tab.webview = webview
+
+      // Focus the webview when the tab page has been mounted e.g. after a bookmark has been clicked
+      // or the user types something in the address bar in the home page
+      webview.focus()
 
       // TODO: Should probably use did-navigate and did-navigate-in-page for history?
 
@@ -47,6 +52,15 @@
       webview.addEventListener('new-window', this.newWindow)
 
       // Add a context menu to the webview
+    },
+    updated: function () {
+      // Focus the webview when the URL has changed e.g. when the user has clicked a link or typed something
+      // in the address bar
+      if (this.tab.url !== this.previousUrl) {
+        const webview = document.getElementById(this.tab._id)
+        webview.focus()
+        this.previousUrl = this.tab.url
+      }
     },
     methods: {
       getPartition () {

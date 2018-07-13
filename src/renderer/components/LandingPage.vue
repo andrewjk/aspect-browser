@@ -270,7 +270,7 @@
             _id: uuid(),
             url: null,
             addressText: null,
-            title: 'New tab',
+            title: 'Home',
             icon: null,
             isActive: true,
             isLoading: false,
@@ -280,7 +280,6 @@
           this.setActiveTabIndex(tabs.length - 1)
           const box = document.getElementById('address-text-' + activePersona._id)
           box.focus()
-          box.select()
         }
       },
       openNewWindow (url, background) {
@@ -300,9 +299,6 @@
           })
           if (!background) {
             this.setActiveTabIndex(tabs.length - 1)
-            const box = document.getElementById('address-text-' + activePersona._id)
-            box.focus()
-            box.select()
           }
         }
       },
