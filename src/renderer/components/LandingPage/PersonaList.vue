@@ -328,7 +328,7 @@
   .persona-list {
     width: 80px;
     padding: 0 5px 10px;
-    background-color: #444;
+    background-color: #2d2d2d;
     height: 100vh;
     overflow: hidden;
     display: flex;
@@ -356,7 +356,7 @@
 
   .persona:hover,
   .persona:focus {
-    background-color: #777;
+    background-color: #555;
   }
 
   .persona.editing:hover,
@@ -392,7 +392,7 @@
 
   .persona-button:hover,
   .persona-button:focus {
-    background-color: #777;
+    background-color: #555;
   }
 
   .edit-persona-button {

@@ -5,6 +5,7 @@
         <tab-list :persona="item" :activity="activity" class="persona-tab-list"></tab-list>
         <address-bar :persona="item" :activity="activity" :settings="settings" class="persona-address-bar"></address-bar>
         <tab-page-list :persona="item" :activity="activity" :show-welcome="personas.length === 1" class="persona-tab-page-list" @persona-edited="$emit('persona-edited', item)" @persona-deleted="$emit('persona-deleted', item)" @open-new-window="openNewWindow"></tab-page-list>
+        <find-in-page v-show="showFindInPage" :persona="item" :activity="activity" class="persona-find-in-page" @close-find-in-page="$emit('close-find-in-page')"></find-in-page>
       </div>
     </div>
   </div>
@@ -14,15 +15,22 @@
   import TabList from './TabList'
   import AddressBar from './AddressBar'
   import TabPageList from './TabPageList'
+  import FindInPage from './FindInPage'
 
   export default {
-    components: { TabList, AddressBar, TabPageList },
+    components: { TabList, AddressBar, TabPageList, FindInPage },
     props: {
       personas: Array,
       activity: null,
-      settings: null
+      settings: null,
+      showFindInPage: false
     },
     methods: {
+      getActivePersona () {
+        return this.personas.find(function (item) {
+          return item.isActive
+        })
+      },
       getZIndex: function (index) {
         return this.personas[index].isActive ? 99 : -99
       },
@@ -60,6 +68,10 @@
 
   .persona-tab-page-list {
     flex: 1 0 auto;
+  }
+
+  .persona-find-in-page {
+    flex: 0 0 auto;
   }
 
 </style>

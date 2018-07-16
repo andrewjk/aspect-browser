@@ -4,7 +4,7 @@
       <persona-list :personas="personas" :activity="activity" :settings="settings" @persona-added="personaAdded" @persona-edited="personaEdited" @persona-deleted="personaDeleted"></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser :personas="personas" :activity="activity" :settings="settings" @open-new-window="openNewWindow"></persona-browser>
+      <persona-browser :personas="personas" :activity="activity" :settings="settings" :showFindInPage="showFindInPage" :focusFindInPage="focusFindInPage" @open-new-window="openNewWindow" @close-find-in-page="closeFindInPage"></persona-browser>
     </div>
   </main>
 </template>
@@ -24,7 +24,9 @@
         personas: [],
         activity: {},
         settings: {},
-        zoomLevel: 0
+        zoomLevel: 0,
+        showFindInPage: false,
+        focusFindInPage: false
       }
     },
     created: function () {
@@ -75,6 +77,16 @@
       document.addEventListener('keydown', this.keyDown)
       document.addEventListener('keypress', this.keyPress)
     },
+    updated: function () {
+      if (this.focusFindInPage) {
+        this.focusFindInPage = false
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          const box = document.getElementById('find-text-' + activePersona._id)
+          box.focus()
+        }
+      }
+    },
     methods: {
       setActiveIndex (index) {
         if (index < 0 || index >= this.personas.length) {
@@ -94,6 +106,7 @@
           tabs.forEach(function (item, i) {
             item.isActive = (i === index)
           })
+          this.showFindInPage = false
         }
       },
       getActivePersona () {
@@ -239,7 +252,7 @@
         }
       },
       keyPress (e) {
-        // console.log(e.keyCode)
+        console.log('keypress: ' + e.keyCode)
         if (e.ctrlKey || e.metaKey) {
           if (e.keyCode === 12) { // L
             this.focusAddressBox()
@@ -247,6 +260,8 @@
             this.openNewTab()
           } else if (e.keyCode === 23) { // V
             this.closeTab()
+          } else if (e.keyCode === 6) { // F
+            this.findInPage()
           }
         }
       },
@@ -363,6 +378,16 @@
           this.zoomLevel = 0
           activeTab.webview.setZoomLevel(this.zoomLevel)
         }
+      },
+      findInPage () {
+        const activePersona = this.getActivePersona()
+        if (activePersona) {
+          this.showFindInPage = true
+          this.focusFindInPage = true
+        }
+      },
+      closeFindInPage () {
+        this.showFindInPage = false
       }
     }
   }
