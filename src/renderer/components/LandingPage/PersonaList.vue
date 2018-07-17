@@ -326,8 +326,7 @@
   }
 
   .persona-list {
-    width: 80px;
-    padding: 0 5px 10px;
+    width: 76px;
     background-color: #2d2d2d;
     height: 100vh;
     overflow: hidden;
@@ -338,7 +337,7 @@
   }
 
   .persona-list.editing {
-    width: 120px;
+    width: 116px;
   }
 
   .list {
@@ -348,9 +347,8 @@
   .persona {
     border-radius: 2px;
     display: flex;
-    margin-bottom: 10px;
     cursor: default;
-    padding: 5px;
+    padding: 8px;
     text-align: center;
   }
 
