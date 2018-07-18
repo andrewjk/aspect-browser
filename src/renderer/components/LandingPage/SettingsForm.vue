@@ -21,7 +21,7 @@
   export default {
     computed: {
       ...mapState({
-        settingsToEdit: state => state.Personas.settingsToEdit
+        settingsToEdit: state => state.Store.settingsToEdit
       }),
       // Computed properties for v-model binding
       searchProvider: {

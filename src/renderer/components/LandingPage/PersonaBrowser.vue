@@ -25,9 +25,9 @@
       showFindInPage: false
     },
     computed: mapState({
-      personas: state => state.Personas.personas,
-      activity: state => state.Personas.activity,
-      settings: state => state.Personas.settings
+      personas: state => state.Store.personas,
+      activity: state => state.Store.activity,
+      settings: state => state.Store.settings
     }),
     methods: {
       ...mapMutations([

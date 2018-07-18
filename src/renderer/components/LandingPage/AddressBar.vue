@@ -35,8 +35,8 @@
     },
     computed: {
       ...mapState({
-        activity: state => state.Personas.activity,
-        settings: state => state.Personas.settings
+        activity: state => state.Store.activity,
+        settings: state => state.Store.settings
       }),
       ...mapGetters([
         'getActiveTab'

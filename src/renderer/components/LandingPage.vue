@@ -11,7 +11,7 @@
       <persona-form slot="body"></persona-form>
       <div slot="footer" class="modal-button-footer">
         <a v-show="personaToUpdate" href="#" class="delete-link" @click="deletePersona({ db: $pdb, personaToUpdate })">Delete persona</a>
-        <button @click="commitPersonaEdit({ db: $pdb, personaToEdit, personaToUpdate })">
+        <button @click="savePersona({ db: $pdb, personaToEdit, personaToUpdate })">
           Save
         </button>
         <button @click="closePersonaModal">
@@ -24,7 +24,7 @@
       <bookmark-form slot="body"></bookmark-form>
       <div slot="footer" class="modal-button-footer">
         <a v-show="bookmarkToUpdate" href="#" class="delete-link" @click="deleteBookmark({ db: $pdb, persona: getActivePersona, bookmarkToUpdate })">Delete bookmark</a>
-        <button @click="commitBookmarkEdit({ db: $pdb, persona: getActivePersona, bookmarkToEdit, bookmarkToUpdate })">
+        <button @click="saveBookmark({ db: $pdb, persona: getActivePersona, bookmarkToEdit, bookmarkToUpdate })">
           Save
         </button>
         <button @click="closeBookmarkModal">
@@ -36,7 +36,7 @@
       <h3 slot="header">Settings:</h3>
       <settings-form slot="body"></settings-form>
       <div slot="footer" class="modal-button-footer">
-        <button @click="commitSettingsEdit({ db: $sdb, settingsToEdit, settingsToUpdate })">
+        <button @click="saveSettings({ db: $sdb, settingsToEdit, settingsToUpdate })">
           Save
         </button>
         <button @click="closeSettingsModal">
@@ -69,18 +69,18 @@
     },
     computed: {
       ...mapState({
-        personas: state => state.Personas.personas,
-        activity: state => state.Personas.activity,
-        settings: state => state.Personas.settings,
-        showPersonaModal: state => state.Personas.showPersonaModal,
-        personaToEdit: state => state.Personas.personaToEdit,
-        personaToUpdate: state => state.Personas.personaToUpdate,
-        showBookmarkModal: state => state.Personas.showBookmarkModal,
-        bookmarkToEdit: state => state.Personas.bookmarkToEdit,
-        bookmarkToUpdate: state => state.Personas.bookmarkToUpdate,
-        showSettingsModal: state => state.Personas.showSettingsModal,
-        settingsToEdit: state => state.Personas.settingsToEdit,
-        settingsToUpdate: state => state.Personas.settingsToUpdate
+        personas: state => state.Store.personas,
+        activity: state => state.Store.activity,
+        settings: state => state.Store.settings,
+        showPersonaModal: state => state.Store.showPersonaModal,
+        personaToEdit: state => state.Store.personaToEdit,
+        personaToUpdate: state => state.Store.personaToUpdate,
+        showBookmarkModal: state => state.Store.showBookmarkModal,
+        bookmarkToEdit: state => state.Store.bookmarkToEdit,
+        bookmarkToUpdate: state => state.Store.bookmarkToUpdate,
+        showSettingsModal: state => state.Store.showSettingsModal,
+        settingsToEdit: state => state.Store.settingsToEdit,
+        settingsToUpdate: state => state.Store.settingsToUpdate
       }),
       ...mapGetters([
         'getActivePersona',
@@ -108,7 +108,7 @@
     },
     methods: {
       ...mapMutations([
-        'setActiveIndex',
+        'setActivePersonaIndex',
         'setActiveTabIndex',
         'previousPersona',
         'nextPersona',
@@ -123,11 +123,11 @@
       ...mapActions([
         'loadPersonas',
         'loadSettings',
-        'commitPersonaEdit',
+        'savePersona',
         'deletePersona',
-        'commitBookmarkEdit',
+        'saveBookmark',
         'deleteBookmark',
-        'commitSettingsEdit'
+        'saveSettings'
       ]),
       keyDown (e) {
         // Have to listen for Ctrl + Tab in keyDown because it doesn't work in keyPress
@@ -158,7 +158,7 @@
         } else if (e.altKey) {
           if (e.keyCode >= 48 && e.keyCode <= 57) { // 1 - 9
             const newIndex = e.keyCode - 49
-            this.setActiveIndex(newIndex)
+            this.setActivePersonaIndex(newIndex)
           }
         }
       },

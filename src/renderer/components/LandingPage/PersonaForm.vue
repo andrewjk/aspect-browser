@@ -37,7 +37,7 @@
   export default {
     computed: {
       ...mapState({
-        personaToEdit: state => state.Personas.personaToEdit
+        personaToEdit: state => state.Store.personaToEdit
       }),
       // Computed properties for v-model binding
       name: {

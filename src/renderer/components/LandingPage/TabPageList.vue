@@ -25,11 +25,11 @@
     },
     data () {
       return {
-        tabs: this.$store.state.Personas.activity[this.persona._id].tabs
+        tabs: this.$store.state.Store.activity[this.persona._id].tabs
       }
     },
     computed: mapState({
-      activity: state => state.Personas.activity
+      activity: state => state.Store.activity
     }),
     methods: {
       ...mapMutations([

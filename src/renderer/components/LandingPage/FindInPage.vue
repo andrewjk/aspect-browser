@@ -38,7 +38,7 @@
     },
     computed: {
       ...mapState({
-        activity: state => state.Personas.activity
+        activity: state => state.Store.activity
       })
     },
     methods: {

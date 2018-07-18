@@ -21,7 +21,7 @@
   export default {
     computed: {
       ...mapState({
-        bookmarkToEdit: state => state.Personas.bookmarkToEdit
+        bookmarkToEdit: state => state.Store.bookmarkToEdit
       }),
       // Computed properties for v-model binding
       title: {

@@ -5,7 +5,7 @@
         <fa icon="bars"/>
       </div>
       <div class="list">
-        <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActiveIndex(index)">
+        <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersonaIndex(index)">
           <div class="persona-info">
             <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(index) }">
               {{ item.shortName }}
@@ -49,9 +49,9 @@
 
   export default {
     computed: mapState({
-      personas: state => state.Personas.personas,
-      activity: state => state.Personas.activity,
-      settings: state => state.Personas.settings
+      personas: state => state.Store.personas,
+      activity: state => state.Store.activity,
+      settings: state => state.Store.settings
     }),
     data () {
       return {
@@ -64,7 +64,7 @@
     },
     methods: {
       ...mapMutations([
-        'setActiveIndex',
+        'setActivePersonaIndex',
         'addPersona',
         'editPersona',
         'editSettings'

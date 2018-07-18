@@ -13,10 +13,7 @@ const state = {
   bookmarkToEdit: null,
   showSettingsModal: false,
   settingsToUpdate: null,
-  settingsToEdit: null,
-  zoomLevel: 0,
-  showFindInPage: false,
-  focusFindInPage: false
+  settingsToEdit: null
 }
 
 const getters = {
@@ -55,7 +52,7 @@ const mutations = {
   setPersonas (state, personas) {
     state.personas = personas
   },
-  setActiveIndex (state, index) {
+  setActivePersonaIndex (state, index) {
     if (index < 0 || index >= state.personas.length) {
       return
     }
@@ -232,9 +229,6 @@ const mutations = {
       tabs.forEach(function (t, i) {
         t.isActive = (i === newIndex)
       })
-      // TODO:
-      // const box = document.getElementById('address-text-' + activePersona._id)
-      // box.focus()
     }
   },
   openInTab (state, data) {
@@ -340,7 +334,6 @@ const mutations = {
     })
   },
   closePersonaModal (state) {
-    // Close the modal
     state.personaToUpdate = null
     state.personaToEdit = null
     state.showPersonaModal = false
@@ -445,7 +438,6 @@ const mutations = {
     })
   },
   closeBookmarkModal (state) {
-    // Close the modal
     state.bookmarkToUpdate = null
     state.bookmarkToEdit = null
     state.showBookmarkModal = false
@@ -602,7 +594,6 @@ const mutations = {
     if (data.searchProvider !== undefined) settings.searchProvider = data.searchProvider
   },
   closeSettingsModal (state) {
-    // Close the modal
     state.settingsToUpdate = null
     state.settingsToEdit = null
     state.showSettingsModal = false
@@ -626,7 +617,7 @@ const actions = {
       commit('sortPersonas')
 
       // Ensure that the first persona is active
-      commit('setActiveIndex', 0)
+      commit('setActivePersonaIndex', 0)
 
       // Create a home tab for each persona
       dbPersonas.forEach(function (item, i) {
@@ -686,7 +677,7 @@ const actions = {
       })
     })
   },
-  commitPersonaEdit ({ commit }, data) {
+  savePersona ({ commit }, data) {
     const db = data.db
     const personaToUpdate = data.personaToUpdate
     const personaToEdit = data.personaToEdit
@@ -754,7 +745,7 @@ const actions = {
       }
     })
   },
-  commitBookmarkEdit ({ commit }, data) {
+  saveBookmark ({ commit }, data) {
     const db = data.db
     const persona = data.persona
     const bookmarkToUpdate = data.bookmarkToUpdate
@@ -822,7 +813,7 @@ const actions = {
       commit('setSettings', dbSettings)
     })
   },
-  commitSettingsEdit ({ commit }, data) {
+  saveSettings ({ commit }, data) {
     const db = data.db
     const settingsToUpdate = data.settingsToUpdate
     const settingsToEdit = data.settingsToEdit
