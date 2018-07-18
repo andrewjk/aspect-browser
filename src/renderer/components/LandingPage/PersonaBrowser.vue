@@ -2,16 +2,18 @@
   <div class="persona-browser-wrapper">
     <div class="persona-browser">
       <div v-for="(item, index) in personas" :key="item._id" class="persona" :style="{ zIndex: getZIndex(index) }">
-        <tab-list :persona="item" :activity="activity" class="persona-tab-list"></tab-list>
-        <address-bar :persona="item" :activity="activity" :settings="settings" class="persona-address-bar"></address-bar>
-        <tab-page-list :persona="item" :activity="activity" :show-welcome="personas.length === 1" class="persona-tab-page-list" @persona-edited="$emit('persona-edited', item)" @persona-deleted="$emit('persona-deleted', item)" @open-new-window="openNewWindow"></tab-page-list>
-        <find-in-page v-show="showFindInPage" :persona="item" :activity="activity" class="persona-find-in-page" @close-find-in-page="$emit('close-find-in-page')"></find-in-page>
+        <tab-list :persona="item" class="persona-tab-list"></tab-list>
+        <address-bar :persona="item" class="persona-address-bar"></address-bar>
+        <tab-page-list :persona="item" :show-welcome="personas.length === 1" class="persona-tab-page-list"></tab-page-list>
+        <find-in-page v-show="showFindInPage" :persona="item" class="persona-find-in-page" @close-find-in-page="$emit('close-find-in-page')"></find-in-page>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import { mapState, mapMutations } from 'vuex'
+
   import TabList from './TabList'
   import AddressBar from './AddressBar'
   import TabPageList from './TabPageList'
@@ -20,22 +22,20 @@
   export default {
     components: { TabList, AddressBar, TabPageList, FindInPage },
     props: {
-      personas: Array,
-      activity: null,
-      settings: null,
       showFindInPage: false
     },
+    computed: mapState({
+      personas: state => state.Personas.personas,
+      activity: state => state.Personas.activity,
+      settings: state => state.Personas.settings
+    }),
     methods: {
-      getActivePersona () {
-        return this.personas.find(function (item) {
-          return item.isActive
-        })
-      },
+      ...mapMutations([
+        'openInTab',
+        'getZIndex'
+      ]),
       getZIndex: function (index) {
         return this.personas[index].isActive ? 99 : -99
-      },
-      openNewWindow (url, background) {
-        this.$emit('open-new-window', url, background)
       }
     }
   }

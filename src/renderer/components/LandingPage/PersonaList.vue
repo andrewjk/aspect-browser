@@ -13,13 +13,13 @@
             <div class="persona-name">{{ item.name }}</div>
           </div>
           <div v-if="showEditPersonaLinks" class="persona-edit-buttons">
-            <button class="edit-persona-button" @click.stop="movePersonaUp(index)" title="Move this persona up">
+            <button class="edit-persona-button" @click.stop="movePersonaUpAndSave({ db: $pdb, personas, index })" title="Move this persona up">
               <fa icon="chevron-up"/>
             </button>
             <button class="edit-persona-button" @click.stop="editPersona(index)" title="Edit this persona">
               <fa icon="user-edit"/>
             </button>
-            <button class="edit-persona-button" @click.stop="movePersonaDown(index)" title="Move this persona down">
+            <button class="edit-persona-button" @click.stop="movePersonaDownAndSave({ db: $pdb, personas, index })" title="Move this persona down">
               <fa icon="chevron-down"/>
             </button>
           </div>
@@ -41,61 +41,18 @@
         <fa icon="user-edit"/>
       </button>
     </div>
-    <modal v-if="showAddPersonaModal" @close="showAddPersonaModal = false">
-      <h3 slot="header">Add Persona:</h3>
-      <persona-form slot="body" :persona="newPersona"></persona-form>
-      <div slot="footer" class="modal-button-footer">
-        <button @click="commitPersonaAdd">
-          Save
-        </button>
-        <button @click="cancelPersonaAdd">
-          Cancel
-        </button>
-      </div>
-    </modal>
-    <modal v-if="showEditPersonaModal" @close="showEditPersonaModal = false">
-      <h3 slot="header">Edit Persona:</h3>
-      <persona-form slot="body" :persona="newPersona"></persona-form>
-      <div slot="footer" class="modal-button-footer">
-        <a href="#" class="delete-link" @click="deletePersona">Delete persona</a>
-        <button @click="commitPersonaEdit">
-          Save
-        </button>
-        <button @click="cancelPersonaEdit">
-          Cancel
-        </button>
-      </div>
-    </modal>
-    <modal v-if="showEditSettingsModal" @close="showEditSettingsModal = false">
-      <h3 slot="header">Settings:</h3>
-      <settings-form slot="body" :settings="settings"></settings-form>
-      <div slot="footer" class="modal-button-footer">
-        <button @click="commitSettingsEdit">
-          Save
-        </button>
-        <button @click="cancelSettingsEdit">
-          Cancel
-        </button>
-      </div>
-    </modal>
   </div>
 </template>
 
 <script>
-  import Modal from './Modal'
-  import PersonaForm from './PersonaForm'
-  import SettingsForm from './SettingsForm'
-
-  // NOTE: V4 uses random numbers
-  import uuid from 'uuid/v4'
+  import { mapState, mapMutations, mapActions } from 'vuex'
 
   export default {
-    components: { Modal, PersonaForm, SettingsForm },
-    props: {
-      personas: Array,
-      activity: null,
-      settings: null
-    },
+    computed: mapState({
+      personas: state => state.Personas.personas,
+      activity: state => state.Personas.activity,
+      settings: state => state.Personas.settings
+    }),
     data () {
       return {
         showEditPersonaLinks: false,
@@ -106,34 +63,16 @@
       }
     },
     methods: {
-      setActiveIndex (index) {
-        if (this.showEditPersonaLinks) {
-          return
-        }
-        // TODO: Emit an event to be handled in LandingPage
-        const self = this
-        this.personas.forEach(function (item, i) {
-          if (item.isActive && i === index) {
-            // If it's already the active item, go to the home page
-            const tabs = self.activity[item._id].tabs
-            const activeTab = tabs.find(function (titem) {
-              return titem.isActive
-            })
-            if (activeTab) {
-              // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-              activeTab.backHistory.push({
-                url: activeTab.url,
-                title: activeTab.title
-              })
-              activeTab.forwardHistory = []
-              activeTab.url = null
-              activeTab.addressText = null
-              activeTab.title = 'Home'
-            }
-          }
-          item.isActive = (i === index)
-        })
-      },
+      ...mapMutations([
+        'setActiveIndex',
+        'addPersona',
+        'editPersona',
+        'editSettings'
+      ]),
+      ...mapActions([
+        'movePersonaUpAndSave',
+        'movePersonaDownAndSave'
+      ]),
       getBackgroundColor (index) {
         if (this.personas[index].isActive) {
           return this.personas[index].color
@@ -144,172 +83,6 @@
       },
       editPersonas () {
         this.showEditPersonaLinks = !this.showEditPersonaLinks
-      },
-      movePersonaUp (index) {
-        if (index === 0) {
-          return
-        }
-        // Swap this persona's order with the next persona's order
-        const thisOrder = this.personas[index].order
-        const prevOrder = this.personas[index - 1].order
-        this.personas[index].order = prevOrder
-        this.personas[index - 1].order = thisOrder
-        this.sanitizePersonaOrders()
-      },
-      movePersonaDown (index) {
-        if (index === this.personas.length - 1) {
-          return
-        }
-        // Swap this persona's order with the next persona's order
-        const thisOrder = this.personas[index].order
-        const nextOrder = this.personas[index + 1].order
-        this.personas[index].order = nextOrder
-        this.personas[index + 1].order = thisOrder
-        this.sanitizePersonaOrders()
-      },
-      sanitizePersonaOrders () {
-        // Sort the personas
-        this.sortPersonas()
-        // Renumber everything, just in case something funny has gone on
-        for (var i = 0; i < this.personas.length; i++) {
-          this.personas[i].order = i + 1
-        }
-        // Save the persona
-        this.savePersonas()
-      },
-      sortPersonas () {
-        this.personas.sort(function (a, b) {
-          if (a.order < b.order) {
-            return -1
-          } else if (a.order > b.order) {
-            return 1
-          } else {
-            return 0
-          }
-        })
-      },
-      addPersona () {
-        // TODO: Should I emit an event so that this gets done centrally in the landing page?
-        this.newPersona = {
-          _id: uuid(),
-          order: this.personas.length + 1,
-          isActive: true
-        }
-        this.showAddPersonaModal = true
-      },
-      commitPersonaAdd () {
-        // Save the persona to the database
-        const self = this
-        this.$pdb.insert(this.newPersona, function (err, dbPersona) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          // Do things further up the chain
-          self.$emit('persona-added', dbPersona)
-          // Close the modal
-          self.showAddPersonaModal = false
-        })
-      },
-      cancelPersonaAdd () {
-        //  Close the modal
-        this.showAddPersonaModal = false
-      },
-      editPersona (index) {
-        // Store the persona's details so they can be reset if the user presses the Cancel button
-        this.newPersona = this.personas[index]
-        this.oldPersona = {
-          name: this.newPersona.name,
-          shortName: this.newPersona.shortName,
-          color: this.newPersona.color
-        }
-        // Show the modal
-        this.showEditPersonaModal = true
-      },
-      commitPersonaEdit () {
-        // Save the persona to the database
-        const self = this
-        const persona = this.newPersona
-        this.$pdb.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          // Do things further up the chain
-          self.$emit('persona-edited', self.persona)
-          // Close the modal
-          self.oldPersona = null
-          self.newPersona = null
-          self.showEditPersonaModal = false
-        })
-      },
-      cancelPersonaEdit () {
-        // Reset the persona's details
-        this.newPersona.name = this.oldPersona.name
-        this.newPersona.shortName = this.oldPersona.shortName
-        this.newPersona.color = this.oldPersona.color
-        //  Close the modal
-        this.oldPersona = null
-        this.newPersona = null
-        this.showEditPersonaModal = false
-      },
-      savePersonas () {
-        const self = this
-        this.personas.forEach(function (persona) {
-          // Save the persona to the database
-          self.$pdb.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
-            if (err) {
-              alert('ERROR: ' + err)
-            }
-          })
-        })
-      },
-      deletePersona () {
-        if (confirm('Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.') && confirm('Are you really sure you want to delete this persona?')) {
-          // Remove the persona from the database
-          const self = this
-          const persona = this.newPersona
-          this.$pdb.remove({ _id: persona._id }, {}, function (err, numReplaced) {
-            if (err) {
-              alert('ERROR: ' + err)
-              return
-            }
-            // Do things further up the chain
-            self.$emit('persona-deleted', persona)
-            // Close the modal
-            self.oldPersona = null
-            self.newPersona = null
-            self.showEditPersonaModal = false
-          })
-        }
-      },
-      editSettings (index) {
-        // Store the settings's details so they can be reset if the user presses the Cancel button
-        this.oldSettings = {
-          searchProvider: this.settings.searchProvider
-        }
-        // Show the modal
-        this.showEditSettingsModal = true
-      },
-      commitSettingsEdit () {
-        // Save the settings to the database
-        const self = this
-        this.$sdb.update({ _id: this.settings._id }, this.settings, {}, function (err, numReplaced) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          // Close the modal
-          self.oldSettings = null
-          self.showEditSettingsModal = false
-        })
-      },
-      cancelSettingsEdit () {
-        // Reset the settings's details
-        this.settings.searchProvider = this.oldSettings.searchProvider
-        //  Close the modal
-        this.oldSettings = null
-        this.showEditSettingsModal = false
       }
     }
   }
@@ -357,11 +130,6 @@
     background-color: #555;
   }
 
-  .persona.editing:hover,
-  .persona.editing:focus {
-    background-color: inherit;
-  }
-
   .persona-icon {
     height: 60px;
     width: 60px;
@@ -407,25 +175,6 @@
   .edit-persona-button:hover,
   .edit-persona-button:focus {
     background-color: #777;
-  }
-
-  .modal-button-footer {
-    text-align: right;
-  }
-
-  .modal-button-footer button {
-    margin-left: 10px;
-    border: 1px solid #aaa;
-    border-radius: 10px;
-  }
-
-  .modal-button-footer button:hover,
-  .modal-button-footer button:focus {
-    background-color: #ddd;
-  }
-
-  .delete-link {
-    color: red;
   }
   
 </style>

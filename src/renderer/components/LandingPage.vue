@@ -1,77 +1,96 @@
 <template>
   <main>
     <div class="persona-list-container">
-      <persona-list :personas="personas" :activity="activity" :settings="settings" @persona-added="personaAdded" @persona-edited="personaEdited" @persona-deleted="personaDeleted"></persona-list>
+      <persona-list></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser :personas="personas" :activity="activity" :settings="settings" :showFindInPage="showFindInPage" :focusFindInPage="focusFindInPage" @open-new-window="openNewWindow" @close-find-in-page="closeFindInPage"></persona-browser>
+      <persona-browser :showFindInPage="showFindInPage" :focusFindInPage="focusFindInPage" @close-find-in-page="closeFindInPage"></persona-browser>
     </div>
+    <modal v-if="showPersonaModal">
+      <h3 slot="header">{{ personaToUpdate ? 'Edit Persona:' : 'Add Persona:' }}</h3>
+      <persona-form slot="body"></persona-form>
+      <div slot="footer" class="modal-button-footer">
+        <a v-show="personaToUpdate" href="#" class="delete-link" @click="deletePersona({ db: $pdb, personaToUpdate })">Delete persona</a>
+        <button @click="commitPersonaEdit({ db: $pdb, personaToEdit, personaToUpdate })">
+          Save
+        </button>
+        <button @click="closePersonaModal">
+          Cancel
+        </button>
+      </div>
+    </modal>
+    <modal v-if="showBookmarkModal">
+      <h3 slot="header">{{ bookmarkToUpdate ? 'Edit Bookmark:' : 'Add Bookmark:' }}</h3>
+      <bookmark-form slot="body"></bookmark-form>
+      <div slot="footer" class="modal-button-footer">
+        <a v-show="bookmarkToUpdate" href="#" class="delete-link" @click="deleteBookmark({ db: $pdb, persona: getActivePersona, bookmarkToUpdate })">Delete bookmark</a>
+        <button @click="commitBookmarkEdit({ db: $pdb, persona: getActivePersona, bookmarkToEdit, bookmarkToUpdate })">
+          Save
+        </button>
+        <button @click="closeBookmarkModal">
+          Cancel
+        </button>
+      </div>
+    </modal>
+    <modal v-if="showSettingsModal">
+      <h3 slot="header">Settings:</h3>
+      <settings-form slot="body"></settings-form>
+      <div slot="footer" class="modal-button-footer">
+        <button @click="commitSettingsEdit({ db: $sdb, settingsToEdit, settingsToUpdate })">
+          Save
+        </button>
+        <button @click="closeSettingsModal">
+          Cancel
+        </button>
+      </div>
+    </modal>
   </main>
 </template>
 
 <script>
+  import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+
   import PersonaList from './LandingPage/PersonaList'
   import PersonaBrowser from './LandingPage/PersonaBrowser'
-
-  // NOTE: V4 uses random numbers
-  import uuid from 'uuid/v4'
+  import Modal from './LandingPage/Modal'
+  import PersonaForm from './LandingPage/PersonaForm'
+  import BookmarkForm from './LandingPage/BookmarkForm'
+  import SettingsForm from './LandingPage/SettingsForm'
 
   export default {
     name: 'landing-page',
-    components: { PersonaList, PersonaBrowser },
+    components: { PersonaList, PersonaBrowser, Modal, PersonaForm, BookmarkForm, SettingsForm },
     data () {
       return {
-        personas: [],
-        activity: {},
-        settings: {},
         zoomLevel: 0,
         showFindInPage: false,
         focusFindInPage: false
       }
     },
+    computed: {
+      ...mapState({
+        personas: state => state.Personas.personas,
+        activity: state => state.Personas.activity,
+        settings: state => state.Personas.settings,
+        showPersonaModal: state => state.Personas.showPersonaModal,
+        personaToEdit: state => state.Personas.personaToEdit,
+        personaToUpdate: state => state.Personas.personaToUpdate,
+        showBookmarkModal: state => state.Personas.showBookmarkModal,
+        bookmarkToEdit: state => state.Personas.bookmarkToEdit,
+        bookmarkToUpdate: state => state.Personas.bookmarkToUpdate,
+        showSettingsModal: state => state.Personas.showSettingsModal,
+        settingsToEdit: state => state.Personas.settingsToEdit,
+        settingsToUpdate: state => state.Personas.settingsToUpdate
+      }),
+      ...mapGetters([
+        'getActivePersona',
+        'getActiveTab'
+      ])
+    },
     created: function () {
-      const self = this
-
-      // Load the personas from the database
-      this.$pdb.find({}).sort({ order: 1 }).exec(function (err, dbPersonas) {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
-        }
-
-        self.personas = dbPersonas
-
-        // HACK: The sort function doesn't seem to work?
-        self.sortPersonas()
-
-        // Ensure that the first persona is active and create the tabs for each persona
-        self.personas.forEach(function (item, i) {
-          item.isActive = (i === 0)
-          self.addHomeTab(item)
-        })
-
-        // If there are no personas, add a default one that the user can edit
-        if (!self.personas || !self.personas.length) {
-          self.createDefaultPersona()
-        }
-      })
-
+      this.loadPersonas(this.$pdb)
+      this.loadSettings(this.$sdb)
       // TODO: Load history from the database
-
-      // Load the settings from the database
-      this.$sdb.find({}).exec(function (err, dbSettings) {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
-        }
-
-        // Create default settings if nothing was loaded
-        if (dbSettings && dbSettings.length) {
-          self.settings = dbSettings[0]
-        } else {
-          self.createDefaultSettings()
-        }
-      })
     },
     mounted: function () {
       document.addEventListener('keydown', this.keyDown)
@@ -80,7 +99,7 @@
     updated: function () {
       if (this.focusFindInPage) {
         this.focusFindInPage = false
-        const activePersona = this.getActivePersona()
+        const activePersona = this.getActivePersona
         if (activePersona) {
           const box = document.getElementById('find-text-' + activePersona._id)
           box.focus()
@@ -88,138 +107,28 @@
       }
     },
     methods: {
-      setActiveIndex (index) {
-        if (index < 0 || index >= this.personas.length) {
-          return
-        }
-        this.personas.forEach(function (item, i) {
-          item.isActive = (i === index)
-        })
-      },
-      setActiveTabIndex (index) {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          if (index < 0 || index >= tabs.length) {
-            return
-          }
-          tabs.forEach(function (item, i) {
-            item.isActive = (i === index)
-          })
-          this.showFindInPage = false
-        }
-      },
-      getActivePersona () {
-        return this.personas.find(function (item) {
-          return item.isActive
-        })
-      },
-      getActivePersonaIndex () {
-        for (let i = 0; i < this.personas.length; i++) {
-          if (this.personas[i].isActive) {
-            return i
-          }
-        }
-      },
-      getActiveTab () {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          return tabs.find(function (item) {
-            return item.isActive
-          })
-        }
-      },
-      getActiveTabIndex () {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          for (let i = 0; i < tabs.length; i++) {
-            if (tabs[i].isActive) {
-              return i
-            }
-          }
-        }
-      },
-      sortPersonas () {
-        this.personas.sort(function (a, b) {
-          if (a.order < b.order) {
-            return -1
-          } else if (a.order > b.order) {
-            return 1
-          } else {
-            return 0
-          }
-        })
-      },
-      addHomeTab (persona) {
-        this.activity[persona._id] = {
-          tabs: [
-            {
-              _id: uuid(),
-              url: null,
-              addressText: null,
-              title: 'Home',
-              icon: null,
-              isActive: true,
-              isLoading: false,
-              backHistory: [],
-              forwardHistory: []
-            }
-          ]
-        }
-      },
-      personaAdded (persona) {
-        this.personas.push(persona)
-        this.addHomeTab(persona)
-        this.setActiveIndex(this.personas.length - 1)
-        this.sortPersonas()
-      },
-      personaEdited (persona) {
-        this.sortPersonas()
-      },
-      personaDeleted (persona) {
-        const index = this.personas.indexOf(persona)
-        this.personas.splice(index, 1)
-        if (!this.personas.length) {
-          this.createDefaultPersona()
-        }
-        this.setActiveIndex(Math.min(index, this.personas.length - 1))
-      },
-      createDefaultPersona () {
-        const defaultPersona = {
-          _id: uuid(),
-          name: 'Personal',
-          shortName: 'P',
-          color: '#009E49',
-          order: 1,
-          isActive: true,
-          bookmarks: []
-        }
-        const self = this
-        this.$pdb.insert(defaultPersona, function (err, dbPersona) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          self.personas = [ dbPersona ]
-          self.addHomeTab(dbPersona)
-        })
-      },
-      createDefaultSettings () {
-        const defaultSettings = {
-          _id: uuid(),
-          searchProvider: 'https://duckduckgo.com/?q={0}'
-        }
-        const self = this
-        this.$sdb.insert(defaultSettings, function (err, dbSettings) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          self.settings = dbSettings
-        })
-      },
+      ...mapMutations([
+        'setActiveIndex',
+        'setActiveTabIndex',
+        'previousPersona',
+        'nextPersona',
+        'previousTab',
+        'nextTab',
+        'openNewTab',
+        'closeTab',
+        'closePersonaModal',
+        'closeBookmarkModal',
+        'closeSettingsModal'
+      ]),
+      ...mapActions([
+        'loadPersonas',
+        'loadSettings',
+        'commitPersonaEdit',
+        'deletePersona',
+        'commitBookmarkEdit',
+        'deleteBookmark',
+        'commitSettingsEdit'
+      ]),
       keyDown (e) {
         // Have to listen for Ctrl + Tab in keyDown because it doesn't work in keyPress
         // console.log(e.keyCode)
@@ -237,7 +146,8 @@
               this.nextPersona()
             }
           } else if (e.keyCode >= 49 && e.keyCode <= 57) { // 1 - 9
-            this.setActiveTabIndex(e.keyCode - 49)
+            const newIndex = e.keyCode - 49
+            this.setActiveTabIndex(newIndex)
           } else if (e.keyCode === 45 || e.keyCode === 109 || e.keyCode === 189) { // Minus
             this.zoomOut()
           } else if (e.keyCode === 43 || e.keyCode === 61 || e.keyCode === 107 || e.keyCode === 187) { // Plus or equals
@@ -246,13 +156,14 @@
             this.zoomDefault()
           }
         } else if (e.altKey) {
-          if (e.keyCode >= 48 && e.keyCode <= 57) { // 0 - 9
-            this.setActiveIndex(e.keyCode - 49)
+          if (e.keyCode >= 48 && e.keyCode <= 57) { // 1 - 9
+            const newIndex = e.keyCode - 49
+            this.setActiveIndex(newIndex)
           }
         }
       },
       keyPress (e) {
-        console.log('keypress: ' + e.keyCode)
+        // console.log('keypress: ' + e.keyCode)
         if (e.ctrlKey || e.metaKey) {
           if (e.keyCode === 12) { // L
             this.focusAddressBox()
@@ -265,88 +176,8 @@
           }
         }
       },
-      nextPersona () {
-        const index = this.getActivePersonaIndex()
-        const newIndex = index < this.personas.length - 1 ? index + 1 : 0
-        this.setActiveIndex(newIndex)
-      },
-      previousPersona () {
-        const index = this.getActivePersonaIndex()
-        const newIndex = index > 0 ? index - 1 : this.personas.length - 1
-        this.setActiveIndex(newIndex)
-      },
-      nextTab () {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          const index = this.getActiveTabIndex()
-          const newIndex = index < tabs.length - 1 ? index + 1 : 0
-          this.setActiveTabIndex(newIndex)
-        }
-      },
-      previousTab () {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          const index = this.getActiveTabIndex()
-          const newIndex = index > 0 ? index - 1 : tabs.length - 1
-          this.setActiveTabIndex(newIndex)
-        }
-      },
-      closeTab () {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          const index = this.getActiveTabIndex()
-          tabs.splice(index, 1)
-          if (!tabs.length) {
-            this.addHomeTab(activePersona)
-          }
-          this.setActiveTabIndex(Math.min(index, tabs.length - 1))
-        }
-      },
-      openNewTab () {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          tabs.push({
-            _id: uuid(),
-            url: null,
-            addressText: null,
-            title: 'Home',
-            icon: null,
-            isActive: true,
-            isLoading: false,
-            backHistory: [],
-            forwardHistory: []
-          })
-          this.setActiveTabIndex(tabs.length - 1)
-          const box = document.getElementById('address-text-' + activePersona._id)
-          box.focus()
-        }
-      },
-      openNewWindow (url, background) {
-        const activePersona = this.getActivePersona()
-        if (activePersona) {
-          const tabs = this.activity[activePersona._id].tabs
-          tabs.push({
-            _id: uuid(),
-            url: url,
-            addressText: url,
-            title: url.replace(/http[s]*:\/\/[www.]*/, ''),
-            icon: null,
-            isActive: false,
-            isLoading: false,
-            backHistory: [],
-            forwardHistory: []
-          })
-          if (!background) {
-            this.setActiveTabIndex(tabs.length - 1)
-          }
-        }
-      },
       focusAddressBox () {
-        const activePersona = this.getActivePersona()
+        const activePersona = this.getActivePersona
         if (activePersona) {
           const box = document.getElementById('address-text-' + activePersona._id)
           box.focus()
@@ -356,7 +187,7 @@
         if (this.zoomLevel === 8) {
           return
         }
-        const activeTab = this.getActiveTab()
+        const activeTab = this.getActiveTab
         if (activeTab && activeTab.webview) {
           this.zoomLevel = this.zoomLevel + 1
           activeTab.webview.setZoomLevel(this.zoomLevel)
@@ -366,21 +197,21 @@
         if (this.zoomLevel === -8) {
           return
         }
-        const activeTab = this.getActiveTab()
+        const activeTab = this.getActiveTab
         if (activeTab && activeTab.webview) {
           this.zoomLevel = this.zoomLevel - 1
           activeTab.webview.setZoomLevel(this.zoomLevel)
         }
       },
       zoomDefault () {
-        const activeTab = this.getActiveTab()
+        const activeTab = this.getActiveTab
         if (activeTab && activeTab.webview) {
           this.zoomLevel = 0
           activeTab.webview.setZoomLevel(this.zoomLevel)
         }
       },
       findInPage () {
-        const activePersona = this.getActivePersona()
+        const activePersona = this.getActivePersona
         if (activePersona) {
           this.showFindInPage = true
           this.focusFindInPage = true
@@ -485,4 +316,23 @@
     width: 100vw;
   }
 
+  .modal-button-footer {
+    text-align: right;
+  }
+
+  .modal-button-footer button {
+    margin-left: 10px;
+    border: 1px solid #aaa;
+    border-radius: 10px;
+  }
+
+  .modal-button-footer button:hover,
+  .modal-button-footer button:focus {
+    background-color: #ddd;
+  }
+
+  .delete-link {
+    color: red;
+  }
+  
 </style>

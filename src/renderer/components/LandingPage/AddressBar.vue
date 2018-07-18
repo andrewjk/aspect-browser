@@ -1,197 +1,102 @@
 <template>
   <div class="address-bar-wrapper">
     <div class="address-bar">
-      <button :class="['address-button', canGoBack() ? '' : 'disabled']" :tabindex="canGoBack() ? '0' : '-1'" @click="goBack" :title="getBackHistory()">
+      <button :class="['address-button', canGoBack() ? '' : 'disabled']" :tabindex="canGoBack() ? '0' : '-1'" @click="goBack({ persona, tab: getActiveTab })" :title="getBackHistory()">
         <fa icon="arrow-left"/>
       </button>
-      <button :class="['address-button', canGoForward() ? '' : 'disabled']" :tabindex="canGoForward() ? '0' : '-1'" @click="goForward" :title="getForwardHistory()">
+      <button :class="['address-button', canGoForward() ? '' : 'disabled']" :tabindex="canGoForward() ? '0' : '-1'" @click="goForward({ persona, tab: getActiveTab })" :title="getForwardHistory()">
         <fa icon="arrow-right"/>
       </button>
-      <button class="address-button" @click="goHome" title="Open the home page for this persona">
+      <button class="address-button" @click="goHome(getActiveTab)" title="Open the home page for this persona">
         <fa icon="home"/>
       </button>
       <div class="address-input">
-        <input type="text" :id="'address-text-' + persona._id" v-model="activeTab.addressText" onfocus="this.select();" @keypress="keyPressed" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
+        <input type="text" :id="'address-text-' + persona._id" v-model="addressText" onfocus="this.select();" @keypress="keyPressed" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
       </div>
-      <button class="address-button" @click="addBookmark" title="Add the current page to this persona's bookmarks">
+      <button class="address-button" @click="addBookmark({ persona, url: getActiveTab.url, title: getActiveTab.title, icon: getActiveTab.icon })" title="Add the current page to this persona's bookmarks">
         <fa icon="star"/>
       </button>
-      <button v-if="activeTab.isLoading" class="address-button" @click="stopLoad" title = "Stop loading the current page">
+      <button v-if="getActiveTab.isLoading" class="address-button" @click="stopLoad" title = "Stop loading the current page">
         <fa icon="times"/>
       </button>
       <button v-else class="address-button" @click="reload" title = "Reload the current page">
         <fa icon="sync-alt"/>
       </button>
     </div>
-    <modal v-if="showBookmarkModal" @close="showBookmarkModal = false">
-      <h3 slot="header">Add Bookmark:</h3>
-      <bookmark-form slot="body" :bookmark="newBookmark"></bookmark-form>
-      <div slot="footer" class="modal-button-footer">
-        <button @click="commitBookmarkEdit">
-          Save
-        </button>
-        <button @click="cancelBookmarkEdit">
-          Cancel
-        </button>
-      </div>
-    </modal>
   </div>
 </template>
 
 <script>
-  import Modal from './Modal'
-  import BookmarkForm from './BookmarkForm'
-
-  // NOTE: V4 uses random numbers
-  import uuid from 'uuid/v4'
+  import { mapState, mapGetters, mapMutations } from 'vuex'
 
   export default {
-    components: { Modal, BookmarkForm },
     props: {
-      persona: null,
-      activity: null,
-      settings: null
-    },
-    data () {
-      return {
-        showBookmarkModal: false,
-        newBookmark: null
-      }
+      persona: null
     },
     computed: {
-      activeTab () {
-        const tabs = this.activity[this.persona._id].tabs
-        const activeTab = tabs.find(function (item) {
-          return item.isActive
-        })
-        return activeTab
+      ...mapState({
+        activity: state => state.Personas.activity,
+        settings: state => state.Personas.settings
+      }),
+      ...mapGetters([
+        'getActiveTab'
+      ]),
+      // Computed properties for v-model binding
+      addressText: {
+        get () {
+          return this.getActiveTab.addressText
+        },
+        set (value) {
+          this.setTabDetails({ persona: this.persona, tab: this.getActiveTab, addressText: value })
+        }
       }
     },
     methods: {
-      // TODO: These should probably all emit events so they can be handled centrally
+      ...mapMutations([
+        'setTabDetails',
+        'addBookmark',
+        'goBack',
+        'goForward',
+        'goToUrl',
+        'goHome'
+      ]),
       canGoBack () {
-        return this.activeTab.backHistory && this.activeTab.backHistory.length
-      },
-      goBack () {
-        if (this.activeTab.backHistory.length) {
-          // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-          this.activeTab.forwardHistory.push({
-            url: this.activeTab.url,
-            title: this.activeTab.title
-          })
-          this.activeTab.url = this.activeTab.backHistory.pop().url
-          this.activeTab.backHistoryNavigation = true
-        }
+        const tab = this.getActiveTab
+        return tab.backHistory && tab.backHistory.length
       },
       getBackHistory () {
-        return this.activeTab.backHistory ? this.activeTab.backHistory.map(function (item) { return item.url }).join('\n') : []
+        const tab = this.getActiveTab
+        return tab.backHistory ? tab.backHistory.map(function (item) { return item.title }).reverse().join('\n') : []
       },
       canGoForward () {
-        return this.activeTab.forwardHistory && this.activeTab.forwardHistory.length
-      },
-      goForward () {
-        if (this.activeTab.forwardHistory.length) {
-          // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-          if (!this.activeTab.forwardHistory) {
-            this.activeTab.forwardHistory = []
-          }
-          this.activeTab.backHistory.push({
-            url: this.activeTab.url,
-            title: this.activeTab.title
-          })
-          this.activeTab.url = this.activeTab.forwardHistory.pop().url
-          this.activeTab.backHistoryNavigation = true
-        }
+        const tab = this.getActiveTab
+        return tab.forwardHistory && tab.forwardHistory.length
       },
       getForwardHistory () {
-        return this.activeTab.forwardHistory ? this.activeTab.forwardHistory.map(function (item) { return item.url }).join('\n') : []
-      },
-      goHome () {
-        if (this.activeTab) {
-          // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-          if (!this.activeTab.backHistory) {
-            this.activeTab.backHistory = []
-          }
-          this.activeTab.backHistory.push({
-            url: this.activeTab.url,
-            title: this.activeTab.title
-          })
-          this.activeTab.forwardHistory = []
-          this.activeTab.url = null
-          this.activeTab.addressText = null
-          this.activeTab.title = 'Home'
-          this.activeTab.webview = null
-        }
+        const tab = this.getActiveTab
+        return tab.forwardHistory ? tab.forwardHistory.map(function (item) { return item.title }).join('\n') : []
       },
       keyPressed (e) {
         if (e.keyCode === 13) {
-          if (this.activeTab) {
-            let url = this.activeTab.addressText.trim()
-            if (!url) {
-              this.goHome()
-              return
-            }
-
-            if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
-              // If it has a dot and no spaces, treat it as a URL
-              // Might need to add http:// on the front there
-              if (!/http[s]*:\/\//.test(url)) {
-                url = 'https://' + url
-              }
-            } else {
-              // Search for whatever was typed in
-              url = this.settings.searchProvider.replace('{0}', url)
-            }
-            this.activeTab.addressText = url
-
-            if (this.activeTab.webview) {
-              this.activeTab.webview.loadURL(url)
-            } else {
-              this.activeTab.url = url
-            }
+          let tab = this.getActiveTab
+          let url = tab.addressText.trim()
+          if (url) {
+            this.goToUrl({ tab, url })
+          } else {
+            this.goHome(tab)
           }
         }
-      },
-      addBookmark () {
-        // TODO: Should I emit an event so that this gets done centrally in the landing page?
-        this.newBookmark = {
-          _id: uuid(),
-          url: this.activeTab.url,
-          title: this.activeTab.title,
-          icon: this.activeTab.icon,
-          order: this.persona.bookmarks.length + 1
-        }
-        this.showBookmarkModal = true
-      },
-      commitBookmarkEdit () {
-        // Add the bookmark to the persona
-        this.persona.bookmarks.push(this.newBookmark)
-
-        // Save the persona to the database
-        const self = this
-        this.$pdb.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          // Close the modal
-          self.newBookmark = null
-          self.showBookmarkModal = false
-        })
-      },
-      cancelBookmarkEdit () {
-        //  Close the modal
-        this.newBookmark = null
-        this.showBookmarkModal = false
       },
       stopLoad () {
-        if (this.activeTab.webview) {
-          this.activeTab.webview.stop()
+        const tab = this.getActiveTab
+        if (tab.webview) {
+          tab.webview.stop()
         }
       },
       reload () {
-        if (this.activeTab.webview) {
-          this.activeTab.webview.reload()
+        const tab = this.getActiveTab
+        if (tab.webview) {
+          tab.webview.reload()
         }
       }
     }
@@ -241,25 +146,6 @@
 
   .address-input > input {
     width: 100%;
-  }
-
-  .modal-button-footer {
-    text-align: right;
-  }
-
-  .modal-button-footer button {
-    margin-left: 10px;
-    border: 1px solid #aaa;
-    border-radius: 10px;
-  }
-
-  .modal-button-footer button:hover,
-  .modal-button-footer button:focus {
-    background-color: #ddd;
-  }
-
-  .delete-link {
-    color: red;
   }
 
 </style>

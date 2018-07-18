@@ -30,16 +30,16 @@
         <img class="bookmark-icon" :src="item.icon">
         <div class="bookmark-title">{{ item.title }}</div>
         <div v-show="showEditBookmarkLinks" class="edit-bookmark-links">
-          <button class="bookmark-edit-button" @click.stop="moveBookmarkUp(index)" title="Move this bookmark up">
+          <button class="bookmark-edit-button" @click.stop="moveBookmarkUpAndSave({ db: $pdb, persona, index })" title="Move this bookmark up">
             <fa icon="chevron-up"/>
           </button>
-          <button class="bookmark-edit-button" @click.stop="moveBookmarkDown(index)" title="Move this bookmark down">
+          <button class="bookmark-edit-button" @click.stop="moveBookmarkDownAndSave({ db: $pdb, persona, index })" title="Move this bookmark down">
             <fa icon="chevron-down"/>
           </button>
-          <button class="bookmark-edit-button" @click.stop="editBookmark(index)" title="Edit this bookmark">
+          <button class="bookmark-edit-button" @click.stop="editBookmark({ persona, index })" title="Edit this bookmark">
             <fa icon="edit"/>
           </button>
-          <button class="bookmark-edit-button delete-link" @click.stop="deleteBookmark(index)" title="Delete this bookmark">
+          <button class="bookmark-edit-button delete-link" @click.stop="deleteBookmark({ db: $pdb, persona, bookmarkToUpdate: item })" title="Delete this bookmark">
             <fa icon="trash"/>
           </button>
         </div>
@@ -52,31 +52,13 @@
         {{ showEditBookmarkLinks ? 'Done editing' : 'Edit bookmarks' }}
       </a>
     </div>
-    <modal v-if="showBookmarkModal" @close="showBookmarkModal = false">
-      <h3 slot="header">{{ newBookmark._id ? 'Edit Bookmark:' : 'Add Bookmark:' }} </h3>
-      <bookmark-form slot="body" :bookmark="newBookmark"></bookmark-form>
-      <div slot="footer" class="modal-button-footer">
-        <a href="#" class="delete-link" @click="deleteBookmark">Delete bookmark</a>
-        <button @click="commitBookmarkEdit">
-          Save
-        </button>
-        <button @click="cancelBookmarkEdit">
-          Cancel
-        </button>
-      </div>
-    </modal>
   </div>
 </template>
 
 <script>
-  import Modal from './Modal'
-  import BookmarkForm from './BookmarkForm'
-
-  // NOTE: V4 uses random numbers
-  import uuid from 'uuid/v4'
+  import { mapMutations, mapActions } from 'vuex'
 
   export default {
-    components: { Modal, BookmarkForm },
     props: {
       persona: null,
       tabs: Array,
@@ -84,22 +66,34 @@
     },
     data () {
       return {
-        showEditBookmarkLinks: false,
-        showBookmarkModal: false,
-        newBookmark: null
+        showEditBookmarkLinks: false
       }
     },
     mounted: function () {
-      this.sortBookmarks()
+      // Focus the address box when the home page has been mounted e.g. when a new tab has been opened
+      const box = document.getElementById('address-text-' + this.persona._id)
+      box.focus()
     },
     methods: {
+      ...mapMutations([
+        'setTabDetails',
+        'openInTab',
+        'addToHistory',
+        'editBookmark'
+      ]),
+      ...mapActions([
+        'moveBookmarkUpAndSave',
+        'moveBookmarkDownAndSave',
+        'deleteBookmark'
+      ]),
       openBookmark (bookmark, e) {
         if (this.showEditBookmarkLinks) {
           return
         }
+
         // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
         if (e.ctrlKey || e.which === 2 || e.which === 4) {
-          this.$emit('open-new-window', bookmark.url, true)
+          this.openInTab({ url: bookmark.url, background: true })
           return
         }
 
@@ -107,126 +101,11 @@
           return item.isActive
         })
 
-        // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-        if (!activeTab.backHistory) {
-          activeTab.backHistory = []
-        }
-        activeTab.backHistory.push({
-          url: null,
-          title: 'Home'
-        })
-        activeTab.forwardHistory = []
-        activeTab.backHistoryNavigation = true
-
-        activeTab.isLoading = true
-        activeTab.url = bookmark.url
+        this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: bookmark.url })
+        this.addToHistory({ tab: activeTab, url: null, title: 'Home' })
       },
       editBookmarks () {
         this.showEditBookmarkLinks = !this.showEditBookmarkLinks
-      },
-      moveBookmarkUp (index) {
-        if (index === 0) {
-          return
-        }
-        // Swap this bookmark's order with the next bookmark's order
-        const thisOrder = this.persona.bookmarks[index].order
-        const prevOrder = this.persona.bookmarks[index - 1].order
-        this.persona.bookmarks[index].order = prevOrder
-        this.persona.bookmarks[index - 1].order = thisOrder
-        this.sanitizeBookmarkOrders()
-      },
-      moveBookmarkDown (index) {
-        if (index === this.persona.bookmarks.length - 1) {
-          return
-        }
-        // Swap this bookmark's order with the next bookmark's order
-        const thisOrder = this.persona.bookmarks[index].order
-        const nextOrder = this.persona.bookmarks[index + 1].order
-        this.persona.bookmarks[index].order = nextOrder
-        this.persona.bookmarks[index + 1].order = thisOrder
-        this.sanitizeBookmarkOrders()
-      },
-      sanitizeBookmarkOrders () {
-        // Sort the bookmarks
-        this.sortBookmarks()
-        // Renumber everything, just in case something funny has gone on
-        for (var i = 0; i < this.persona.bookmarks.length; i++) {
-          this.persona.bookmarks[i].order = i + 1
-        }
-        // Save the persona
-        this.savePersona()
-      },
-      deleteBookmark (index) {
-        if (confirm('Are you sure you want to delete this bookmark?') && confirm('Are you really sure you want to delete this bookmark?')) {
-          // Remove the bookmark from the persona
-          this.persona.bookmarks.splice(index, 1)
-
-          // Save the persona to the database
-          this.$pdb.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
-            if (err) {
-              alert('ERROR: ' + err)
-            }
-          })
-        }
-      },
-      editBookmark (index) {
-        const bookmark = this.persona.bookmarks[index]
-        this.newBookmark = {
-          _id: bookmark._id,
-          url: bookmark.url,
-          title: bookmark.title,
-          icon: bookmark.icon,
-          order: bookmark.order
-        }
-        // Show the modal
-        this.showBookmarkModal = true
-      },
-      commitBookmarkEdit () {
-        if (this.newBookmark._id) {
-          // Update the bookmark's details
-          const self = this
-          const bookmark = this.persona.bookmarks.find(function (item) {
-            return item._id === self.newBookmark._id
-          })
-          bookmark.url = this.newBookmark.url
-          bookmark.title = this.newBookmark.title
-          bookmark.icon = this.newBookmark.icon
-          bookmark.order = this.newBookmark.order
-        } else {
-          // Add the bookmark to the persona
-          this.newBookmark._id = uuid()
-          this.persona.bookmarks.push(this.newBookmark)
-        }
-        this.savePersona()
-      },
-      cancelBookmarkEdit () {
-        // Close the modal
-        this.showBookmarkModal = false
-      },
-      sortBookmarks () {
-        this.persona.bookmarks.sort(function (a, b) {
-          if (a.order < b.order) {
-            return -1
-          } else if (a.order > b.order) {
-            return 1
-          } else {
-            return 0
-          }
-        })
-      },
-      savePersona () {
-        // Save the persona to the database
-        const self = this
-        this.$pdb.update({ _id: this.persona._id }, this.persona, {}, function (err, numReplaced) {
-          if (err) {
-            alert('ERROR: ' + err)
-            return
-          }
-          // Sort bookmarks
-          self.sortBookmarks()
-          // Close the modal
-          self.showBookmarkModal = false
-        })
       }
     }
   }
@@ -313,25 +192,6 @@
   .bookmark-edit-button:hover,
   .bookmark-edit-button:focus {
     background-color: #ddd;
-  }
-
-  .modal-button-footer {
-    text-align: right;
-  }
-
-  .modal-button-footer button {
-    margin-left: 10px;
-    border: 1px solid #aaa;
-    border-radius: 10px;
-  }
-
-  .modal-button-footer button:hover,
-  .modal-button-footer button:focus {
-    background-color: #ddd;
-  }
-
-  .delete-link {
-    color: red;
   }
 
 </style>

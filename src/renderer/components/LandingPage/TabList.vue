@@ -6,7 +6,7 @@
       </button>
     </button>
     <div :id="'tab-list-' + persona._id" class="tab-list" :style="{ maxWidth: maxTabListWidth }">
-      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveIndex(index)" @click.middle="closeTab(index)" :title="item.title">
+      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveTabIndex(index)" @click.middle="closeTab(index)" :title="item.title">
         <template v-if="!item.url">
           <fa icon="home" class="tab-icon"/>
         </template>
@@ -40,24 +40,26 @@
 </template>
 
 <script>
-  import WindowButtons from './WindowButtons'
+  import { mapState, mapMutations } from 'vuex'
 
-  import uuid from 'uuid/v4'
+  import WindowButtons from './WindowButtons'
 
   export default {
     components: { WindowButtons },
     props: {
-      persona: null,
-      activity: null
+      persona: null
     },
     data () {
       return {
         canScrollLeft: true,
         canScrollRight: false,
-        tabs: this.activity[this.persona._id].tabs
+        tabs: this.$store.state.Personas.activity[this.persona._id].tabs
       }
     },
     computed: {
+      ...mapState({
+        activity: state => state.Personas.activity
+      }),
       showTabNavigation () {
         if (this.tabs.length > 1) {
           const el = document.getElementById('tab-list-' + this.persona._id)
@@ -85,55 +87,15 @@
       }
     },
     methods: {
+      ...mapMutations([
+        'setActiveTabIndex',
+        'openInTab',
+        'closeTab'
+      ]),
       getActiveTab () {
         return this.tabs.find(function (item) {
           return item.isActive
         })
-      },
-      // TODO: Emit these up the heirarchy
-      setActiveIndex (index) {
-        this.tabs.forEach(function (item, i) {
-          item.isActive = (i === index)
-          // When changing the active tab, set the addresstext back to the url so that it's not confusing when it's returned to
-          item.addressText = item.url
-        })
-      },
-      closeTab (index) {
-        const isActiveTab = this.tabs[index].isActive
-        this.tabs.splice(index, 1)
-        if (!this.tabs.length) {
-          this.tabs.push({
-            _id: uuid(),
-            url: null,
-            addressText: null,
-            title: 'Home',
-            icon: null,
-            isActive: true,
-            isLoading: false,
-            backHistory: [],
-            forwardHistory: []
-          })
-        }
-        if (isActiveTab) {
-          this.setActiveIndex(Math.min(index, this.tabs.length - 1))
-        }
-      },
-      openNewTab () {
-        this.tabs.push({
-          _id: uuid(),
-          url: null,
-          addressText: null,
-          title: 'New tab',
-          icon: null,
-          isActive: true,
-          isLoading: false,
-          backHistory: [],
-          forwardHistory: []
-        })
-        this.setActiveIndex(this.tabs.length - 1)
-        const box = document.getElementById('address-text-' + this.persona._id)
-        box.focus()
-        box.select()
       },
       scrollTabsLeft () {
         const el = document.getElementById('tab-list-' + this.persona._id)

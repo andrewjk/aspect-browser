@@ -6,12 +6,14 @@
 </template>
 
 <script>
+  import { mapMutations } from 'vuex'
+
   import path from 'path'
 
   export default {
     props: {
-      tab: null,
-      partition: ''
+      persona: null,
+      tab: null
     },
     data () {
       return {
@@ -27,13 +29,11 @@
     mounted: function () {
       const webview = document.getElementById(this.tab._id)
 
-      this.tab.webview = webview
+      this.setTabDetails({ persona: this.persona, tab: this.tab, webview })
 
       // Focus the webview when the tab page has been mounted e.g. after a bookmark has been clicked
       // or the user types something in the address bar in the home page
       webview.focus()
-
-      // TODO: Should probably use did-navigate and did-navigate-in-page for history?
 
       // Listen to webview events
       webview.addEventListener('did-start-loading', this.loadStarted)
@@ -63,46 +63,35 @@
       }
     },
     methods: {
+      ...mapMutations([
+        'setTabDetails',
+        'openInTab',
+        'addToHistory'
+      ]),
       getPartition () {
-        return 'persist:' + this.partition
+        return 'persist:' + this.persona._id
       },
       loadStarted () {
         console.log('load started')
-        this.tab.isLoading = true
+        this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: true })
       },
       loadCommitted () {
         console.log('load committed')
-
         const url = this.tab.webview.getURL()
         const title = this.tab.webview.getTitle()
-
-        this.tab.url = url
-        this.tab.addressText = url
-        this.tab.title = title
+        this.setTabDetails({ persona: this.persona, tab: this.tab, url, addressText: url, title })
       },
       loadFinished () {
         console.log('load finished: ' + this.tab.webview.getURL())
-
-        // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-        if (!this.tab.backHistoryNavigation) {
-          this.tab.backHistory.push({
-            url: this.tab.url,
-            title: this.tab.title
-          })
-          this.tab.forwardHistory = []
-        }
-        this.tab.backHistoryNavigation = false
-
-        this.tab.isLoading = false
+        this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: false })
       },
       loadFailed () {
         console.log('load failed: ' + this.tab.webview.getURL())
-
         // TODO: What should I actually be doing here?
-        this.tab.isLoading = false
+        this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: false })
       },
       pageTitleUpdated (e) {
-        this.tab.title = e.title
+        this.setTabDetails({ persona: this.persona, tab: this.tab, title: e.title })
       },
       pageIconUpdated (e) {
         if (e.favicons.length) {
@@ -115,7 +104,7 @@
           if (!icon) {
             icon = e.favicons[0]
           }
-          this.tab.icon = icon
+          this.setTabDetails({ persona: this.persona, tab: this.tab, icon })
         }
       },
       targetUrlUpdated (e) {
@@ -123,16 +112,19 @@
       },
       willNavigate () {
         // TODO:
+        console.log('will navigate')
+        this.addToHistory({ tab: this.tab, url: this.tab.url, title: this.tab.title })
       },
       didNavigate () {
         // TODO:
+        console.log('did navigate')
       },
       didNavigateInPage () {
         // TODO:
+        console.log('did navigate in page')
       },
       newWindow (e) {
-        // Do things further up the chain
-        this.$emit('open-new-window', e.url, e.disposition === 'background-tab')
+        this.openInTab({ url: e.url, background: e.disposition === 'background-tab' })
       }
     }
   }

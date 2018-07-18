@@ -13,7 +13,7 @@
       <div class="find-result">
         <span>{{ matchNumber }} of {{ matchCount }} matches</span>
       </div>
-      <button class="find-button" @click="close" title="Close the find bar">
+      <button class="find-button" @click="closeFind" title="Close the find bar">
         <fa icon="times"/>
       </button>
     </div>
@@ -21,10 +21,11 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
+
   export default {
     props: {
-      persona: null,
-      activity: null
+      persona: null
     },
     data () {
       return {
@@ -35,7 +36,10 @@
         matchCount: 0
       }
     },
-    mounted: function () {
+    computed: {
+      ...mapState({
+        activity: state => state.Personas.activity
+      })
     },
     methods: {
       getActiveWebview () {
@@ -76,7 +80,7 @@
           }
         }
       },
-      close () {
+      closeFind () {
         if (this.activeWebview) {
           this.activeWebview.stopFindInPage('keepSelection')
           this.activeWebview.focus()

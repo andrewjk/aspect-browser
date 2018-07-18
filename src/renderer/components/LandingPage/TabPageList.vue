@@ -2,16 +2,18 @@
   <div class="tab-page-list-wrapper">
       <div v-for="(item, index) in tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
         <template v-if="!item.url">
-          <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome" @persona-edited="$emit('persona-edited', persona)" @persona-deleted="$emit('persona-deleted', persona)" @open-new-window="openNewWindow"></home-page>
+          <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome"></home-page>
         </template>
         <template v-else>
-          <tab-page :tab="item" :partition="persona._id" @open-new-window="openNewWindow"></tab-page>
+          <tab-page :persona="persona" :tab="item"></tab-page>
         </template>
       </div>
   </div>
 </template>
 
 <script>
+  import { mapState, mapMutations } from 'vuex'
+
   import HomePage from './HomePage'
   import TabPage from './TabPage'
 
@@ -19,20 +21,22 @@
     components: { HomePage, TabPage },
     props: {
       persona: null,
-      activity: null,
       showWelcome: false
     },
     data () {
       return {
-        tabs: this.activity[this.persona._id].tabs
+        tabs: this.$store.state.Personas.activity[this.persona._id].tabs
       }
     },
+    computed: mapState({
+      activity: state => state.Personas.activity
+    }),
     methods: {
+      ...mapMutations([
+        'openInTab'
+      ]),
       getZIndex: function (index) {
         return this.tabs[index].isActive ? 99 : -99
-      },
-      openNewWindow (url, background) {
-        this.$emit('open-new-window', url, background)
       }
     }
   }
