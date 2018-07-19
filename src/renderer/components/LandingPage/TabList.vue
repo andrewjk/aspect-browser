@@ -89,7 +89,6 @@
     methods: {
       ...mapMutations([
         'setActiveTabIndex',
-        'openInTab',
         'closeTab'
       ]),
       getActiveTab () {

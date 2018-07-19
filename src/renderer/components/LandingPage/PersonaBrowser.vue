@@ -31,7 +31,6 @@
     }),
     methods: {
       ...mapMutations([
-        'openInTab',
         'getZIndex'
       ]),
       getZIndex: function (index) {

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapState } from 'vuex'
 
   import HomePage from './HomePage'
   import TabPage from './TabPage'
@@ -32,9 +32,6 @@
       activity: state => state.Store.activity
     }),
     methods: {
-      ...mapMutations([
-        'openInTab'
-      ]),
       getZIndex: function (index) {
         return this.tabs[index].isActive ? 99 : -99
       }

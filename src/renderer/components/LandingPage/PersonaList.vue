@@ -5,7 +5,7 @@
         <fa icon="bars"/>
       </div>
       <div class="list">
-        <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersonaIndex(index)">
+        <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersonaIndexClick(index)">
           <div class="persona-info">
             <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(index) }">
               {{ item.shortName }}
@@ -25,7 +25,7 @@
           </div>
         </button>
       </div>
-      <button v-if="!showEditPersonaLinks" class="persona-button" @click="search" title="Search personas and bookmarks">
+      <button v-if="!showEditPersonaLinks" class="persona-button" @click="findBookmark" title="Search for a bookmark">
         <fa icon="search"/>
       </button>
       <button v-if="!showEditPersonaLinks" class="persona-button" @click="editSettings" title="Edit application settings">
@@ -45,13 +45,16 @@
 </template>
 
 <script>
-  import { mapState, mapMutations, mapActions } from 'vuex'
+  import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
   export default {
     computed: mapState({
       personas: state => state.Store.personas,
       activity: state => state.Store.activity,
-      settings: state => state.Store.settings
+      settings: state => state.Store.settings,
+      ...mapGetters([
+        'getActiveTab'
+      ])
     }),
     data () {
       return {
@@ -65,6 +68,7 @@
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
+        'goHome',
         'addPersona',
         'editPersona',
         'editSettings'
@@ -78,8 +82,16 @@
           return this.personas[index].color
         }
       },
-      search () {
-        // TODO:
+      setActivePersonaIndexClick (index) {
+        if (this.personas[index].isActive) {
+          const activeTab = this.getActiveTab
+          this.goHome(activeTab)
+        } else {
+          this.setActivePersonaIndex(index)
+        }
+      },
+      findBookmark () {
+        this.$emit('show-find-bookmark')
       },
       editPersonas () {
         this.showEditPersonaLinks = !this.showEditPersonaLinks

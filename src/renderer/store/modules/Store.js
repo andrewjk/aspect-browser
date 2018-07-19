@@ -57,24 +57,6 @@ const mutations = {
       return
     }
     state.personas.forEach(function (p, i) {
-      if (p.isActive && i === index && state.activity[p._id]) {
-        // If it's already the active item, go to the home page
-        const tabs = state.activity[p._id].tabs
-        const activeTab = tabs.find(function (t) {
-          return t.isActive
-        })
-        if (activeTab) {
-          // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
-          activeTab.backHistory.push({
-            url: activeTab.url,
-            title: activeTab.title
-          })
-          activeTab.forwardHistory = []
-          activeTab.url = null
-          activeTab.addressText = null
-          activeTab.title = 'Home'
-        }
-      }
       p.isActive = (i === index)
     })
   },

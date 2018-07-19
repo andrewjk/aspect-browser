@@ -1,7 +1,7 @@
 <template>
   <main>
     <div class="persona-list-container">
-      <persona-list></persona-list>
+      <persona-list @show-find-bookmark="showFindBookmarkModal"></persona-list>
     </div>
     <div class="persona-browser-container">
       <persona-browser :showFindInPage="showFindInPage" :focusFindInPage="focusFindInPage" @close-find-in-page="closeFindInPage"></persona-browser>
@@ -44,6 +44,15 @@
         </button>
       </div>
     </modal>
+    <modal v-if="showFindBookmark">
+      <h3 slot="header">Search:</h3>
+      <find-bookmark slot="body" @close-find-bookmark="closeFindBookmarkModal"></find-bookmark>
+      <div slot="footer" class="modal-button-footer">
+        <button @click="closeFindBookmarkModal">
+          Cancel
+        </button>
+      </div>
+    </modal>
   </main>
 </template>
 
@@ -56,13 +65,16 @@
   import PersonaForm from './LandingPage/PersonaForm'
   import BookmarkForm from './LandingPage/BookmarkForm'
   import SettingsForm from './LandingPage/SettingsForm'
+  import FindBookmark from './LandingPage/FindBookmark'
 
   export default {
     name: 'landing-page',
-    components: { PersonaList, PersonaBrowser, Modal, PersonaForm, BookmarkForm, SettingsForm },
+    components: { PersonaList, PersonaBrowser, Modal, PersonaForm, BookmarkForm, SettingsForm, FindBookmark },
     data () {
       return {
         zoomLevel: 0,
+        showFindBookmark: false,
+        focusFindBookmark: false,
         showFindInPage: false,
         focusFindInPage: false
       }
@@ -97,13 +109,13 @@
       document.addEventListener('keypress', this.keyPress)
     },
     updated: function () {
+      if (this.focusFindBookmark) {
+        this.focusFindBookmark = false
+        this.focusFindBookmarkBox()
+      }
       if (this.focusFindInPage) {
         this.focusFindInPage = false
-        const activePersona = this.getActivePersona
-        if (activePersona) {
-          const box = document.getElementById('find-text-' + activePersona._id)
-          box.focus()
-        }
+        this.focusFindInPageBox()
       }
     },
     methods: {
@@ -130,7 +142,7 @@
         'saveSettings'
       ]),
       keyDown (e) {
-        // Have to listen for Ctrl + Tab in keyDown because it doesn't work in keyPress
+        // Have to listen for Ctrl + Tab and some others in keyDown because they don't work in keyPress
         // console.log(e.keyCode)
         if (e.ctrlKey || e.metaKey) {
           if (e.keyCode === 9) { // Tab
@@ -154,6 +166,8 @@
             this.zoomIn()
           } else if (e.keyCode === 48) { // Zero
             this.zoomDefault()
+          } else if (e.keyCode === 190) { // .
+            this.showFindBookmarkModal()
           }
         } else if (e.altKey) {
           if (e.keyCode >= 48 && e.keyCode <= 57) { // 1 - 9
@@ -183,6 +197,17 @@
           box.focus()
         }
       },
+      focusFindBookmarkBox () {
+        const box = document.getElementById('find-bookmark-text')
+        box.focus()
+      },
+      focusFindInPageBox () {
+        const activePersona = this.getActivePersona
+        if (activePersona) {
+          const box = document.getElementById('find-text-' + activePersona._id)
+          box.focus()
+        }
+      },
       zoomIn () {
         if (this.zoomLevel === 8) {
           return
@@ -209,6 +234,13 @@
           this.zoomLevel = 0
           activeTab.webview.setZoomLevel(this.zoomLevel)
         }
+      },
+      showFindBookmarkModal () {
+        this.showFindBookmark = true
+        this.focusFindBookmark = true
+      },
+      closeFindBookmarkModal () {
+        this.showFindBookmark = false
       },
       findInPage () {
         const activePersona = this.getActivePersona
