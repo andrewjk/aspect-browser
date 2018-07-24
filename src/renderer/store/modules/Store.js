@@ -157,17 +157,18 @@ const mutations = {
       })
     }
   },
-  closeTab (state) {
+  closeTab (state, index) {
     const activePersona = state.personas.find(function (p) {
       return p.isActive
     })
     if (activePersona) {
       const tabs = state.activity[activePersona._id].tabs
-      let index
-      for (let i = 0; i < tabs.length; i++) {
-        if (tabs[i].isActive) {
-          index = i
-          break
+      if (index === undefined) {
+        for (let i = 0; i < tabs.length; i++) {
+          if (tabs[i].isActive) {
+            index = i
+            break
+          }
         }
       }
       tabs.splice(index, 1)

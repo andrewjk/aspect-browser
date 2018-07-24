@@ -89,7 +89,8 @@
     methods: {
       ...mapMutations([
         'setActiveTabIndex',
-        'closeTab'
+        'closeTab',
+        'openNewTab'
       ]),
       getActiveTab () {
         return this.tabs.find(function (item) {
