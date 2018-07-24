@@ -1,5 +1,5 @@
 {
-  "name": "browser",
+  "name": "aspect-browser",
   "version": "0.0.1",
   "author": "Andrew K <andrewjk@gmail.com>",
   "description": "A multi-persona web browser",
@@ -22,8 +22,8 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "browser",
-    "appId": "org.simulatedgreg.electron-vue",
+    "productName": "Aspect",
+    "appId": "org.aptiqa.aspect-browser",
     "directories": {
       "output": "build"
     },

@@ -22,9 +22,9 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     titleBarStyle: 'hidden',
     frame: false,
-    height: 563,
+    height: 800,
     useContentSize: true,
-    width: 1000
+    width: 1200
   })
 
   mainWindow.setMenu(null)
@@ -35,6 +35,8 @@ function createWindow () {
     mainWindow = null
   })
 }
+
+console.log(app.getPath('userData'))
 
 app.on('ready', createWindow)
 

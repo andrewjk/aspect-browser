@@ -617,7 +617,7 @@ const actions = {
       _id: uuid(),
       name: 'Personal',
       shortName: 'P',
-      color: '#009E49',
+      color: '#25B76D',
       order: 1,
       isActive: true,
       bookmarks: []

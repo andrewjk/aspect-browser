@@ -1,6 +1,6 @@
 <div style="text-align: center">
 
-# browser
+# aspect
 
 A multi-persona web browser
 
@@ -12,18 +12,18 @@ A multi-persona web browser
 
 ## About
 
-The browser allows you to setup multiple personas, each containing their own bookmarks, logins, history and tabs.
+Aspect allows you to setup multiple personas, each containing their own bookmarks, logins, history and tabs.
 
 You might want to set up a persona for your personal browsing and one for your work browsing, to avoid having to log in and out of email and social media accounts. You might want to set up a persona for each client if you manage the same accounts for multiple customers. You might want to set up a persona for Facebook or Google to keep them from knowing too much about your browsing habits.
 
-The browser is built on the Electron platform for Windows, Mac and Linux.
+Aspect is built on the Electron platform for Windows, Mac and Linux.
 
 ## Features
 
 * Setup multiple personas with their own bookmarks, logins, history and tabs
 * Add bookmarks to the home page of each persona for quick access
-* Tabbed browsing makes it easy to keep your browsing history within the same persona
-* Use keyboard shortcuts to switch between personas and tabs, or quickly search
+* Tabbed browsing makes it easy to keep your browsing confined to the one persona
+* Use keyboard shortcuts and search to switch between personas and tabs
 
 ## Build Setup
 
@@ -47,7 +47,7 @@ npm run lint
 
 ## License
 
-The browser is licensed under the [MIT License](LICENSE.md).
+This project is licensed under the [MIT License](LICENSE.md).
 
 ## Built With
 

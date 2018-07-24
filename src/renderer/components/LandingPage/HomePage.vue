@@ -3,12 +3,12 @@
     <div class="title">{{ persona.name }} Home</div>
     <div class="welcome" v-if="showWelcome">
       <p>
-        Welcome to this browser.
+        Welcome to the Aspect web browser.
       </p>
       <p>
         Your personas are listed along the left column. Each persona has its own set of bookmarks and
         login info. This means that you can access the same sites (or completely different sites!) with
-        different logins without leaving this browser.
+        different logins without leaving the browser.
       </p>
       <p>
         A default, empty persona called "Personal" has been setup for you. You can store your personal

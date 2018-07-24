@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'browser'
+    name: 'Aspect'
   }
 </script>
 
