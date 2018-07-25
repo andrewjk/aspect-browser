@@ -2,7 +2,7 @@
   <div class="persona-list-wrapper">
     <div :class="['persona-list', showEditPersonaLinks ? 'editing' : '']">
       <div class="drag-indicator">
-        <fa icon="bars"/>
+        <fa v-if="platform !== 'darwin'" icon="bars"/>
       </div>
       <div class="list">
         <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersonaIndexClick(index)">
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+  import os from 'os'
   import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
   export default {
@@ -58,6 +59,7 @@
     }),
     data () {
       return {
+        platform: os.platform(),
         showEditPersonaLinks: false,
         showEditPersonaModal: false,
         showAddPersonaModal: false,

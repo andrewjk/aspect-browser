@@ -1,21 +1,25 @@
 <template>
   <div class="window-buttons-wrapper">
-    <button v-show="canMinimize && showMinimize" class="window-button" @click="minimize">
+    <button v-show="canMinimize && showMinimize && platform !== 'darwin'" class="window-button" @click="minimize">
       <fa :icon="['far', 'window-minimize']"/>
     </button>
-    <button v-show="canMaximize && showMaximize" class="window-button" @click="maximize">
+    <button v-show="canMaximize && showMaximize && platform !== 'darwin'" class="window-button" @click="maximize">
       <fa :icon="['far', 'window-maximize']"/>
     </button>
-    <button v-show="showRestore" class="window-button" @click="restore">
+    <button v-show="showRestore && platform !== 'darwin'" class="window-button" @click="restore">
       <fa :icon="['far', 'window-restore']"/>
     </button>
-    <button v-show="showClose" class="window-button close" @click="close">
+    <button v-show="showClose && platform !== 'darwin'" class="window-button close" @click="close">
       <fa :icon="['far', 'window-close']"/>
+    </button>
+    <button v-show="platform === 'darwin'" class="window-button drag">
+      <fa icon="bars"/>
     </button>
   </div>
 </template>
 
 <script>
+  import os from 'os'
   import electron from 'electron'
 
   const window = electron.remote.getCurrentWindow()
@@ -23,6 +27,7 @@
   export default {
     data () {
       return {
+        platform: os.platform(),
         showMinimize: true,
         showMaximize: !window.isMaximized(),
         showRestore: window.isMaximized(),
@@ -81,6 +86,10 @@
 
   .window-button.close:hover {
     background-color: #e81123;
+  }
+
+  .window-button.drag {
+    -webkit-app-region: drag;
   }
 
 </style>
