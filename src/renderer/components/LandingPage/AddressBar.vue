@@ -22,21 +22,35 @@
       <button v-else class="address-button" @click="reload" title = "Reload the current page">
         <fa icon="sync-alt"/>
       </button>
+      <button v-if="updateExists" class="address-button" @click="getUpdate" title = "There is an updated version available">
+        <fa icon="external-link-alt"/>
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-  import { mapState, mapGetters, mapMutations } from 'vuex'
+  import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+  import octokitrest from '@octokit/rest'
+  import { remote, shell } from 'electron'
+  import semver from 'semver'
+
+  const octokit = octokitrest()
 
   export default {
     props: {
       persona: null
     },
+    data () {
+      return {
+        updateExists: false,
+        updateUrl: ''
+      }
+    },
     computed: {
       ...mapState({
         activity: state => state.Store.activity,
-        settings: state => state.Store.settings
+        systemSettings: state => state.Store.systemSettings
       }),
       ...mapGetters([
         'getActiveTab'
@@ -51,6 +65,12 @@
         }
       }
     },
+    mounted: function () {
+      this.checkUpdate()
+    },
+    beforeUpdate: function () {
+      this.checkUpdate()
+    },
     methods: {
       ...mapMutations([
         'setTabDetails',
@@ -58,7 +78,11 @@
         'goBack',
         'goForward',
         'goToUrl',
-        'goHome'
+        'goHome',
+        'setUpdateChecked'
+      ]),
+      ...mapActions([
+        'saveSystemSettings'
       ]),
       canGoBack () {
         const tab = this.getActiveTab
@@ -98,6 +122,41 @@
         if (tab.webview) {
           tab.webview.reload()
         }
+      },
+      checkUpdate () {
+        const updateChecked = this.systemSettings.updateChecked
+        const now = new Date()
+        const timeToCheck = 60 * 60 * 1000 // Check once an hour
+        if (!updateChecked || now.getTime() - updateChecked.getTime() > timeToCheck) {
+          this.setUpdateChecked(new Date())
+          this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
+
+          // Sample code from https://github.com/octokit/rest.js/blob/master/examples/getReleaseAsset.js
+          octokit.repos.getReleases({
+            owner: 'andrewjk',
+            repo: 'aspect-browser'
+          }).then(result => {
+            if (result.data.length === 0) {
+              console.log('Repository has no releases')
+              return
+            }
+
+            const release = result.data[0]
+            const version = release.tag_name.replace('v', '')
+            const localVersion = remote.app.getVersion()
+            if (semver.gt(version, localVersion)) {
+              console.log('checked for updates ' + version + ' vs ' + localVersion + ' - update exists')
+              this.updateExists = true
+              this.updateUrl = release.html_url
+            } else {
+              console.log('checked for updates ' + version + ' vs ' + localVersion + ' - no update found')
+            }
+          })
+        }
+      },
+      getUpdate () {
+        // TODO: Open inside our browser when downloads are working. We could also automatically indicate/download the appropriate package for the current OS?
+        shell.openExternal(this.updateUrl)
       }
     }
   }

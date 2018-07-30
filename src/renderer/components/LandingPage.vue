@@ -102,6 +102,7 @@
     created: function () {
       this.loadPersonas(this.$pdb)
       this.loadSettings(this.$sdb)
+      this.loadSystemSettings(this.$ssdb)
       // TODO: Load history from the database
     },
     mounted: function () {
@@ -135,6 +136,7 @@
       ...mapActions([
         'loadPersonas',
         'loadSettings',
+        'loadSystemSettings',
         'savePersona',
         'deletePersona',
         'saveBookmark',

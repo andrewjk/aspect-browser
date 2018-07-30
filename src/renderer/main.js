@@ -8,10 +8,11 @@ import store from './store'
 // Data storage via nedb
 import pdb from './personas-db'
 import sdb from './settings-db'
+import ssdb from './system-settings-db'
 
 // FontAwesome icons
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSearch, faCog, faEdit, faUserEdit, faPlus, faTrash, faCheck, faHome, faArrowLeft, faArrowRight, faStar, faSyncAlt, faSpinner, faTimes, faChevronLeft, faChevronRight, faChevronUp, faChevronDown, faBars } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faCog, faEdit, faUserEdit, faPlus, faTrash, faCheck, faHome, faArrowLeft, faArrowRight, faStar, faSyncAlt, faExternalLinkAlt, faSpinner, faTimes, faChevronLeft, faChevronRight, faChevronUp, faChevronDown, faBars } from '@fortawesome/free-solid-svg-icons'
 import { faWindowMinimize, faWindowMaximize, faWindowRestore, faWindowClose } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -22,6 +23,7 @@ require('../../node_modules/normalize.css/normalize.css')
 // Setup the data storage so that it can be accessed from any Vue component
 Vue.prototype.$pdb = pdb
 Vue.prototype.$sdb = sdb
+Vue.prototype.$ssdb = ssdb
 
 // Add the FontAwesome icons that we will use
 library.add(faSearch)
@@ -36,6 +38,7 @@ library.add(faArrowLeft)
 library.add(faArrowRight)
 library.add(faStar)
 library.add(faSyncAlt)
+library.add(faExternalLinkAlt)
 library.add(faSpinner)
 library.add(faTimes)
 library.add(faChevronLeft)

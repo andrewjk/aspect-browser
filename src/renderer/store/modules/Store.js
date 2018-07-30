@@ -4,6 +4,7 @@ import uuid from 'uuid/v4'
 const state = {
   personas: [],
   settings: {},
+  systemSettings: {},
   activity: {},
   showPersonaModal: false,
   personaToUpdate: null,
@@ -580,6 +581,15 @@ const mutations = {
     state.settingsToUpdate = null
     state.settingsToEdit = null
     state.showSettingsModal = false
+  },
+  // ========
+  // SYSTEM SETTINGS
+  // ========
+  setSystemSettings (state, systemSettings) {
+    state.systemSettings = systemSettings
+  },
+  setUpdateChecked (state, updateChecked) {
+    state.systemSettings.updateChecked = updateChecked
   }
 }
 
@@ -807,6 +817,46 @@ const actions = {
         return
       }
       commit('closeSettingsModal')
+    })
+  },
+  // ========
+  // SYSTEM SETTINGS
+  // ========
+  loadSystemSettings ({ commit, dispatch }, db) {
+    db.find({}).exec(function (err, dbSettings) {
+      if (err) {
+        alert('ERROR: ' + err)
+        return
+      }
+      // Create default settings if nothing was loaded
+      if (dbSettings.length) {
+        commit('setSystemSettings', dbSettings[0])
+      } else {
+        dispatch('createDefaultSystemSettings', db)
+      }
+    })
+  },
+  createDefaultSystemSettings ({ commit }, db) {
+    const defaultSettings = {
+      _id: uuid(),
+      updateChecked: new Date(1900, 1, 1)
+    }
+    db.insert(defaultSettings, function (err, dbSettings) {
+      if (err) {
+        alert('ERROR: ' + err)
+        return
+      }
+      commit('setSystemSettings', dbSettings)
+    })
+  },
+  saveSystemSettings ({ commit }, data) {
+    const db = data.db
+    const settings = data.systemSettings
+    db.update({ _id: settings._id }, settings, {}, function (err, numReplaced) {
+      if (err) {
+        alert('ERROR: ' + err)
+        // return
+      }
     })
   }
 }
