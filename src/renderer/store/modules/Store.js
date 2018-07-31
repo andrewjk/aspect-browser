@@ -93,7 +93,8 @@ const mutations = {
           backHistory: [],
           forwardHistory: []
         }
-      ]
+      ],
+      hasOpenTab: false
     }
   },
   nextPersona (state) {
@@ -163,19 +164,19 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const activity = state.activity[activePersona._id]
       if (index === undefined) {
-        for (let i = 0; i < tabs.length; i++) {
-          if (tabs[i].isActive) {
+        for (let i = 0; i < activity.tabs.length; i++) {
+          if (activity.tabs[i].isActive) {
             index = i
             break
           }
         }
       }
-      tabs.splice(index, 1)
-      if (!tabs.length) {
+      activity.tabs.splice(index, 1)
+      if (!activity.tabs.length) {
         // HACK: Don't feel great about duplicating this:
-        state.activity[activePersona._id].tabs.push({
+        activity.tabs.push({
           _id: uuid(),
           url: null,
           addressText: null,
@@ -186,9 +187,12 @@ const mutations = {
           forwardHistory: []
         })
       }
-      const newIndex = Math.min(index, tabs.length - 1)
-      tabs.forEach(function (t, i) {
-        t.isActive = (i === newIndex)
+      const newIndex = Math.min(index, activity.tabs.length - 1)
+      activity.tabs.forEach(function (tab, i) {
+        tab.isActive = (i === newIndex)
+      })
+      activity.hasOpenTab = activity.tabs.some(function (tab) {
+        return tab.url
       })
     }
   },
@@ -222,7 +226,8 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const activity = state.activity[activePersona._id]
+      const tabs = activity.tabs
       tabs.push({
         _id: uuid(),
         url: url,
@@ -240,6 +245,9 @@ const mutations = {
           t.isActive = (i === newIndex)
         })
       }
+      activity.hasOpenTab = tabs.some(function (tab) {
+        return tab.url
+      })
     }
   },
   movePersonaUp (state, index) {
@@ -432,7 +440,8 @@ const mutations = {
   setTabDetails (state, data) {
     const persona = data.persona
     const tab = data.tab
-    state.activity[persona._id].tabs.forEach(function (t) {
+    const activity = state.activity[persona._id]
+    activity.tabs.forEach(function (t) {
       if (t._id === tab._id) {
         if (data.webview !== undefined) t.webview = data.webview
         if (data.url !== undefined) t.url = data.url
@@ -441,6 +450,9 @@ const mutations = {
         if (data.icon !== undefined) t.icon = data.icon
         if (data.isLoading !== undefined) t.isLoading = data.isLoading
       }
+    })
+    activity.hasOpenTab = activity.tabs.some(function (tab) {
+      return tab.url
     })
   },
   // ========

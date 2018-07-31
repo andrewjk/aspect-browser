@@ -6,8 +6,9 @@
       </div>
       <div class="list">
         <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersonaIndexClick(index)">
+          <div v-show="hasOpenTab(item)" class="open-tab-indicator"></div>
           <div class="persona-info">
-            <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(index) }">
+            <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(item) }">
               {{ item.shortName }}
             </div>
             <div class="persona-name">{{ item.name }}</div>
@@ -79,9 +80,15 @@
         'movePersonaUpAndSave',
         'movePersonaDownAndSave'
       ]),
-      getBackgroundColor (index) {
-        if (this.personas[index].isActive) {
-          return this.personas[index].color
+      hasOpenTab (persona) {
+        // TODO: This doesn't get updated when opening a page in the current persona
+        // I think we might have to change everything to be displayed off activity rather than personas?
+        return this.activity[persona._id].hasOpenTab
+      },
+      getBackgroundColor (persona) {
+        // TODO: Move persona.isActive into activity
+        if (persona.isActive) {
+          return persona.color
         }
       },
       setActivePersonaIndexClick (index) {
@@ -132,6 +139,7 @@
   }
 
   .persona {
+    position: relative;
     border-radius: 2px;
     display: flex;
     cursor: default;
@@ -139,9 +147,21 @@
     text-align: center;
   }
 
+  .open-tab-indicator {
+    background-color: #666;
+    position: absolute;
+    width: 4px;
+    left: 0;
+    top: 28px;
+    height: 20px;
+  }
+
   .persona:hover,
   .persona:focus {
     background-color: #555;
+    border-left: 0;
+    padding: 8px;
+    margin: 0;
   }
 
   .persona-icon {
