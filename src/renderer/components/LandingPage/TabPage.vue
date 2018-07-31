@@ -1,7 +1,7 @@
 <template>
   <div class="tab-page-wrapper">
       <webview :id="tab._id" class="tab-page-view" :partition="getPartition()" :src="initialUrl" :preload="preload"></webview>
-      <div class="target-url" v-show="targetUrl">{{ targetUrl }}</div>
+      <div :class="['target-url', showTargetUrl ? 'visible' : '']">{{ targetUrl }}</div>
   </div>
 </template>
 
@@ -22,6 +22,8 @@
         initialUrl: this.tab.url,
         previousUrl: '',
         targetUrl: '',
+        targetUrlInterval: 0,
+        showTargetUrl: false,
         // Per https://github.com/SimulatedGREG/electron-vue/issues/239
         preload: 'file://' + path.join(__static, '/webview-preload.js')
       }
@@ -108,7 +110,22 @@
         }
       },
       targetUrlUpdated (e) {
-        this.targetUrl = e.url
+        if (this.targetUrlInterval) {
+          clearInterval(this.targetUrlInterval)
+        }
+        if (e.url && this.showTargetUrl) {
+          // If there's already a url being displayed, just update it
+          this.targetUrl = e.url
+          this.showTargetUrl = true
+        } else {
+          // There's either a new URL to show, or no URL now, so show or hide the url after an interval
+          this.targetUrlInterval = setInterval(() => {
+            if (e.url) {
+              this.targetUrl = e.url
+            }
+            this.showTargetUrl = !!e.url
+          }, 200)
+        }
       },
       willNavigate () {
         // TODO:
@@ -153,6 +170,12 @@
     border-right: 1px solid #ddd;
     border-top-right-radius: 2px;
     padding: 4px 4px 2px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .target-url.visible {
+    opacity: 1;
   }
 
 </style>
