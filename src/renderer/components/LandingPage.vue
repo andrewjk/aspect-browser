@@ -129,6 +129,7 @@
         'nextTab',
         'openNewTab',
         'closeTab',
+        'reopenTab',
         'closePersonaModal',
         'closeBookmarkModal',
         'closeSettingsModal'
@@ -184,7 +185,11 @@
           if (e.keyCode === 12) { // L
             this.focusAddressBox()
           } else if (e.keyCode === 20) { // T
-            this.openNewTab()
+            if (e.shiftKey) {
+              this.reopenTab()
+            } else {
+              this.openNewTab()
+            }
           } else if (e.keyCode === 23) { // V
             this.closeTab()
           } else if (e.keyCode === 6) { // F

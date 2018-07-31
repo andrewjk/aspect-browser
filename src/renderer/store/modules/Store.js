@@ -94,6 +94,7 @@ const mutations = {
           forwardHistory: []
         }
       ],
+      closedTabs: [],
       hasOpenTab: false
     }
   },
@@ -173,6 +174,11 @@ const mutations = {
           }
         }
       }
+      activity.tabs[index].index = index
+      activity.closedTabs.push(activity.tabs[index])
+      while (activity.closedTabs.length > 20) {
+        activity.closedTabs.splice(0, 1)
+      }
       activity.tabs.splice(index, 1)
       if (!activity.tabs.length) {
         // HACK: Don't feel great about duplicating this:
@@ -194,6 +200,23 @@ const mutations = {
       activity.hasOpenTab = activity.tabs.some(function (tab) {
         return tab.url
       })
+    }
+  },
+  reopenTab (state) {
+    const activePersona = state.personas.find(function (p) {
+      return p.isActive
+    })
+    if (activePersona) {
+      const activity = state.activity[activePersona._id]
+      if (activity.closedTabs && activity.closedTabs.length) {
+        const closedTab = activity.closedTabs.pop()
+        const newIndex = Math.min(closedTab.index, activity.tabs.length)
+        activity.tabs.splice(newIndex, 0, closedTab)
+        closedTab.index = undefined
+        activity.tabs.forEach(function (t, i) {
+          t.isActive = (i === newIndex)
+        })
+      }
     }
   },
   openNewTab (state) {
