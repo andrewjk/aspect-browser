@@ -19,6 +19,7 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
   import os from 'os'
   import electron from 'electron'
 
@@ -33,6 +34,13 @@
         showRestore: window.isMaximized(),
         showClose: true
       }
+    },
+    computed: {
+      ...mapState({
+        personas: state => state.Store.personas,
+        activity: state => state.Store.activity,
+        systemSettings: state => state.Store.systemSettings
+      })
     },
     mounted: function () {
       window.resize = (e) => {
@@ -66,7 +74,26 @@
         this.showRestore = false
       },
       close () {
-        window.close()
+        let personaCount = 0
+        let tabCount = 0
+        this.personas.forEach(persona => {
+          const activity = this.activity[persona._id]
+          personaCount = personaCount + (persona.isActive || activity.hasOpenTab ? 1 : 0)
+          activity.tabs.forEach(tab => {
+            tabCount = tabCount + (tab.url ? 1 : 0)
+          })
+        })
+        if (tabCount > 0) {
+          const message = `You are about to close ${tabCount} open tab${tabCount === 1 ? '' : 's'} in ${personaCount} persona${personaCount === 1 ? '' : 's'}. Are you sure you want to continue?`
+          const dialogOptions = { title: 'Close Browser', type: 'question', buttons: ['Close', 'Cancel'], message }
+          electron.remote.dialog.showMessageBox(dialogOptions, function (index) {
+            if (index === 0) {
+              window.close()
+            }
+          })
+        } else {
+          window.close()
+        }
       }
     }
   }
