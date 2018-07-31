@@ -2,7 +2,7 @@
   <div class="find-in-page-wrapper">
     <div class="find-in-page">
       <div class="find-input">
-        <input type="text" :id="'find-text-' + persona._id" v-model="findText" onfocus="this.select();" @keyup.enter="startFind" @keyup.esc="closeFind" placeholder="Find in page">
+        <input type="text" :id="'find-text-' + persona._id" :class="[this.haveSearched && this.findText && !this.matchCount ? 'not-found' : '']" v-model="findText" onfocus="this.select();" @keyup.enter.exact="goToNext" @keyup.shift.enter="goToPrevious" @keyup.esc="closeFind" @keydown="keyDown" placeholder="Find in page">
       </div>
       <button :class="['find-button', canNavigate() ? '' : 'disabled']" :tabindex="canNavigate() ? '0' : '-1'" @click="goToPrevious" title="Go to the previous match">
         <fa icon="chevron-up"/>
@@ -31,9 +31,22 @@
       return {
         findText: '',
         activeWebview: null,
+        haveSearched: false,
         haveFoundText: false,
         matchNumber: 0,
         matchCount: 0
+      }
+    },
+    watch: {
+      findText: function (val, oldVal) {
+        this.haveSearched = false
+        if (val) {
+          this.startFind()
+        } else {
+          if (this.activeWebview) {
+            this.activeWebview.stopFindInPage('clearSelection')
+          }
+        }
       }
     },
     computed: {
@@ -57,26 +70,38 @@
           this.activeWebview.removeEventListener('found-in-page', this.foundInPage)
         }
         // Default to nothing found, which will get overridden as soon as there's a found-in-page event
+        this.haveSearched = true
         this.haveFoundText = false
         // Do the find
         this.activeWebview = this.getActiveWebview()
-        this.activeWebview.addEventListener('found-in-page', this.foundInPage)
-        this.activeWebview.addEventListener('keydown', this.keyDown)
-        this.activeWebview.addEventListener('keypress', this.keyPress)
-        this.activeWebview.findInPage(this.findText)
+        if (this.activeWebview) {
+          this.activeWebview.addEventListener('found-in-page', this.foundInPage)
+          this.activeWebview.addEventListener('keydown', this.keyDown)
+          this.activeWebview.findInPage(this.findText)
+        }
       },
       goToPrevious () {
-        this.activeWebview.findInPage(this.findText, { forward: false, findNext: true })
+        if (this.activeWebview) {
+          this.activeWebview.findInPage(this.findText, { forward: false, findNext: true })
+        } else {
+          this.startFind()
+        }
       },
       goToNext () {
-        this.activeWebview.findInPage(this.findText, { findNext: true })
+        if (this.activeWebview) {
+          this.activeWebview.findInPage(this.findText, { findNext: true })
+        } else {
+          this.startFind()
+        }
       },
       keyDown (e) {
         if (e.keyCode === 114) { // F3
-          if (e.shiftKey) {
-            this.goToPrevious()
-          } else {
-            this.goToNext()
+          if (this.findText) {
+            if (e.shiftKey) {
+              this.goToPrevious()
+            } else {
+              this.goToNext()
+            }
           }
         }
       },
@@ -84,6 +109,7 @@
         if (this.activeWebview) {
           this.activeWebview.stopFindInPage('keepSelection')
           this.activeWebview.focus()
+          this.activeWebview = null
         }
         this.$emit('close-find-in-page')
       },
@@ -140,6 +166,10 @@
 
   .find-input > input {
     width: 100%;
+  }
+
+  .find-input > input.not-found {
+    background-color: pink;
   }
 
   .find-result {
