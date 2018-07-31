@@ -66,7 +66,11 @@
       }
     },
     mounted: function () {
-      this.checkUpdate()
+      // HACK: Give it time to load the system settings database
+      setInterval(() => {
+        this.updateExists = this.systemSettings.updateExists
+        this.checkUpdate()
+      }, 100)
     },
     beforeUpdate: function () {
       this.checkUpdate()
@@ -79,7 +83,8 @@
         'goForward',
         'goToUrl',
         'goHome',
-        'setUpdateChecked'
+        'setUpdateChecked',
+        'setUpdateExists'
       ]),
       ...mapActions([
         'saveSystemSettings'
@@ -150,7 +155,10 @@
               this.updateUrl = release.html_url
             } else {
               console.log('checked for updates ' + version + ' vs ' + localVersion + ' - no update found')
+              this.updateExists = false
             }
+            this.setUpdateExists({ updateExists: this.updateExists, oldVersion: localVersion })
+            this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
           })
         }
       },

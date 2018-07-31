@@ -602,6 +602,12 @@ const mutations = {
   },
   setUpdateChecked (state, updateChecked) {
     state.systemSettings.updateChecked = updateChecked
+  },
+  setUpdateExists (state, data) {
+    const updateExists = data.updateExists
+    const oldVersion = data.oldVersion
+    state.systemSettings.updateExists = updateExists
+    state.systemSettings.oldVersion = oldVersion
   }
 }
 
@@ -851,7 +857,9 @@ const actions = {
   createDefaultSystemSettings ({ commit }, db) {
     const defaultSettings = {
       _id: uuid(),
-      updateChecked: new Date(1900, 1, 1)
+      updateChecked: new Date(1900, 1, 1),
+      updateExists: false,
+      oldVersion: ''
     }
     db.insert(defaultSettings, function (err, dbSettings) {
       if (err) {
