@@ -26,6 +26,13 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 * Tabbed browsing makes it easy to keep your browsing confined to the one persona
 * Use keyboard shortcuts and search to switch between personas and tabs
 
+## Download
+
+[Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.1/aspect-browser-setup-0.0.1.exe) ≈
+[Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.1/Aspect-0.0.1.dmg) ≈
+[Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.1/aspect-browser-0.0.1-x86_64.AppImage) ≈
+[All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.1)
+
 ## Build Setup
 
 ``` bash
