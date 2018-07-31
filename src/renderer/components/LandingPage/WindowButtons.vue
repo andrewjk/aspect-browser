@@ -43,15 +43,10 @@
       })
     },
     mounted: function () {
-      window.resize = (e) => {
+      window.on('resize', (e) => {
         this.showMaximize = !window.isMaximized()
         this.showRestore = window.isMaximized()
-      }
-      // TODO: This doesn't seem to fire
-      window.move = (e) => {
-        this.showMaximize = !window.isMaximized()
-        this.showRestore = window.isMaximized()
-      }
+      })
     },
     methods: {
       canMaximize () {
@@ -65,13 +60,9 @@
       },
       maximize () {
         window.maximize()
-        this.showMaximize = false
-        this.showRestore = true
       },
       restore () {
         window.unmaximize()
-        this.showMaximize = true
-        this.showRestore = false
       },
       close () {
         let personaCount = 0
