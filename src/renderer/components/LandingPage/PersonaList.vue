@@ -71,7 +71,7 @@
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
-        'goHome',
+        'openNewTab',
         'addPersona',
         'editPersona',
         'editSettings'
@@ -94,7 +94,7 @@
       setActivePersonaIndexClick (index) {
         if (this.personas[index].isActive) {
           const activeTab = this.getActiveTab
-          this.goHome(activeTab)
+          this.openNewTab(activeTab)
         } else {
           this.setActivePersonaIndex(index)
         }
