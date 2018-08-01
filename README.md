@@ -28,10 +28,10 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 
 ## Download
 
-[Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.1/aspect-browser-setup-0.0.1.exe) ≈
-[Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.1/Aspect-0.0.1.dmg) ≈
-[Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.1/aspect-browser-0.0.1-x86_64.AppImage) ≈
-[All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.1)
+[Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-setup-0.0.2.exe) ≈
+[Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg) ≈
+[Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage) ≈
+[All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2)
 
 ## Build Setup
 
