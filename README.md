@@ -9,7 +9,7 @@ A multi-persona web browser
 
 </div>
 
-![A screenshot of the main browser screen, showing the list of personas, a home page and some open tabs](/screenshot.png)
+![A screenshot of the main browser screen, showing the list of personas, a home page and some open tabs](/docs/images/screenshot.png)
 
 ## About
 
@@ -28,28 +28,26 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 
 ## Download
 
-[Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-setup-0.0.2.exe) ≈
-[Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg) ≈
-[Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage) ≈
-[All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2)
+| ![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-setup-0.0.2.exe) |
+| ![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg) |
+| ![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage) |
+| ![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2) |
 
-## Build Setup
+## Build
 
 ``` bash
+# clone into aspect-browser
+git clone https://github.com/andrewjk/aspect-browser.git
+cd aspect-browser
+
 # install dependencies
-npm install
+npm install  
 
 # serve with hot reload at localhost:9080
 npm run dev
 
 # build electron application for production
 npm run build
-
-# run unit & end-to-end tests
-npm test
-
-# lint all JS/Vue component files in `src/`
-npm run lint
 
 ```
 
@@ -62,3 +60,5 @@ This project is licensed under the [MIT License](LICENSE.md).
 This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[4c6ee7b](https://github.com/SimulatedGREG/electron-vue/tree/4c6ee7bf4f9b4aa647a22ec1c1ca29c2e59c3645) using [vue-cli](https://github.com/vuejs/vue-cli).
 
 Icons are from [Font Awesome](https://fontawesome.com/) via [vue-fontawesome](https://github.com/FortAwesome/vue-fontawesome).
+
+Storage is implemented with [NeDB](https://github.com/louischatriot/nedb/).
