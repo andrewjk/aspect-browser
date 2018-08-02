@@ -12,7 +12,7 @@ import ssdb from './system-settings-db'
 
 // FontAwesome icons
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSearch, faCog, faEdit, faUserEdit, faPlus, faTrash, faCheck, faHome, faArrowLeft, faArrowRight, faStar, faSyncAlt, faExternalLinkAlt, faSpinner, faTimes, faChevronLeft, faChevronRight, faChevronUp, faChevronDown, faBars } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faCog, faEdit, faUserEdit, faPlus, faTrash, faCheck, faHome, faArrowLeft, faArrowRight, faStar, faSyncAlt, faExternalLinkAlt, faSpinner, faTimes, faChevronLeft, faChevronRight, faChevronUp, faChevronDown, faBars, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
 import { faWindowMinimize, faWindowMaximize, faWindowRestore, faWindowClose } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -46,6 +46,7 @@ library.add(faChevronRight)
 library.add(faChevronUp)
 library.add(faChevronDown)
 library.add(faBars)
+library.add(faEllipsisV)
 library.add(faWindowMinimize)
 library.add(faWindowMaximize)
 library.add(faWindowRestore)

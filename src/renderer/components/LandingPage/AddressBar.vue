@@ -1,31 +1,33 @@
 <template>
-  <div class="address-bar-wrapper">
-    <div class="address-bar">
-      <button :class="['address-button', canGoBack() ? '' : 'disabled']" :tabindex="canGoBack() ? '0' : '-1'" @click="goBack({ persona, tab: getActiveTab })" :title="getBackHistory()">
-        <fa icon="arrow-left"/>
-      </button>
-      <button :class="['address-button', canGoForward() ? '' : 'disabled']" :tabindex="canGoForward() ? '0' : '-1'" @click="goForward({ persona, tab: getActiveTab })" :title="getForwardHistory()">
-        <fa icon="arrow-right"/>
-      </button>
-      <button class="address-button" @click="goHome(getActiveTab)" title="Open the home page for this persona">
-        <fa icon="home"/>
-      </button>
-      <div class="address-input">
-        <input type="text" :id="'address-text-' + persona._id" v-model="addressText" onfocus="this.select();" @keypress="keyPressed" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
-      </div>
-      <button class="address-button" @click="addBookmark({ persona, url: getActiveTab.url, title: getActiveTab.title, icon: getActiveTab.icon })" title="Add the current page to this persona's bookmarks">
-        <fa icon="star"/>
-      </button>
-      <button v-if="getActiveTab.isLoading" class="address-button" @click="stopLoad" title = "Stop loading the current page">
-        <fa icon="times"/>
-      </button>
-      <button v-else class="address-button" @click="reload" title = "Reload the current page">
-        <fa icon="sync-alt"/>
-      </button>
-      <button v-if="updateExists" class="address-button" @click="getUpdate" title = "There is an updated version available">
-        <fa icon="external-link-alt"/>
-      </button>
+  <div class="address-bar">
+    <button :class="['address-button', canGoBack() ? '' : 'disabled']" :tabindex="canGoBack() ? '0' : '-1'" @click="goBack({ persona, tab: getActiveTab })" :title="getBackHistory()">
+      <fa icon="arrow-left"/>
+    </button>
+    <button :class="['address-button', canGoForward() ? '' : 'disabled']" :tabindex="canGoForward() ? '0' : '-1'" @click="goForward({ persona, tab: getActiveTab })" :title="getForwardHistory()">
+      <fa icon="arrow-right"/>
+    </button>
+    <button class="address-button" @click="goHome(getActiveTab)" title="Open the home page for this persona">
+      <fa icon="home"/>
+    </button>
+    <div class="address-input">
+      <input type="text" :id="'address-text-' + persona._id" v-model="addressText" onfocus="this.select();" @keypress="keyPressed" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
     </div>
+    <button class="address-button" @click="addBookmark({ persona, url: getActiveTab.url, title: getActiveTab.title, icon: getActiveTab.icon })" title="Add the current page to this persona's bookmarks">
+      <fa icon="star"/>
+    </button>
+    <button v-if="getActiveTab.isLoading" class="address-button" @click="stopLoad" title = "Stop loading the current page">
+      <fa icon="times"/>
+    </button>
+    <button v-else class="address-button" @click="reload" title = "Reload the current page">
+      <fa icon="sync-alt"/>
+    </button>
+    <button class="address-button" @click="toggleOptionsMenu" title = "Open the options menu">
+      <fa icon="ellipsis-v"/>
+    </button>
+    <options-menu v-show="showOptionsMenu" @close-options-menu="toggleOptionsMenu"></options-menu>
+    <button v-if="updateExists" class="address-button" @click="getUpdate" title = "There is an updated version available">
+      <fa icon="external-link-alt"/>
+    </button>
   </div>
 </template>
 
@@ -35,16 +37,20 @@
   import { remote, shell } from 'electron'
   import semver from 'semver'
 
+  import OptionsMenu from './OptionsMenu'
+
   const octokit = octokitrest()
 
   export default {
+    components: { OptionsMenu },
     props: {
       persona: null
     },
     data () {
       return {
         updateExists: false,
-        updateUrl: ''
+        updateUrl: '',
+        showOptionsMenu: false
       }
     },
     computed: {
@@ -74,6 +80,15 @@
     },
     beforeUpdate: function () {
       this.checkUpdate()
+    },
+    updated: function () {
+      // HACK: Is this a good way to do this?
+      if (this.showOptionsMenu) {
+        document.removeEventListener('click', this.toggleOptionsMenu)
+        document.addEventListener('click', this.toggleOptionsMenu)
+      } else {
+        document.removeEventListener('click', this.toggleOptionsMenu)
+      }
     },
     methods: {
       ...mapMutations([
@@ -128,6 +143,9 @@
           tab.webview.reload()
         }
       },
+      toggleOptionsMenu () {
+        this.showOptionsMenu = !this.showOptionsMenu
+      },
       checkUpdate () {
         const updateChecked = this.systemSettings.updateChecked
         const now = new Date()
@@ -142,7 +160,7 @@
             repo: 'aspect-browser'
           }).then(result => {
             if (result.data.length === 0) {
-              console.log('Repository has no releases')
+              console.log('repository has no releases')
               return
             }
 
@@ -172,25 +190,24 @@
 
 <style scoped>
 
-  .address-bar-wrapper {
+  .address-bar {
     background-color: #eee;
     height: 34px;
     border-bottom: 1px solid #ddd;
     font-size: 14px;
     padding: 4px;
-  }
-
-  .address-bar {
+    overflow: visible;
     display: flex;
-    line-height: 24px;
+    line-height: 26px;
+    z-index: 9999;
   }
 
   .address-button {
-    border: inherit;
     background-color: inherit;
     border-radius: 2px;
     display: inline-block;
     padding: 0 10px;
+    height: 26px;
   }
 
   .address-button:hover,

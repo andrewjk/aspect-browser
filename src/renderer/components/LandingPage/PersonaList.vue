@@ -29,9 +29,6 @@
       <button v-if="!showEditPersonaLinks" class="persona-button" @click="findBookmark" title="Search for a bookmark">
         <fa icon="search"/>
       </button>
-      <button v-if="!showEditPersonaLinks" class="persona-button" @click="editSettings" title="Edit application settings">
-        <fa icon="cog"/>
-      </button>
       <button v-if="showEditPersonaLinks" class="persona-button" @click="addPersona" title="Add a persona">
         <fa icon="plus"/>
       </button>
@@ -73,8 +70,7 @@
         'setActivePersonaIndex',
         'openNewTab',
         'addPersona',
-        'editPersona',
-        'editSettings'
+        'editPersona'
       ]),
       ...mapActions([
         'movePersonaUpAndSave',
