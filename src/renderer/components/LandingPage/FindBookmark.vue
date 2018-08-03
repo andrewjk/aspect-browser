@@ -57,10 +57,9 @@
 
           this.lastFindText = this.findText
           const results = []
-          const self = this
-          this.personas.forEach(function (p, pi) {
+          this.personas.forEach((p, pi) => {
             // If the persona matches, add it to the results
-            if (p.name.toLowerCase().indexOf(self.findText.toLowerCase()) !== -1) {
+            if (p.name.toLowerCase().indexOf(this.findText.toLowerCase()) !== -1) {
               results.push({
                 pid: p._id,
                 pindex: pi,
@@ -69,9 +68,9 @@
               })
             }
             // If the bookmark matches, add it to the results
-            p.bookmarks.forEach(function (t, ti) {
-              if (p.name.toLowerCase().indexOf(self.findText.toLowerCase()) !== -1 ||
-                  t.title.toLowerCase().indexOf(self.findText.toLowerCase()) !== -1) {
+            p.bookmarks.forEach((t, ti) => {
+              if (p.name.toLowerCase().indexOf(this.findText.toLowerCase()) !== -1 ||
+                  t.title.toLowerCase().indexOf(this.findText.toLowerCase()) !== -1) {
                 results.push({
                   pid: p._id,
                   pindex: pi,
@@ -98,7 +97,7 @@
         return -1
       },
       setActiveIndex (index) {
-        this.results.forEach(function (r, i) {
+        this.results.forEach((r, i) => {
           r.isActive = (i === index)
         })
       },
@@ -113,7 +112,7 @@
         this.setActiveIndex(newIndex)
       },
       openResult () {
-        const result = this.results.find(function (r, i) {
+        const result = this.results.find((r, i) => {
           return r.isActive
         })
         if (result) {

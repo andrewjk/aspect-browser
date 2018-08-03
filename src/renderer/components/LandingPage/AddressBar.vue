@@ -110,7 +110,7 @@
       },
       getBackHistory () {
         const tab = this.getActiveTab
-        return tab.backHistory ? tab.backHistory.map(function (item) { return item.title }).reverse().join('\n') : []
+        return tab.backHistory ? tab.backHistory.map((item) => { return item.title }).reverse().join('\n') : []
       },
       canGoForward () {
         const tab = this.getActiveTab
@@ -118,7 +118,7 @@
       },
       getForwardHistory () {
         const tab = this.getActiveTab
-        return tab.forwardHistory ? tab.forwardHistory.map(function (item) { return item.title }).join('\n') : []
+        return tab.forwardHistory ? tab.forwardHistory.map((item) => { return item.title }).join('\n') : []
       },
       keyPressed (e) {
         if (e.keyCode === 13) {

@@ -77,7 +77,7 @@
         if (tabCount > 0) {
           const message = `You are about to close ${tabCount} open tab${tabCount === 1 ? '' : 's'} in ${personaCount} persona${personaCount === 1 ? '' : 's'}. Are you sure you want to continue?`
           const dialogOptions = { title: 'Close Browser', type: 'question', buttons: ['Close', 'Cancel'], message }
-          electron.remote.dialog.showMessageBox(dialogOptions, function (index) {
+          electron.remote.dialog.showMessageBox(dialogOptions, (index) => {
             if (index === 0) {
               window.close()
             }

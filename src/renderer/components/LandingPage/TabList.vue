@@ -93,7 +93,7 @@
         'openNewTab'
       ]),
       getActiveTab () {
-        return this.tabs.find(function (item) {
+        return this.tabs.find((item) => {
           return item.isActive
         })
       },

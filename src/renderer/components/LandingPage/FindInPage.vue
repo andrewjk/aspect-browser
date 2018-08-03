@@ -57,7 +57,7 @@
     methods: {
       getActiveWebview () {
         const tabs = this.activity[this.persona._id].tabs
-        const activeTab = tabs.find(function (item) {
+        const activeTab = tabs.find((item) => {
           return item.isActive
         })
         return activeTab.webview

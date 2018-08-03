@@ -19,17 +19,17 @@ const state = {
 
 const getters = {
   getActivePersona (state) {
-    return state.personas.find(function (p) {
+    return state.personas.find((p) => {
       return p.isActive
     })
   },
   getActiveTab (state) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
       const tabs = state.activity[activePersona._id].tabs
-      return tabs.find(function (t) {
+      return tabs.find((t) => {
         return t.isActive
       })
     }
@@ -57,12 +57,12 @@ const mutations = {
     if (index < 0 || index >= state.personas.length) {
       return
     }
-    state.personas.forEach(function (p, i) {
+    state.personas.forEach((p, i) => {
       p.isActive = (i === index)
     })
   },
   setActiveTabIndex (state, index) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -70,7 +70,7 @@ const mutations = {
       if (index < 0 || index >= tabs.length) {
         return
       }
-      tabs.forEach(function (t, i) {
+      tabs.forEach((t, i) => {
         t.isActive = (i === index)
       })
       state.showFindInPage = false
@@ -106,7 +106,7 @@ const mutations = {
       }
     }
     const newIndex = index < state.personas.length - 1 ? index + 1 : 0
-    state.personas.forEach(function (p, i) {
+    state.personas.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
   },
@@ -118,12 +118,12 @@ const mutations = {
       }
     }
     const newIndex = index > 0 ? index - 1 : state.personas.length - 1
-    state.personas.forEach(function (p, i) {
+    state.personas.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
   },
   nextTab (state) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -136,13 +136,13 @@ const mutations = {
         }
       }
       const newIndex = index < tabs.length - 1 ? index + 1 : 0
-      tabs.forEach(function (t, i) {
+      tabs.forEach((t, i) => {
         t.isActive = (i === newIndex)
       })
     }
   },
   previousTab (state) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -155,13 +155,13 @@ const mutations = {
         }
       }
       const newIndex = index > 0 ? index - 1 : tabs.length - 1
-      tabs.forEach(function (t, i) {
+      tabs.forEach((t, i) => {
         t.isActive = (i === newIndex)
       })
     }
   },
   closeTab (state, index) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -194,16 +194,16 @@ const mutations = {
         })
       }
       const newIndex = Math.min(index, activity.tabs.length - 1)
-      activity.tabs.forEach(function (tab, i) {
+      activity.tabs.forEach((tab, i) => {
         tab.isActive = (i === newIndex)
       })
-      activity.hasOpenTab = activity.tabs.some(function (tab) {
+      activity.hasOpenTab = activity.tabs.some((tab) => {
         return tab.url
       })
     }
   },
   reopenTab (state) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -213,14 +213,14 @@ const mutations = {
         const newIndex = Math.min(closedTab.index, activity.tabs.length)
         activity.tabs.splice(newIndex, 0, closedTab)
         closedTab.index = undefined
-        activity.tabs.forEach(function (t, i) {
+        activity.tabs.forEach((t, i) => {
           t.isActive = (i === newIndex)
         })
       }
     }
   },
   openNewTab (state) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -237,7 +237,7 @@ const mutations = {
         forwardHistory: []
       })
       const newIndex = tabs.length - 1
-      tabs.forEach(function (t, i) {
+      tabs.forEach((t, i) => {
         t.isActive = (i === newIndex)
       })
     }
@@ -245,7 +245,7 @@ const mutations = {
   openInTab (state, data) {
     const url = data.url
     const background = data.background
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -264,11 +264,11 @@ const mutations = {
       })
       if (!background) {
         const newIndex = tabs.length - 1
-        tabs.forEach(function (t, i) {
+        tabs.forEach((t, i) => {
           t.isActive = (i === newIndex)
         })
       }
-      activity.hasOpenTab = tabs.some(function (tab) {
+      activity.hasOpenTab = tabs.some((tab) => {
         return tab.url
       })
     }
@@ -333,7 +333,7 @@ const mutations = {
   insertPersona (state, persona) {
     state.personas.push(persona)
     const newIndex = state.personas.length - 1
-    state.personas.forEach(function (p, i) {
+    state.personas.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
   },
@@ -344,7 +344,7 @@ const mutations = {
       // TODO: this.createDefaultPersona()
     }
     const newIndex = Math.min(index, state.personas.length - 1)
-    state.personas.forEach(function (p, i) {
+    state.personas.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
   },
@@ -357,7 +357,7 @@ const mutations = {
   // BOOKMARKS
   // =========
   moveBookmarkUp (state, data) {
-    const persona = state.personas.find(function (p) {
+    const persona = state.personas.find((p) => {
       return p._id === data.persona._id
     })
     const index = data.index
@@ -371,7 +371,7 @@ const mutations = {
     persona.bookmarks[index - 1].order = thisOrder
   },
   moveBookmarkDown (state, data) {
-    const persona = state.personas.find(function (p) {
+    const persona = state.personas.find((p) => {
       return p._id === data.persona._id
     })
     const index = data.index
@@ -385,7 +385,7 @@ const mutations = {
     persona.bookmarks[index + 1].order = thisOrder
   },
   sanitizeBookmarkOrders (state, data) {
-    const persona = state.personas.find(function (p) {
+    const persona = state.personas.find((p) => {
       return p._id === data.persona._id
     })
     // Renumber everything, just in case something funny has gone on
@@ -395,7 +395,7 @@ const mutations = {
     }
   },
   sortBookmarks (state) {
-    const activePersona = state.personas.find(function (p) {
+    const activePersona = state.personas.find((p) => {
       return p.isActive
     })
     if (activePersona) {
@@ -438,7 +438,7 @@ const mutations = {
     const bookmark = data.bookmark
     persona.bookmarks.push(bookmark)
     const newIndex = persona.bookmarks.length - 1
-    persona.bookmarks.forEach(function (p, i) {
+    persona.bookmarks.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
   },
@@ -448,7 +448,7 @@ const mutations = {
     const index = persona.bookmarks.indexOf(bookmark)
     persona.bookmarks.splice(index, 1)
     const newIndex = Math.min(index, persona.bookmarks.length - 1)
-    persona.bookmarks.forEach(function (p, i) {
+    persona.bookmarks.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
   },
@@ -464,7 +464,7 @@ const mutations = {
     const persona = data.persona
     const tab = data.tab
     const activity = state.activity[persona._id]
-    activity.tabs.forEach(function (t) {
+    activity.tabs.forEach((t) => {
       if (t._id === tab._id) {
         if (data.webview !== undefined) t.webview = data.webview
         if (data.url !== undefined) t.url = data.url
@@ -474,7 +474,7 @@ const mutations = {
         if (data.isLoading !== undefined) t.isLoading = data.isLoading
       }
     })
-    activity.hasOpenTab = activity.tabs.some(function (tab) {
+    activity.hasOpenTab = activity.tabs.some((tab) => {
       return tab.url
     })
   },
@@ -498,7 +498,7 @@ const mutations = {
   goBack (state, data) {
     const persona = data.persona
     const tab = data.tab
-    state.activity[persona._id].tabs.forEach(function (t) {
+    state.activity[persona._id].tabs.forEach((t) => {
       if (t._id === tab._id) {
         if (t.backHistory.length) {
           t.forwardHistory.push({
@@ -524,7 +524,7 @@ const mutations = {
   goForward (state, data) {
     const persona = data.persona
     const tab = data.tab
-    state.activity[persona._id].tabs.forEach(function (t) {
+    state.activity[persona._id].tabs.forEach((t) => {
       if (t._id === tab._id) {
         if (t.forwardHistory.length) {
           if (!t.forwardHistory) {
@@ -654,7 +654,7 @@ const actions = {
       commit('setActivePersonaIndex', 0)
 
       // Create a home tab for each persona
-      dbPersonas.forEach(function (item, i) {
+      dbPersonas.forEach((item, i) => {
         commit('addHomeTab', item)
       })
 
@@ -689,7 +689,7 @@ const actions = {
     const index = data.index
     commit('movePersonaUp', index)
     commit('sanitizePersonaOrders')
-    personas.forEach(function (p) {
+    personas.forEach((p) => {
       db.update({ _id: p._id }, p, {}, function (err, numReplaced) {
         if (err) {
           alert('ERROR: ' + err)
@@ -703,7 +703,7 @@ const actions = {
     const index = data.index
     commit('movePersonaDown', index)
     commit('sanitizePersonaOrders')
-    personas.forEach(function (p) {
+    personas.forEach((p) => {
       db.update({ _id: p._id }, p, {}, function (err, numReplaced) {
         if (err) {
           alert('ERROR: ' + err)

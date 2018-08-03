@@ -97,7 +97,7 @@
           return
         }
 
-        const activeTab = this.tabs.find(function (item) {
+        const activeTab = this.tabs.find((item) => {
           return item.isActive
         })
 
