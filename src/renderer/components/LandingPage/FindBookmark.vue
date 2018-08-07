@@ -124,7 +124,7 @@
               if (tabs.length === 1 && !tabs[0].url) {
                 const activeTab = tabs[0]
                 this.setTabDetails({ persona: activePersona, tab: activeTab, isLoading: true, url: result.url })
-                this.addToHistory({ tab: activeTab, url: null, title: 'Home' })
+                this.addToHistory({ tab: activeTab, url: 'aspect://home', title: 'Home' })
               } else {
                 this.openInTab({ url: result.url, background: false })
               }

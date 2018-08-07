@@ -4,6 +4,10 @@
       <fa icon="cog"/>
       <span>Settings</span>
     </button>
+    <button class="options-menu-item" @click="showHistory" title="Show browsing history for this persona">
+      <fa icon="history"/>
+      <span>History</span>
+    </button>
   </div>
 </template>
 
@@ -13,7 +17,8 @@
   export default {
     methods: {
       ...mapMutations([
-        'editSettings'
+        'editSettings',
+        'showHistory'
       ])
     }
   }

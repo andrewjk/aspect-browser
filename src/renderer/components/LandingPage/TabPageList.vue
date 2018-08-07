@@ -1,8 +1,11 @@
 <template>
   <div class="tab-page-list-wrapper">
       <div v-for="(item, index) in tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
-        <template v-if="!item.url">
+        <template v-if="item.url === 'aspect://home'">
           <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome"></home-page>
+        </template>
+        <template v-else-if="item.url === 'aspect://history'">
+          <history-page :persona="persona" :tabs="tabs"></history-page>
         </template>
         <template v-else>
           <tab-page :persona="persona" :tab="item"></tab-page>
@@ -15,10 +18,11 @@
   import { mapState } from 'vuex'
 
   import HomePage from './HomePage'
+  import HistoryPage from './HistoryPage'
   import TabPage from './TabPage'
 
   export default {
-    components: { HomePage, TabPage },
+    components: { HomePage, HistoryPage, TabPage },
     props: {
       persona: null,
       showWelcome: false
@@ -52,6 +56,7 @@
     left: 0;
     bottom: 0;
     right: 0;
+    overflow: auto;
   }
 
 </style>

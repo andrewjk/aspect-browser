@@ -71,7 +71,7 @@
           const activity = this.activity[persona._id]
           personaCount = personaCount + (persona.isActive || activity.hasOpenTab ? 1 : 0)
           activity.tabs.forEach(tab => {
-            tabCount = tabCount + (tab.url ? 1 : 0)
+            tabCount = tabCount + (tab.url.indexOf('aspect://') === -1 ? 1 : 0)
           })
         })
         if (tabCount > 0) {

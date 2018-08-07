@@ -102,7 +102,7 @@
         })
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: bookmark.url })
-        this.addToHistory({ tab: activeTab, url: null, title: 'Home' })
+        this.addToHistory({ tab: activeTab, url: 'aspect://home', title: 'Home' })
       },
       editBookmarks () {
         this.showEditBookmarkLinks = !this.showEditBookmarkLinks

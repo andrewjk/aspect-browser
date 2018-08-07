@@ -7,8 +7,11 @@
     </button>
     <div :id="'tab-list-' + persona._id" class="tab-list" :style="{ maxWidth: maxTabListWidth }">
       <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveTabIndex(index)" @click.middle="closeTab(index)" :title="item.title">
-        <template v-if="!item.url">
+        <template v-if="item.url === 'aspect://home'">
           <fa icon="home" class="tab-icon"/>
+        </template>
+        <template v-else-if="item.url === 'aspect://history'">
+          <fa icon="history" class="tab-icon"/>
         </template>
         <template v-else-if="item.isLoading">
           <fa icon="spinner" class="tab-icon" spin/>

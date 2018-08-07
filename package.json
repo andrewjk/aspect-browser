@@ -62,6 +62,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.0",
     "@octokit/rest": "^15.9.4",
     "axios": "^0.16.1",
+    "dateformat": "^3.0.3",
     "nedb": "^1.8.0",
     "normalize.css": "^8.0.0",
     "semver": "^5.5.0",

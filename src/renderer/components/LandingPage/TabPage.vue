@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import { mapMutations } from 'vuex'
+  import { mapMutations, mapActions } from 'vuex'
 
   import path from 'path'
 
@@ -21,6 +21,7 @@
         // If we set <webview src="tab.url">, Vue reloads the component every time the url changes
         initialUrl: this.tab.url,
         previousUrl: '',
+        historyUrl: '',
         targetUrl: '',
         targetUrlInterval: 0,
         showTargetUrl: false,
@@ -70,6 +71,9 @@
         'openInTab',
         'addToHistory'
       ]),
+      ...mapActions([
+        'saveToHistory'
+      ]),
       getPartition () {
         return 'persist:' + this.persona._id
       },
@@ -86,6 +90,17 @@
       loadFinished () {
         console.log('load finished: ' + this.tab.webview.getURL())
         this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: false })
+        if (this.tab.url !== this.historyUrl) {
+          console.log('adding to history')
+          this.saveToHistory({
+            db: this.$hdb,
+            personaId: this.persona._id,
+            url: this.tab.url,
+            icon: this.tab.icon,
+            title: this.tab.title
+          })
+        }
+        this.historyUrl = this.tab.url
       },
       loadFailed () {
         console.log('load failed: ' + this.tab.webview.getURL())
@@ -111,7 +126,7 @@
       },
       targetUrlUpdated (e) {
         if (this.targetUrlInterval) {
-          clearInterval(this.targetUrlInterval)
+          clearTimeout(this.targetUrlInterval)
         }
         if (e.url && this.showTargetUrl) {
           // If there's already a url being displayed, just update it
@@ -119,7 +134,7 @@
           this.showTargetUrl = true
         } else {
           // There's either a new URL to show, or no URL now, so show or hide the url after an interval
-          this.targetUrlInterval = setInterval(() => {
+          this.targetUrlInterval = setTimeout(() => {
             if (e.url) {
               this.targetUrl = e.url
             }

@@ -103,7 +103,6 @@
       this.loadPersonas(this.$pdb)
       this.loadSettings(this.$sdb)
       this.loadSystemSettings(this.$ssdb)
-      // TODO: Load history from the database
     },
     mounted: function () {
       document.addEventListener('keydown', this.keyDown)
@@ -130,6 +129,7 @@
         'openNewTab',
         'closeTab',
         'reopenTab',
+        'showHistory',
         'closePersonaModal',
         'closeBookmarkModal',
         'closeSettingsModal'
@@ -137,6 +137,7 @@
       ...mapActions([
         'loadPersonas',
         'loadSettings',
+        'loadHistory',
         'loadSystemSettings',
         'savePersona',
         'deletePersona',
@@ -194,6 +195,8 @@
             this.closeTab()
           } else if (e.keyCode === 6) { // F
             this.findInPage()
+          } else if (e.keyCode === 8) { // H
+            this.showHistory()
           }
         }
       },
@@ -282,7 +285,7 @@
     color: #666;
   }
 
-  input {
+  input[type="text"] {
     border-radius: 2px;
     border: 1px solid #ddd;
     padding: 4px 6px;
@@ -336,6 +339,10 @@
     -webkit-app-region: no-drag;
   }
 
+  .delete-link {
+    color: red;
+  }
+  
 </style>
 
 <style scoped>
@@ -370,8 +377,4 @@
     background-color: #ddd;
   }
 
-  .delete-link {
-    color: red;
-  }
-  
 </style>

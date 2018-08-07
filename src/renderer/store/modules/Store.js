@@ -84,7 +84,7 @@ const mutations = {
       tabs: [
         {
           _id: uuid(),
-          url: null,
+          url: 'aspect://home',
           addressText: null,
           title: 'Home',
           icon: null,
@@ -184,7 +184,7 @@ const mutations = {
         // HACK: Don't feel great about duplicating this:
         activity.tabs.push({
           _id: uuid(),
-          url: null,
+          url: 'aspect://home',
           addressText: null,
           title: 'Home',
           icon: null,
@@ -227,7 +227,7 @@ const mutations = {
       const tabs = state.activity[activePersona._id].tabs
       tabs.push({
         _id: uuid(),
-        url: null,
+        url: 'aspect://home',
         addressText: null,
         title: 'Home',
         icon: null,
@@ -508,9 +508,13 @@ const mutations = {
           const url = t.backHistory.pop().url
           t.addressText = url
           t.haveGoneBack = true
-          if (!url) {
-            t.url = null
+          if (url === 'aspect://home') {
+            t.url = 'aspect://home'
             t.title = 'Home'
+            t.webview = null
+          } else if (url === 'aspect://history') {
+            t.url = 'aspect://history'
+            t.title = 'History'
             t.webview = null
           } else if (t.webview) {
             t.webview.loadURL(url)
@@ -537,9 +541,13 @@ const mutations = {
           const url = t.forwardHistory.pop().url
           t.addressText = url
           t.haveGoneBack = true
-          if (!url) {
-            t.url = null
+          if (url === 'aspect://home') {
+            t.url = 'aspect://home'
             t.title = 'Home'
+            t.webview = null
+          } else if (url === 'aspect://history') {
+            t.url = 'aspect://history'
+            t.title = 'History'
             t.webview = null
           } else if (t.webview) {
             t.webview.loadURL(url)
@@ -587,10 +595,33 @@ const mutations = {
       title: tab.title
     })
     tab.forwardHistory = []
-    tab.url = null
+    tab.url = 'aspect://home'
     tab.addressText = null
     tab.title = 'Home'
     tab.webview = null
+  },
+  showHistory (state) {
+    const activePersona = state.personas.find((p) => {
+      return p.isActive
+    })
+    if (activePersona) {
+      const tabs = state.activity[activePersona._id].tabs
+      tabs.push({
+        _id: uuid(),
+        url: 'aspect://history',
+        addressText: null,
+        title: 'History',
+        icon: null,
+        isActive: true,
+        isLoading: false,
+        backHistory: [],
+        forwardHistory: []
+      })
+      const newIndex = tabs.length - 1
+      tabs.forEach((t, i) => {
+        t.isActive = (i === newIndex)
+      })
+    }
   },
   // ========
   // SETTINGS
@@ -817,6 +848,49 @@ const actions = {
   // ========
   // ACTIVITY
   // ========
+  loadHistory ({ commit, dispatch }, data) {
+    const db = data.db
+    const personaId = data.personaId
+    const search = data.search
+    return new Promise((resolve, reject) => {
+      db.find({ $and: [{ personaId }, search ? { $or: [{ title: new RegExp(search, 'gi') }, { url: new RegExp(search, 'gi') }] } : {}] }).sort({ dateTime: -1 }).exec(function (err, dbHistory) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(dbHistory)
+        }
+      })
+    })
+  },
+  saveToHistory ({ commit }, data) {
+    const db = data.db
+    const history = {
+      personaId: data.personaId,
+      url: data.url,
+      icon: data.icon,
+      title: data.title,
+      dateTime: new Date()
+    }
+    db.insert(history, function (err, dbHistory) {
+      if (err) {
+        alert('ERROR: ' + err)
+        // return
+      }
+    })
+  },
+  deleteHistory ({ commit }, data) {
+    const db = data.db
+    const ids = data.ids
+    return new Promise((resolve, reject) => {
+      db.remove({ _id: { $in: ids } }, { multi: true }, function (err, numRemoved) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(numRemoved)
+        }
+      })
+    })
+  },
   // ========
   // SETTINGS
   // ========

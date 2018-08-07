@@ -73,7 +73,7 @@
     },
     mounted: function () {
       // HACK: Give it time to load the system settings database
-      setInterval(() => {
+      setTimeout(() => {
         this.updateExists = this.systemSettings.updateExists
         this.checkUpdate()
       }, 100)
