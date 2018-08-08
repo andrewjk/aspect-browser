@@ -105,8 +105,12 @@
       this.loadSystemSettings(this.$ssdb)
     },
     mounted: function () {
-      document.addEventListener('keydown', this.keyDown)
-      document.addEventListener('keypress', this.keyPress)
+      window.addEventListener('keydown', (e) => {
+        this.keyDown(e)
+      }, true)
+      window.addEventListener('keypress', (e) => {
+        this.keyPress(e)
+      }, true)
     },
     updated: function () {
       if (this.focusFindBookmark) {
@@ -146,57 +150,96 @@
         'saveSettings'
       ]),
       keyDown (e) {
-        // Have to listen for Ctrl + Tab and some others in keyDown because they don't work in keyPress
-        // console.log(e.keyCode)
-        if (e.ctrlKey || e.metaKey) {
-          if (e.keyCode === 9) { // Tab
-            if (e.shiftKey) {
-              this.previousTab()
-            } else {
-              this.nextTab()
-            }
-          } else if (e.keyCode === 192) { // Tilde
-            if (e.shiftKey) {
-              this.previousPersona()
-            } else {
-              this.nextPersona()
-            }
-          } else if (e.keyCode >= 49 && e.keyCode <= 57) { // 1 - 9
-            const newIndex = e.keyCode - 49
-            this.setActiveTabIndex(newIndex)
-          } else if (e.keyCode === 45 || e.keyCode === 109 || e.keyCode === 189) { // Minus
-            this.zoomOut()
-          } else if (e.keyCode === 43 || e.keyCode === 61 || e.keyCode === 107 || e.keyCode === 187) { // Plus or equals
-            this.zoomIn()
-          } else if (e.keyCode === 48) { // Zero
-            this.zoomDefault()
-          } else if (e.keyCode === 190) { // .
-            this.showFindBookmarkModal()
+        let keys = ''
+        if (e.ctrlKey || e.metaKey) keys = keys + 'ctrl+'
+        if (e.altKey || e.optionKey) keys = keys + 'alt+'
+        if (e.shiftKey) keys = keys + 'shift+'
+        keys = keys + e.key
+
+        // console.log('keydown: ' + keys)
+        switch (keys) {
+          case 'ctrl+`': {
+            this.nextPersona()
+            break
           }
-        } else if (e.altKey) {
-          if (e.keyCode >= 48 && e.keyCode <= 57) { // 1 - 9
-            const newIndex = e.keyCode - 49
+          case 'ctrl+shift+`': {
+            this.previousPersona()
+            break
+          }
+          case 'alt+1':
+          case 'alt+2':
+          case 'alt+3':
+          case 'alt+4':
+          case 'alt+5':
+          case 'alt+6':
+          case 'alt+7':
+          case 'alt+8':
+          case 'alt+9': {
+            const newIndex = parseInt(e.key) - 1
             this.setActivePersonaIndex(newIndex)
+            break
           }
-        }
-      },
-      keyPress (e) {
-        // console.log('keypress: ' + e.keyCode)
-        if (e.ctrlKey || e.metaKey) {
-          if (e.keyCode === 12) { // L
+          case 'ctrl+tab': {
+            this.nextTab()
+            break
+          }
+          case 'ctrl+shift+tab': {
+            this.previousTab()
+            break
+          }
+          case 'ctrl+1':
+          case 'ctrl+2':
+          case 'ctrl+3':
+          case 'ctrl+4':
+          case 'ctrl+5':
+          case 'ctrl+6':
+          case 'ctrl+7':
+          case 'ctrl+8':
+          case 'ctrl+9': {
+            const newIndex = parseInt(e.key) - 1
+            this.setActiveTabIndex(newIndex)
+            break
+          }
+          case 'ctrl+-': {
+            this.zoomOut()
+            break
+          }
+          case 'ctrl++':
+          case 'ctrl+=': {
+            this.zoomIn()
+            break
+          }
+          case 'ctrl+0': {
+            this.zoomDefault()
+            break
+          }
+          case 'ctrl+.': {
+            this.showFindBookmarkModal()
+            break
+          }
+          case 'ctrl+l': {
             this.focusAddressBox()
-          } else if (e.keyCode === 20) { // T
-            if (e.shiftKey) {
-              this.reopenTab()
-            } else {
-              this.openNewTab()
-            }
-          } else if (e.keyCode === 23) { // V
+            break
+          }
+          case 'ctrl+t': {
+            this.openNewTab()
+            break
+          }
+          case 'ctrl+v': {
             this.closeTab()
-          } else if (e.keyCode === 6) { // F
+            break
+          }
+          case 'ctrl+shift+t': {
+            this.reopenTab()
+            break
+          }
+          case 'ctrl+f': {
             this.findInPage()
-          } else if (e.keyCode === 8) { // H
+            break
+          }
+          case 'ctrl+h': {
             this.showHistory()
+            break
           }
         }
       },
