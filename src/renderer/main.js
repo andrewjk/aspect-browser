@@ -6,10 +6,10 @@ import router from './router'
 import store from './store'
 
 // Data storage via nedb
-import pdb from './personas-db'
-import sdb from './settings-db'
-import hdb from './history-db'
-import ssdb from './system-settings-db'
+import pdb from './data/personas'
+import usdb from './data/user-settings'
+import hdb from './data/history'
+import ssdb from './data/system-settings'
 
 // FontAwesome icons
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -48,7 +48,7 @@ require('../../node_modules/normalize.css/normalize.css')
 
 // Setup the data storage so that it can be accessed from any Vue component
 Vue.prototype.$pdb = pdb
-Vue.prototype.$sdb = sdb
+Vue.prototype.$usdb = usdb
 Vue.prototype.$hdb = hdb
 Vue.prototype.$ssdb = ssdb
 

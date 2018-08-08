@@ -36,7 +36,7 @@
       <h3 slot="header">Settings:</h3>
       <settings-form slot="body"></settings-form>
       <div slot="footer" class="modal-button-footer">
-        <button @click="saveSettings({ db: $sdb, settingsToEdit, settingsToUpdate })">
+        <button @click="saveSettings({ db: $usdb, settingsToEdit, settingsToUpdate })">
           Save
         </button>
         <button @click="closeSettingsModal">
@@ -101,7 +101,7 @@
     },
     created: function () {
       this.loadPersonas(this.$pdb)
-      this.loadSettings(this.$sdb)
+      this.loadSettings(this.$usdb)
       this.loadSystemSettings(this.$ssdb)
     },
     mounted: function () {
