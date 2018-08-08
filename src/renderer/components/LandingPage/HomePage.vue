@@ -144,7 +144,7 @@
 
   .bookmark-button:hover,
   .bookmark-button:focus {
-    background-color: #ddd;
+    background-color: #eee;
   }
 
   .bookmark-button.editing:hover,
@@ -181,7 +181,7 @@
     width: 30px;
     line-height: 30px;
     text-align: center;
-    color: #444;
+    color: #888;
   }
 
   .editing-icon {
@@ -191,7 +191,7 @@
 
   .bookmark-edit-button:hover,
   .bookmark-edit-button:focus {
-    background-color: #ddd;
+    background-color: #eee;
   }
 
 </style>

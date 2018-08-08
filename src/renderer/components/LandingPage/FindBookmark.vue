@@ -23,7 +23,7 @@
       return {
         lastFindText: '',
         findText: '',
-        results: []
+        results: Array
       }
     },
     computed: {
@@ -50,7 +50,7 @@
       ]),
       startFind () {
         if (this.findText !== this.lastFindText) {
-          if (this.findText.length < 2) {
+          if (!this.findText.length) {
             this.results = []
             return
           }
@@ -121,7 +121,7 @@
             const activePersona = this.getActivePersona
             if (activePersona) {
               const tabs = this.activity[activePersona._id].tabs
-              if (tabs.length === 1 && !tabs[0].url) {
+              if (tabs.length === 1 && tabs[0].url.indexOf('aspect://') === 0) {
                 const activeTab = tabs[0]
                 this.setTabDetails({ persona: activePersona, tab: activeTab, isLoading: true, url: result.url })
                 this.addToHistory({ tab: activeTab, url: 'aspect://home', title: 'Home' })

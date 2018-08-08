@@ -9,9 +9,7 @@
     <button class="address-button" @click="goHome(getActiveTab)" title="Open the home page for this persona">
       <fa icon="home"/>
     </button>
-    <div class="address-input">
-      <input type="text" :id="'address-text-' + persona._id" v-model="addressText" onfocus="this.select();" @keypress="keyPressed" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
-    </div>
+    <address-input :persona="persona"></address-input>
     <button class="address-button" @click="addBookmark({ persona, url: getActiveTab.url, title: getActiveTab.title, icon: getActiveTab.icon })" title="Add the current page to this persona's bookmarks">
       <fa icon="star"/>
     </button>
@@ -37,12 +35,13 @@
   import { remote, shell } from 'electron'
   import semver from 'semver'
 
+  import AddressInput from './AddressInput'
   import OptionsMenu from './OptionsMenu'
 
   const octokit = octokitrest()
 
   export default {
-    components: { OptionsMenu },
+    components: { AddressInput, OptionsMenu },
     props: {
       persona: null
     },
@@ -60,16 +59,7 @@
       }),
       ...mapGetters([
         'getActiveTab'
-      ]),
-      // Computed properties for v-model binding
-      addressText: {
-        get () {
-          return this.getActiveTab.addressText
-        },
-        set (value) {
-          this.setTabDetails({ persona: this.persona, tab: this.getActiveTab, addressText: value })
-        }
-      }
+      ])
     },
     mounted: function () {
       // HACK: Give it time to load the system settings database
@@ -119,17 +109,6 @@
       getForwardHistory () {
         const tab = this.getActiveTab
         return tab.forwardHistory ? tab.forwardHistory.map((item) => { return item.title }).join('\n') : []
-      },
-      keyPressed (e) {
-        if (e.keyCode === 13) {
-          let tab = this.getActiveTab
-          let url = tab.addressText.trim()
-          if (url) {
-            this.goToUrl({ tab, url })
-          } else {
-            this.goHome(tab)
-          }
-        }
       },
       stopLoad () {
         const tab = this.getActiveTab
@@ -221,15 +200,6 @@
 
   .address-button.disabled:hover {
     background-color: inherit;
-  }
-
-  .address-input {
-    flex-grow: 1;
-    padding: 0 5px;
-  }
-
-  .address-input > input {
-    width: 100%;
   }
 
 </style>

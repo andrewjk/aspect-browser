@@ -169,7 +169,7 @@
   }
 
   .history-edit {
-    color: #aaa;
+    color: #888;
     border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
     font-size: 13px;
@@ -194,16 +194,14 @@
 
   .history-item {
     font-size: 13px;
-    margin: 10px 0;
     display: grid;
     grid-template-columns: 90px 1fr;
     grid-column-gap: 20px;
-    grid-row-gap: 20px;
     align-items: center;
   }
 
   .history-date-time {
-    color: #aaa;
+    color: #888;
   }
 
   .history-button {
@@ -216,12 +214,12 @@
 
   .history-button:hover,
   .history-button:focus {
-    background-color: #ddd;
+    background-color: #eee;
   }
 
   .history-button-grid {
     display: grid;
-    grid-template-columns: auto 1fr 200px;
+    grid-template-columns: auto 1fr 250px;
     grid-column-gap: 20px;
     align-items: center;
   }
@@ -239,7 +237,7 @@
   }
 
   .history-url {
-    color: #aaa;
+    color: #888;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

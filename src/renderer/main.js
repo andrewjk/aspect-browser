@@ -35,7 +35,9 @@ import {
   faChevronDown,
   faBars,
   faEllipsisV,
-  faHistory
+  faHistory,
+  faFolder,
+  faGlobe
 } from '@fortawesome/free-solid-svg-icons'
 import { faWindowMinimize, faWindowMaximize, faWindowRestore, faWindowClose } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -72,11 +74,13 @@ library.add(faChevronUp)
 library.add(faChevronDown)
 library.add(faBars)
 library.add(faEllipsisV)
+library.add(faHistory)
+library.add(faFolder)
+library.add(faGlobe)
 library.add(faWindowMinimize)
 library.add(faWindowMaximize)
 library.add(faWindowRestore)
 library.add(faWindowClose)
-library.add(faHistory)
 
 Vue.component('fa', FontAwesomeIcon)
 
