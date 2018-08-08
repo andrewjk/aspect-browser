@@ -170,7 +170,7 @@
 
           // 3. History
           if (results.length < maxItems) {
-            this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.addressText }).then((response) => {
+            this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.addressText, limit: maxItems }).then((response) => {
               response.forEach((history) => {
                 if (results.length < maxItems && !results.find((item) => item.url === history.url)) {
                   results.push({

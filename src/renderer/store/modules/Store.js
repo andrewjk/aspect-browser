@@ -852,8 +852,10 @@ const actions = {
     const db = data.db
     const personaId = data.personaId
     const search = data.search
+    const skip = data.skip
+    const limit = data.limit
     return new Promise((resolve, reject) => {
-      db.find({ $and: [{ personaId }, search ? { $or: [{ title: new RegExp(search, 'gi') }, { url: new RegExp(search, 'gi') }] } : {}] }).sort({ dateTime: -1 }).exec(function (err, dbHistory) {
+      db.find({ $and: [{ personaId }, search ? { $or: [{ title: new RegExp(search, 'gi') }, { url: new RegExp(search, 'gi') }] } : {}] }).sort({ dateTime: -1 }).skip(skip).limit(limit).exec(function (err, dbHistory) {
         if (err) {
           reject(err)
         } else {

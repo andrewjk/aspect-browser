@@ -21,18 +21,21 @@
       </button>
     </div>
     <div class="history-list">
-      <div class="history-item" v-for="(item) in history" :key="item._id">
-        <label class="history-date-time">
-          <input type="checkbox" v-model="item.isSelected" @change="selectOne">
-          {{ formatTime(item.dateTime) }}
-        </label>
-        <button class="history-button" @click="openHistory(item, $event)">
-          <div class="history-button-grid">
-            <img class="history-icon" :src="item.icon">
-            <div class="history-title" :title="item.title">{{ item.title }}</div>
-            <div class="history-url" :title="item.url">{{ item.url }}</div>
-          </div>
-        </button>
+      <div class="history-group" v-for="(gitem) in historyDates" :key="gitem.toLocaleString()">
+        <div class="history-group-title">{{ formatDate(gitem) }}</div>
+        <div class="history-item" v-for="(item) in history.filter((item) => areDatesEqual(item.dateTime, gitem))" :key="item._id">
+          <label class="history-date-time">
+            <input type="checkbox" v-model="item.isSelected" @change="selectOne">
+            {{ formatTime(item.dateTime) }}
+          </label>
+          <button class="history-button" @click="openHistory(item, $event)">
+            <div class="history-button-grid">
+              <img class="history-icon" :src="item.icon">
+              <div class="history-title" :title="item.title">{{ item.title }}</div>
+              <div class="history-url" :title="item.url">{{ item.url }}</div>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -60,8 +63,24 @@
         selectedCount: 0
       }
     },
+    computed: {
+      historyDates: {
+        get () {
+          const results = []
+          if (this.history && this.history.length && this.history.forEach) {
+            this.history.forEach((item) => {
+              const lastResult = results[results.length - 1]
+              if (!lastResult || !this.areDatesEqual(lastResult, item.dateTime)) {
+                results.push(item.dateTime)
+              }
+            })
+          }
+          return results
+        }
+      }
+    },
     created: function () {
-      this.loadHistory({ db: this.$hdb, personaId: this.persona._id }).then((response) => {
+      this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 }).then((response) => {
         this.history = response
       }).catch((error) => {
         alert('ERROR: ' + error)
@@ -90,7 +109,7 @@
           clearTimeout(this.searchInterval)
         }
         this.searchInterval = setTimeout(() => {
-          this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText }).then((response) => {
+          this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then((response) => {
             this.history = response
             this.searchCompleted = true
           }).catch((error) => {
@@ -111,6 +130,23 @@
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: history.url })
         this.addToHistory({ tab: activeTab, url: 'aspect://history', title: 'History' })
+      },
+      areDatesEqual (d1, d2) {
+        if (!d1.getFullYear) console.log(d1)
+        return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
+      },
+      formatDate (time) {
+        // TODO: Add Today, Yesterday etc
+        const today = new Date()
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        if (this.areDatesEqual(time, today)) {
+          return `Today - ${dateformat(time, 'fullDate')}`
+        } else if (this.areDatesEqual(time, yesterday)) {
+          return `Yesterday - ${dateformat(time, 'fullDate')}`
+        } else {
+          return dateformat(time, 'fullDate')
+        }
       },
       formatTime (time) {
         return dateformat(time, 'shortTime')
@@ -134,7 +170,7 @@
       deleteSelectedItems () {
         const ids = this.history.filter((item) => item.isSelected).map((item) => item._id)
         this.deleteHistory({ db: this.$hdb, ids }).then((response) => {
-          this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText }).then(response => {
+          this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then(response => {
             this.history = response
             this.showSelectAll = true
             this.showDeleteButton = false
@@ -160,6 +196,11 @@
     margin-bottom: 10px;
   }
 
+  .history-group-title {
+    font-size: 18px;
+    margin: 15px 0;
+  }
+
   .welcome {
     margin: 40px 0;
   }
@@ -178,6 +219,10 @@
     grid-template-columns: 90px 1fr;
     grid-column-gap: 20px;
     align-items: center;
+  }
+
+  .history-select-all {
+    padding: 5px 0;
   }
 
   .history-delete-button {
