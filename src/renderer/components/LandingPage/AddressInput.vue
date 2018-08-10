@@ -146,7 +146,29 @@
             })
           }
 
-          // 2. Tabs that are open (other than this one)
+          // 2. Bookmarks
+          if (results.length < maxItems) {
+            this.persona.bookmarks.forEach((bookmark, index) => {
+              if (bookmark.title.toLowerCase().indexOf(this.addressText.toLowerCase()) !== -1 ||
+                  bookmark.url.toLowerCase().indexOf(this.addressText.toLowerCase()) !== -1) {
+                if (results.length < maxItems && !results.find((item) => item.url === bookmark.url)) {
+                  results.push({
+                    type: 'bookmark',
+                    id: bookmark._id,
+                    icon: bookmark.icon,
+                    text: bookmark.title,
+                    url: bookmark.url,
+                    hintIcon: 'star',
+                    hint: 'Open this bookmark',
+                    title: 'Open ' + bookmark.url,
+                    isActive: false
+                  })
+                }
+              }
+            })
+          }
+
+          // 3. Tabs that are open (other than this one)
           this.activity[this.persona._id].tabs.forEach((tab, index) => {
             if (!tab.isActive) {
               if (tab.title.toLowerCase().indexOf(this.addressText.toLowerCase()) !== -1 ||
@@ -168,7 +190,7 @@
             }
           })
 
-          // 3. History
+          // 4. History
           if (results.length < maxItems) {
             this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.addressText, limit: maxItems }).then((response) => {
               response.forEach((history) => {
@@ -186,28 +208,6 @@
                   })
                 }
               })
-
-              // 4. Bookmarks
-              if (results.length < maxItems) {
-                this.persona.bookmarks.forEach((bookmark, index) => {
-                  if (bookmark.title.toLowerCase().indexOf(this.addressText.toLowerCase()) !== -1 ||
-                      bookmark.url.toLowerCase().indexOf(this.addressText.toLowerCase()) !== -1) {
-                    if (results.length < maxItems && !results.find((item) => item.url === bookmark.url)) {
-                      results.push({
-                        type: 'bookmark',
-                        id: bookmark._id,
-                        icon: bookmark.icon,
-                        text: bookmark.title,
-                        url: bookmark.url,
-                        hintIcon: 'star',
-                        hint: 'Open this bookmark',
-                        title: 'Open ' + bookmark.url,
-                        isActive: false
-                      })
-                    }
-                  }
-                })
-              }
 
               if (results.length) {
                 results[0].isActive = true
