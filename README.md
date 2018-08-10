@@ -29,12 +29,13 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 
 ## Download
 
-| | |
-| - | - |
-| ![Windows logo](/docs/images/windows.png) | [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-setup-0.0.2.exe) |
-| ![Apple logo](/docs/images/apple.png) | [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg) |
-| ![Linux logo](/docs/images/linux.png) | [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage) |
-| ![All platforms logo](/docs/images/all-platforms.png) | [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2) |
+![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-setup-0.0.2.exe)
+
+![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg)
+
+![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage)
+
+![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2)
 
 ## Keyboard Shortcuts
 
