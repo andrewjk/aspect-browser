@@ -78,7 +78,6 @@
         'addToHistory',
         'goToUrl',
         'goHome',
-        'openInTab',
         'setActiveTabIndex'
       ]),
       ...mapActions([

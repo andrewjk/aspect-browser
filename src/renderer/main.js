@@ -37,7 +37,8 @@ import {
   faEllipsisV,
   faHistory,
   faFolder,
-  faGlobe
+  faGlobe,
+  faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
 import { faWindowMinimize, faWindowMaximize, faWindowRestore, faWindowClose } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -77,6 +78,8 @@ library.add(faEllipsisV)
 library.add(faHistory)
 library.add(faFolder)
 library.add(faGlobe)
+library.add(faInfoCircle)
+
 library.add(faWindowMinimize)
 library.add(faWindowMaximize)
 library.add(faWindowRestore)
