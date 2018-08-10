@@ -24,7 +24,7 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 * Setup multiple personas with their own bookmarks, logins, history and tabs
 * Add bookmarks to the home page of each persona for quick access
 * Tabbed browsing makes it easy to keep your browsing confined to the one persona
-* Use keyboard shortcuts and search to switch between personas and tabs
+* Use keyboard shortcuts and quick find to switch between personas and tabs
 
 ## Download
 
@@ -32,6 +32,24 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 | ![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg) |
 | ![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage) |
 | ![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2) |
+
+## Keyboard Shortcuts
+
+| Ctrl/Command + ` | Next Persona |
+| Ctrl/Command + Shift + ` | Previous Persona |
+| Alt/Option + 1-9 | Select a Persona |
+| Ctrl/Command + Tab | Next Tab |
+| Ctrl/Command + Shift + Tab | Previous Tab |
+| Ctrl/Command + 1-9 | Select a Tab |
+| Ctrl/Command + . | Find a Persona/Bookmark |
+| Ctrl/Command + T | Open a New Tab |
+| Ctrl/Command + V | Close the Current Tab |
+| Ctrl/Command + Shift + T | Re-open a Closed Tab |
+| Ctrl/Command + L | Focus the Address Box |
+| Ctrl/Command + F | Find in Page |
+| Ctrl/Command + H | Show History |
+| Ctrl/Command + Plus/Minus | Zoom In/Zoom Out |
+| Ctrl/Command + 0 | Reset Zoom |
 
 ## Build
 
