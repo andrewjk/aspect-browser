@@ -1,28 +1,27 @@
 <template>
-  <main>
-    <div class="about-dialog-container">
-      <div class="about-dialog-logo">
-        <img :src="imageSource">
+  <div class="about-dialog-container">
+    <div class="about-dialog-logo">
+      <img :src="imageSource">
+    </div>
+    <div class="about-dialog-info">
+      <div class="about-dialog-title">
+        Aspect
       </div>
-      <div class="about-dialog-info">
-        <div class="about-dialog-title">
-          Aspect
-        </div>
-        <div class="about-dialog-version">
-          Version {{ version }}
-        </div>
-        <p>
-          A multi-persona web browser
-        </p>
-        <div class="about-dialog-links">
-          <a href="#" @click="openWebsite">Website</a> | <a href="#" @click="openSource">Source</a>
-        </div>
+      <div class="about-dialog-version">
+        Version {{ version }}
+      </div>
+      <p>
+        A multi-persona web browser
+      </p>
+      <div class="about-dialog-links">
+        <a href="#" @click="openWebsite">Website</a> | <a href="#" @click="openSource">Source</a>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>
+  import { mapMutations } from 'vuex'
   import path from 'path'
   import { remote } from 'electron'
 
@@ -37,11 +36,17 @@
       }
     },
     methods: {
+      ...mapMutations([
+        'openInTab',
+        'closeAboutInfo'
+      ]),
       openWebsite: function () {
-        remote.getCurrentWebContents().emit('openSite', 'https://github.com/andrewjk/aspect-browser')
+        this.openInTab({ url: 'https://github.com/andrewjk/aspect-browser', background: false })
+        this.closeAboutInfo()
       },
       openSource: function () {
-        remote.getCurrentWebContents().emit('openSite', 'https://github.com/andrewjk/aspect-browser')
+        this.openInTab({ url: 'https://github.com/andrewjk/aspect-browser', background: false })
+        this.closeAboutInfo()
       }
     }
   }
@@ -50,9 +55,6 @@
 <style scoped>
 
   .about-dialog-container {
-    height: 100vh;
-    background-color: #222;
-    color: #eee;
     padding: 20px;
     display: grid;
     grid-template-columns: 128px auto;

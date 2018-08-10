@@ -53,6 +53,14 @@
         </button>
       </div>
     </modal>
+    <modal v-if="showAboutInfo">
+      <about-info slot="body"></about-info>
+      <div slot="footer" class="modal-button-footer">
+        <button @click="closeAboutInfo">
+          Close
+        </button>
+      </div>
+    </modal>
   </main>
 </template>
 
@@ -66,10 +74,11 @@
   import BookmarkForm from './LandingPage/BookmarkForm'
   import SettingsForm from './LandingPage/SettingsForm'
   import FindBookmark from './LandingPage/FindBookmark'
+  import AboutInfo from './LandingPage/AboutInfo'
 
   export default {
     name: 'landing-page',
-    components: { PersonaList, PersonaBrowser, Modal, PersonaForm, BookmarkForm, SettingsForm, FindBookmark },
+    components: { PersonaList, PersonaBrowser, Modal, PersonaForm, BookmarkForm, SettingsForm, FindBookmark, AboutInfo },
     data () {
       return {
         zoomLevel: 0,
@@ -92,7 +101,8 @@
         bookmarkToUpdate: state => state.Store.bookmarkToUpdate,
         showSettingsModal: state => state.Store.showSettingsModal,
         settingsToEdit: state => state.Store.settingsToEdit,
-        settingsToUpdate: state => state.Store.settingsToUpdate
+        settingsToUpdate: state => state.Store.settingsToUpdate,
+        showAboutInfo: state => state.Store.showAboutInfo
       }),
       ...mapGetters([
         'getActivePersona',
@@ -133,7 +143,8 @@
         'showHistory',
         'closePersonaModal',
         'closeBookmarkModal',
-        'closeSettingsModal'
+        'closeSettingsModal',
+        'closeAboutInfo'
       ]),
       ...mapActions([
         'loadPersonas',

@@ -8,7 +8,7 @@
       <fa icon="history"/>
       <span>History</span>
     </button>
-    <button class="options-menu-item" @click="showAboutDialog" title="Show information about Aspect">
+    <button class="options-menu-item" @click="showAboutInfo" title="Show information about Aspect">
       <fa icon="info-circle"/>
       <span>About Aspect</span>
     </button>
@@ -17,38 +17,14 @@
 
 <script>
   import { mapMutations } from 'vuex'
-  import { remote } from 'electron'
 
   export default {
     methods: {
       ...mapMutations([
         'editSettings',
         'showHistory',
-        'openInTab'
-      ]),
-      showAboutDialog: function () {
-        let win = new remote.BrowserWindow({
-          width: 480,
-          height: 280,
-          resizable: false,
-          minimizable: false,
-          webPreferences: {
-            devTools: false
-          }
-        })
-        win.setMenu(null)
-        win.on('closed', () => {
-          win = null
-        })
-        win.webContents.on('openSite', (url) => {
-          this.openInTab({ url, background: false })
-          win.close()
-        })
-        const winurl = process.env.NODE_ENV === 'development'
-          ? `http://localhost:9080/#/about`
-          : `file://${__dirname}/index.html#about`
-        win.loadURL(winurl)
-      }
+        'showAboutInfo'
+      ])
     }
   }
 </script>

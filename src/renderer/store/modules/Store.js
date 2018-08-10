@@ -14,7 +14,8 @@ const state = {
   bookmarkToEdit: null,
   showSettingsModal: false,
   settingsToUpdate: null,
-  settingsToEdit: null
+  settingsToEdit: null,
+  showAboutInfo: false
 }
 
 const getters = {
@@ -648,9 +649,9 @@ const mutations = {
     state.settingsToEdit = null
     state.showSettingsModal = false
   },
-  // ========
+  // ===============
   // SYSTEM SETTINGS
-  // ========
+  // ===============
   setSystemSettings (state, systemSettings) {
     state.systemSettings = systemSettings
   },
@@ -662,6 +663,15 @@ const mutations = {
     const oldVersion = data.oldVersion
     state.systemSettings.updateExists = updateExists
     state.systemSettings.oldVersion = oldVersion
+  },
+  // ====
+  // MISC
+  // ====
+  showAboutInfo (state, data) {
+    state.showAboutInfo = true
+  },
+  closeAboutInfo (state, data) {
+    state.showAboutInfo = false
   }
 }
 

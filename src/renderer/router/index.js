@@ -7,11 +7,6 @@ export default new Router({
   mode: 'hash',
   routes: [
     {
-      path: '/about',
-      name: 'about-dialog',
-      component: require('@/components/AboutDialog').default
-    },
-    {
       path: '/',
       name: 'landing-page',
       component: require('@/components/LandingPage').default
