@@ -24,24 +24,29 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 * Setup multiple personas with their own bookmarks, logins, history and tabs
 * Add bookmarks to the home page of each persona for quick access
 * Tabbed browsing makes it easy to keep your browsing confined to the one persona
-* Use keyboard shortcuts and quick find to switch between personas and tabs
+* Use keyboard shortcuts to switch between personas and tabs
+* Use Quick Find to search for personas and bookmarks
 
 ## Download
 
-| ![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-setup-0.0.2.exe) |
-| ![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg) |
-| ![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage) |
-| ![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2) |
+| | |
+| - | - |
+| ![Windows logo](/docs/images/windows.png) | [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-setup-0.0.2.exe) |
+| ![Apple logo](/docs/images/apple.png) | [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/Aspect-0.0.2.dmg) |
+| ![Linux logo](/docs/images/linux.png) | [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.2/aspect-browser-0.0.2-x86_64.AppImage) |
+| ![All platforms logo](/docs/images/all-platforms.png) | [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.2) |
 
 ## Keyboard Shortcuts
 
+| Shortcut | Action |
+| -------- | ------ |
 | Ctrl/Command + ` | Next Persona |
 | Ctrl/Command + Shift + ` | Previous Persona |
 | Alt/Option + 1-9 | Select a Persona |
 | Ctrl/Command + Tab | Next Tab |
 | Ctrl/Command + Shift + Tab | Previous Tab |
 | Ctrl/Command + 1-9 | Select a Tab |
-| Ctrl/Command + . | Find a Persona/Bookmark |
+| Ctrl/Command + . | Quick Find |
 | Ctrl/Command + T | Open a New Tab |
 | Ctrl/Command + V | Close the Current Tab |
 | Ctrl/Command + Shift + T | Re-open a Closed Tab |
