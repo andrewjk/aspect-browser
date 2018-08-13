@@ -35,12 +35,17 @@ import {
   faChevronDown,
   faBars,
   faEllipsisV,
-  faHistory,
   faFolder,
   faGlobe,
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
-import { faWindowMinimize, faWindowMaximize, faWindowRestore, faWindowClose } from '@fortawesome/free-regular-svg-icons'
+import {
+  faClock,
+  faWindowMinimize,
+  faWindowMaximize,
+  faWindowRestore,
+  faWindowClose
+} from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // Normalize.css
@@ -75,7 +80,7 @@ library.add(faChevronUp)
 library.add(faChevronDown)
 library.add(faBars)
 library.add(faEllipsisV)
-library.add(faHistory)
+library.add(faClock)
 library.add(faFolder)
 library.add(faGlobe)
 library.add(faInfoCircle)

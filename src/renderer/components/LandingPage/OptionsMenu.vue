@@ -6,7 +6,7 @@
     </button>
     <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="showHistory" title="Show browsing history for this persona">
-      <fa icon="history"/>
+      <fa :icon="['far', 'clock']"/>
       <span>View {{ this.persona.name }} History</span>
     </button>
     <button class="options-menu-item" @click="clearHistory({ db: $hdb, personaId: persona._id })" title="Clear the browsing history for this persona">
