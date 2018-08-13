@@ -233,7 +233,7 @@
             this.openNewTab()
             break
           }
-          case 'ctrl+v': {
+          case 'ctrl+w': {
             this.closeTab()
             break
           }

@@ -49,7 +49,7 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 | Ctrl/Command + 1-9 | Select a Tab |
 | Ctrl/Command + . | Quick Find |
 | Ctrl/Command + T | Open a New Tab |
-| Ctrl/Command + V | Close the Current Tab |
+| Ctrl/Command + W | Close the Current Tab |
 | Ctrl/Command + Shift + T | Re-open a Closed Tab |
 | Ctrl/Command + L | Focus the Address Box |
 | Ctrl/Command + F | Find in Page |
