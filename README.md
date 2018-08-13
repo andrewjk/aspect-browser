@@ -57,6 +57,23 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 | Ctrl/Command + Plus/Minus | Zoom In/Zoom Out |
 | Ctrl/Command + 0 | Reset Zoom |
 
+## Roadmap
+
+The following is a very provisional roadmap of planned major features.
+
+| Date | Version | Feature | Done |
+| ---- | ------- | ------- | ---- |
+| 6 Aug | 0.0.4 | Check for updates | ✓ |
+| 13 Aug | 0.0.3 | History management | ✓ |
+| 20 Aug | 0.0.4 | Password storage | |
+| 27 Aug | 0.0.5 | Ad blocking | |
+| 3 Sep | 0.0.6 | Session management | |
+| 10 Sep | 0.0.7 | Download management | |
+| 17 Sep | 0.0.8 | Memory management | |
+| 24 Sep | 0.0.9 | Notifications | |
+| 1 Oct | 0.0.10 | Bookmark management | |
+| 8 Oct | 0.0.11 | Home page widgets | |
+
 ## Build
 
 ``` bash
