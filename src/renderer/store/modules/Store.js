@@ -903,6 +903,33 @@ const actions = {
       })
     })
   },
+  clearHistory ({ commit }, data) {
+    if (confirm(`Are you sure you want to clear the browsing history for this persona?`)) {
+      const db = data.db
+      const personaId = data.personaId
+      console.log(db)
+      console.log(personaId)
+      db.remove({ personaId: personaId }, { multi: true }, function (err, numReplaced) {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+        alert('Browsing history cleared.')
+      })
+    }
+  },
+  clearAllHistory ({ commit }, data) {
+    if (confirm(`Are you sure you want to clear the browsing history for all personas?`)) {
+      const db = data.db
+      db.remove({}, { multi: true }, function (err, numReplaced) {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+        alert('Browsing history cleared.')
+      })
+    }
+  },
   // ========
   // SETTINGS
   // ========

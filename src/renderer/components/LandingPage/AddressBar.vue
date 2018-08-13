@@ -22,7 +22,7 @@
     <button class="address-button" @click="toggleOptionsMenu" title = "Open the options menu">
       <fa icon="ellipsis-v"/>
     </button>
-    <options-menu v-show="showOptionsMenu" @close-options-menu="toggleOptionsMenu"></options-menu>
+    <options-menu v-show="showOptionsMenu" :persona="persona" @close-options-menu="toggleOptionsMenu"></options-menu>
     <button v-if="updateExists" class="address-button" @click="getUpdate" title = "There is an updated version available">
       <fa icon="external-link-alt"/>
     </button>
