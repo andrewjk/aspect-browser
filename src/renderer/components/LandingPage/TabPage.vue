@@ -8,7 +8,9 @@
 <script>
   import { mapMutations, mapActions } from 'vuex'
 
+  import electron from 'electron'
   import path from 'path'
+  import Encrypter from '../../data/Encrypter'
 
   export default {
     props: {
@@ -54,7 +56,83 @@
 
       webview.addEventListener('new-window', this.newWindow)
 
-      // Add a context menu to the webview
+      // Listen to console messages from within the webview (handy for debugging the webview-preload script)
+      webview.addEventListener('console-message', (e) => {
+        console.log('WEBVIEW:', e.message)
+      })
+
+      // Set up password management for forms with password fields
+      electron.remote.ipcMain.on('form-found-with-password', (event, data) => {
+        // Load the existing username/password
+        const db = this.$ldb
+        const form = data.form
+        const personaId = this.persona._id
+        const host = data.host
+
+        // Maybe load the logins database
+        console.log('logins db loaded?', this.$ldb.persistence.isLoaded)
+        if (!this.$ldb.persistence.isLoaded) {
+          this.$swal({
+            title: 'Password Required',
+            text: 'Enter your master password:',
+            input: 'text'
+          })
+            .then((result) => {
+              if (result.value) {
+                // TODO: Check if it's correct...
+                const crypt = new Encrypter(result.value)
+                this.$ldb.persistence.afterSerialization = crypt.encrypt
+                this.$ldb.persistence.beforeDeserialization = crypt.decrypt
+                this.$ldb.loadDatabase((err) => {
+                  if (err) {
+                    alert('ERROR: ' + err)
+                    return
+                  }
+                  this.$ldb.persistence.isLoaded = true
+                  // TODO: to function
+                  this.loadLoginDetails({ db, personaId, host })
+                    .then((result) => {
+                      if (result && result.fields) {
+                        event.sender.send('form-password-fill', { form, fields: result.fields })
+                      }
+                    })
+                    .catch((error) => {
+                      alert('ERROR', error)
+                    })
+                })
+              } else {
+                // Just do nothing?
+              }
+            })
+            .catch((err) => {
+              alert('ERROR: ' + err)
+            })
+        } else {
+          // TODO: to function
+          this.loadLoginDetails({ db, personaId, host })
+            .then((result) => {
+              if (result && result.fields) {
+                event.sender.send('form-password-fill', { form, fields: result.fields })
+              }
+            })
+            .catch((error) => {
+              alert('ERROR', error)
+            })
+        }
+      })
+      electron.remote.ipcMain.on('form-submitted-with-password', (event, data) => {
+        // TODO: Prompt the user to save this username/password
+        const db = this.$ldb
+        const personaId = this.persona._id
+        const host = data.host
+        const fields = data.fields
+        this.saveLoginDetails({ db, personaId, host, fields })
+          .catch((error) => {
+            alert('ERROR', error)
+          })
+      })
+
+      // TODO: Add a context menu to the webview
     },
     updated: function () {
       // Focus the webview when the URL has changed e.g. when the user has clicked a link or typed something
@@ -72,7 +150,9 @@
         'addToHistory'
       ]),
       ...mapActions([
-        'saveToHistory'
+        'saveToHistory',
+        'loadLoginDetails',
+        'saveLoginDetails'
       ]),
       getPartition () {
         return 'persist:' + this.persona._id

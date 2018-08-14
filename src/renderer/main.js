@@ -9,6 +9,7 @@ import store from './store'
 import pdb from './data/personas'
 import usdb from './data/user-settings'
 import hdb from './data/history'
+import ldb from './data/logins'
 import ssdb from './data/system-settings'
 
 // FontAwesome icons
@@ -48,6 +49,9 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+// Dialogs
+import VueSweetalert2 from 'vue-sweetalert2'
+
 // Normalize.css
 // HACK: We have to refer to its location explicitly to avoid import errors
 require('../../node_modules/normalize.css/normalize.css')
@@ -56,6 +60,7 @@ require('../../node_modules/normalize.css/normalize.css')
 Vue.prototype.$pdb = pdb
 Vue.prototype.$usdb = usdb
 Vue.prototype.$hdb = hdb
+Vue.prototype.$ldb = ldb
 Vue.prototype.$ssdb = ssdb
 
 // Add the FontAwesome icons that we will use
@@ -91,6 +96,9 @@ library.add(faWindowRestore)
 library.add(faWindowClose)
 
 Vue.component('fa', FontAwesomeIcon)
+
+// Dialogs
+Vue.use(VueSweetalert2)
 
 if (!process.env.IS_WEB) {
   Vue.use(require('vue-electron'))

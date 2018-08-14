@@ -973,9 +973,67 @@ const actions = {
       commit('closeSettingsModal')
     })
   },
-  // ========
+  // =========
+  // LOGINS
+  // =========
+  loadLoginDetails ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const personaId = data.personaId
+      const host = data.host
+      db.find({ personaId, host }).exec(function (err, dbDetails) {
+        if (err) {
+          reject(err)
+        }
+        // Create default settings if nothing was loaded
+        if (dbDetails.length) {
+          resolve(dbDetails[0])
+        } else {
+          resolve()
+        }
+      })
+    })
+  },
+  saveLoginDetails ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const personaId = data.personaId
+      const host = data.host
+      db.find({ personaId, host }).exec(function (err, dbDetails) {
+        if (err) {
+          reject(err)
+        }
+        if (dbDetails.length) {
+          // Update the existing details
+          const id = dbDetails[0]._id
+          Object.assign(dbDetails[0].fields, data.fields)
+          db.update({ _id: id }, dbDetails[0], {}, function (err, numReplaced) {
+            if (err) {
+              reject(err)
+            }
+            resolve()
+          })
+        } else {
+          // Add the new details
+          const fields = data.fields
+          const login = {
+            personaId,
+            host,
+            fields
+          }
+          db.insert(login, function (err, dbDetails) {
+            if (err) {
+              reject(err)
+            }
+            resolve()
+          })
+        }
+      })
+    })
+  },
+  // ===============
   // SYSTEM SETTINGS
-  // ========
+  // ===============
   loadSystemSettings ({ commit, dispatch }, db) {
     db.find({}).exec(function (err, dbSettings) {
       if (err) {
