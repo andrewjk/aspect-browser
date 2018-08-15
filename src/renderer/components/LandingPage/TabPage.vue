@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import { mapMutations, mapActions } from 'vuex'
+  import { mapState, mapMutations, mapActions } from 'vuex'
 
   import electron from 'electron'
   import path from 'path'
@@ -30,6 +30,11 @@
         // Per https://github.com/SimulatedGREG/electron-vue/issues/239
         preload: 'file://' + path.join(__static, '/webview-preload.js')
       }
+    },
+    computed: {
+      ...mapState({
+        settings: state => state.Store.settings
+      })
     },
     mounted: function () {
       const webview = document.getElementById(this.tab._id)
@@ -57,79 +62,70 @@
       webview.addEventListener('new-window', this.newWindow)
 
       // Listen to console messages from within the webview (handy for debugging the webview-preload script)
-      webview.addEventListener('console-message', (e) => {
-        console.log('WEBVIEW:', e.message)
-      })
+      // webview.addEventListener('console-message', (e) => {
+      //   console.log('WEBVIEW:', e.message)
+      // })
 
       // Set up password management for forms with password fields
       electron.remote.ipcMain.on('form-found-with-password', (event, data) => {
-        // Load the existing username/password
-        const db = this.$ldb
-        const form = data.form
-        const personaId = this.persona._id
-        const host = data.host
+        if (this.settings.enableLoginManager) {
+          // Load the existing username/password
+          const db = this.$ldb
+          const form = data.form
+          const personaId = this.persona._id
+          const host = data.host
 
-        // Maybe load the logins database
-        console.log('logins db loaded?', this.$ldb.persistence.isLoaded)
-        if (!this.$ldb.persistence.isLoaded) {
-          this.$swal({
-            title: 'Password Required',
-            text: 'Enter your master password:',
-            input: 'text'
-          })
-            .then((result) => {
-              if (result.value) {
-                // TODO: Check if it's correct...
-                const crypt = new Encrypter(result.value)
-                this.$ldb.persistence.afterSerialization = crypt.encrypt
-                this.$ldb.persistence.beforeDeserialization = crypt.decrypt
-                this.$ldb.loadDatabase((err) => {
-                  if (err) {
-                    alert('ERROR: ' + err)
-                    return
-                  }
-                  this.$ldb.persistence.isLoaded = true
-                  // TODO: to function
-                  this.loadLoginDetails({ db, personaId, host })
-                    .then((result) => {
-                      if (result && result.fields) {
-                        event.sender.send('form-password-fill', { form, fields: result.fields })
-                      }
-                    })
-                    .catch((error) => {
-                      alert('ERROR', error)
-                    })
-                })
-              } else {
-                // Just do nothing?
-              }
+          // Maybe load the logins database
+          if (!db.persistence.isLoaded) {
+            this.$swal({
+              title: 'Login Manager',
+              text: 'Enter your master password:',
+              input: 'password',
+              showConfirmButton: true,
+              showCancelButton: true,
+              allowOutsideClick: false,
+              animation: false,
+              customClass: 'dialog-custom'
             })
-            .catch((err) => {
-              alert('ERROR: ' + err)
-            })
-        } else {
-          // TODO: to function
-          this.loadLoginDetails({ db, personaId, host })
-            .then((result) => {
-              if (result && result.fields) {
-                event.sender.send('form-password-fill', { form, fields: result.fields })
-              }
-            })
-            .catch((error) => {
-              alert('ERROR', error)
-            })
+              .then((result) => {
+                if (result.value) {
+                  const crypt = new Encrypter(result.value)
+                  db.persistence.afterSerialization = crypt.encrypt
+                  db.persistence.beforeDeserialization = crypt.decrypt
+                  db.loadDatabase((err) => {
+                    if (err) {
+                      alert('Failed to unlock database.')
+                      return
+                    }
+                    db.persistence.isLoaded = true
+                    this.loadFormLoginDetails(db, personaId, host, form, event)
+                  })
+                } else {
+                  // Just do nothing?
+                }
+              })
+              .catch((err) => {
+                alert('ERROR: ' + err)
+              })
+          } else {
+            this.loadFormLoginDetails(db, personaId, host, form, event)
+          }
         }
       })
       electron.remote.ipcMain.on('form-submitted-with-password', (event, data) => {
-        // TODO: Prompt the user to save this username/password
-        const db = this.$ldb
-        const personaId = this.persona._id
-        const host = data.host
-        const fields = data.fields
-        this.saveLoginDetails({ db, personaId, host, fields })
-          .catch((error) => {
-            alert('ERROR', error)
-          })
+        if (this.settings.enableLoginManager) {
+          // TODO: Ask the user whether to save this username/password
+          const db = this.$ldb
+          if (db.persistence.isLoaded) {
+            const personaId = this.persona._id
+            const host = data.host
+            const fields = data.fields
+            this.saveLoginDetails({ db, personaId, host, fields })
+              .catch((error) => {
+                alert('ERROR', error)
+              })
+          }
+        }
       })
 
       // TODO: Add a context menu to the webview
@@ -157,21 +153,33 @@
       getPartition () {
         return 'persist:' + this.persona._id
       },
+      loadFormLoginDetails (db, personaId, host, form, event) {
+        // TODO: to function
+        this.loadLoginDetails({ db, personaId, host })
+          .then((result) => {
+            if (result && result.fields) {
+              event.sender.send('form-password-fill', { form, fields: result.fields })
+            }
+          })
+          .catch((error) => {
+            alert('ERROR', error)
+          })
+      },
       loadStarted () {
-        console.log('load started')
+        // console.log('load started')
         this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: true })
       },
       loadCommitted () {
-        console.log('load committed')
+        // console.log('load committed')
         const url = this.tab.webview.getURL()
         const title = this.tab.webview.getTitle()
         this.setTabDetails({ persona: this.persona, tab: this.tab, url, addressText: url, title })
       },
       loadFinished () {
-        console.log('load finished: ' + this.tab.webview.getURL())
+        // console.log('load finished: ' + this.tab.webview.getURL())
         this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: false })
         if (this.tab.url !== this.historyUrl) {
-          console.log('adding to history')
+          // console.log('adding to history')
           this.saveToHistory({
             db: this.$hdb,
             personaId: this.persona._id,
@@ -183,7 +191,7 @@
         this.historyUrl = this.tab.url
       },
       loadFailed () {
-        console.log('load failed: ' + this.tab.webview.getURL())
+        // console.log('load failed: ' + this.tab.webview.getURL())
         // TODO: What should I actually be doing here?
         this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: false })
       },
@@ -224,16 +232,16 @@
       },
       willNavigate () {
         // TODO:
-        console.log('will navigate')
+        // console.log('will navigate')
         this.addToHistory({ tab: this.tab, url: this.tab.url, title: this.tab.title })
       },
       didNavigate () {
         // TODO:
-        console.log('did navigate')
+        // console.log('did navigate')
       },
       didNavigateInPage () {
         // TODO:
-        console.log('did navigate in page')
+        // console.log('did navigate in page')
       },
       newWindow (e) {
         this.openInTab({ url: e.url, background: e.disposition === 'background-tab' })

@@ -7,23 +7,22 @@ export default function (masterPassword) {
 
   this.encrypt = (text) => {
     const ivLength = 16
-    console.log(this.masterPassword)
-    let iv = crypto.randomBytes(ivLength)
-    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(padPassword(this.masterPassword)), iv)
-    let encrypted = cipher.update(text)
+    const iv = crypto.randomBytes(ivLength)
+    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(padPassword(this.masterPassword)), iv)
 
+    let encrypted = cipher.update(text)
     encrypted = Buffer.concat([encrypted, cipher.final()])
 
     return iv.toString('hex') + ':' + encrypted.toString('hex')
   }
 
   this.decrypt = (text) => {
-    let textParts = text.split(':')
-    let iv = Buffer.from(textParts.shift(), 'hex')
-    let encryptedText = Buffer.from(textParts.join(':'), 'hex')
-    let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(padPassword(this.masterPassword)), iv)
-    let decrypted = decipher.update(encryptedText)
+    const textParts = text.split(':')
+    const iv = Buffer.from(textParts.shift(), 'hex')
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex')
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(padPassword(this.masterPassword)), iv)
 
+    let decrypted = decipher.update(encryptedText)
     decrypted = Buffer.concat([decrypted, decipher.final()])
 
     return decrypted.toString()

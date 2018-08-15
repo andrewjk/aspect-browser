@@ -37,7 +37,7 @@
   }
 
   form table {
-    border-spacing: 10px;
+    border-spacing: 0 10px;
     width: 100%;
   }
 
@@ -87,4 +87,32 @@
     color: red;
   }
   
+  .dialog-custom {
+    border-radius: 2px;
+  }
+
+  .dialog-custom #swal2-title {
+    color: #222;
+    font-weight: normal;
+  }
+  
+  .dialog-custom #swal2-content {
+    color: #666;
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .dialog-custom .swal2-input {
+    font-size: 18px;
+    border-radius: 2px;
+    border: 1px solid #ddd;
+    padding: 6px;
+    height: auto;
+  }
+
+  .dialog-custom .swal2-input:focus {
+    border: 1px solid #ddd;
+    box-shadow: none;
+  }
+
 </style>

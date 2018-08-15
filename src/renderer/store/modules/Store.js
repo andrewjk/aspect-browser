@@ -636,13 +636,15 @@ const mutations = {
     state.settingsToUpdate = settings
     state.settingsToEdit = {
       _id: settings._id,
-      searchProvider: settings.searchProvider
+      searchProvider: settings.searchProvider,
+      enableLoginManager: settings.enableLoginManager
     }
     state.showSettingsModal = true
   },
   setSettingsDetails (state, data) {
     const settings = data.settings
     if (data.searchProvider !== undefined) settings.searchProvider = data.searchProvider
+    if (data.enableLoginManager !== undefined) settings.enableLoginManager = data.enableLoginManager
   },
   closeSettingsModal (state) {
     state.settingsToUpdate = null
@@ -950,7 +952,8 @@ const actions = {
   createDefaultSettings ({ commit }, db) {
     const defaultSettings = {
       _id: uuid(),
-      searchProvider: 'https://duckduckgo.com/?q={0}'
+      searchProvider: 'https://duckduckgo.com/?q={0}',
+      enableLoginManager: false
     }
     db.insert(defaultSettings, function (err, dbSettings) {
       if (err) {
@@ -964,7 +967,12 @@ const actions = {
     const db = data.db
     const settingsToUpdate = data.settingsToUpdate
     const settingsToEdit = data.settingsToEdit
-    commit('setSettingsDetails', { settings: settingsToUpdate, searchProvider: settingsToEdit.searchProvider })
+    const settingsDetails = {
+      settings: settingsToUpdate,
+      searchProvider: settingsToEdit.searchProvider,
+      enableLoginManager: settingsToEdit.enableLoginManager
+    }
+    commit('setSettingsDetails', settingsDetails)
     db.update({ _id: settingsToUpdate._id }, settingsToUpdate, {}, function (err, numReplaced) {
       if (err) {
         alert('ERROR: ' + err)
@@ -973,9 +981,31 @@ const actions = {
       commit('closeSettingsModal')
     })
   },
-  // =========
+  // ======
   // LOGINS
-  // =========
+  // ======
+  loadMasterPasswordRecord ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      db.find({ masterPassword: 1 }).exec(function (err, dbDetails) {
+        if (err) {
+          reject(err)
+        }
+        resolve()
+      })
+    })
+  },
+  saveMasterPasswordRecord ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      db.insert({ 'masterPassword': 1 }, function (err, dbRecord) {
+        if (err) {
+          reject(err)
+        }
+        resolve()
+      })
+    })
+  },
   loadLoginDetails ({ commit }, data) {
     return new Promise((resolve, reject) => {
       const db = data.db
@@ -985,7 +1015,6 @@ const actions = {
         if (err) {
           reject(err)
         }
-        // Create default settings if nothing was loaded
         if (dbDetails.length) {
           resolve(dbDetails[0])
         } else {
