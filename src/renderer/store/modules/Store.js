@@ -909,8 +909,6 @@ const actions = {
     if (confirm(`Are you sure you want to clear the browsing history for this persona?`)) {
       const db = data.db
       const personaId = data.personaId
-      console.log(db)
-      console.log(personaId)
       db.remove({ personaId: personaId }, { multi: true }, function (err, numReplaced) {
         if (err) {
           alert('ERROR: ' + err)

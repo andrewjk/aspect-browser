@@ -62,17 +62,21 @@
       webview.addEventListener('new-window', this.newWindow)
 
       // Listen to console messages from within the webview (handy for debugging the webview-preload script)
-      // webview.addEventListener('console-message', (e) => {
-      //   console.log('WEBVIEW:', e.message)
-      // })
+      // But only listen to messages that start with a $ because those will be the ones that we have made
+      webview.addEventListener('console-message', (e) => {
+        if (e.message.indexOf('$') === 0) {
+          console.log('WEBVIEW:', e.message.substring(1))
+        }
+      })
 
       // Set up password management for forms with password fields
-      electron.remote.ipcMain.on('form-found-with-password', (event, data) => {
+      const personaId = this.persona._id
+      electron.remote.ipcMain.on('form-found-with-password-' + personaId, (event, data) => {
+        // Is the login manager enabled?
         if (this.settings.enableLoginManager) {
           // Load the existing username/password
           const db = this.$ldb
           const form = data.form
-          const personaId = this.persona._id
           const host = data.host
 
           // Maybe load the logins database
@@ -98,7 +102,7 @@
                       return
                     }
                     db.persistence.isLoaded = true
-                    this.loadFormLoginDetails(db, personaId, host, form, event)
+                    this.loadFormLoginDetails(db, host, form, event)
                   })
                 } else {
                   // Just do nothing?
@@ -108,16 +112,17 @@
                 alert('ERROR: ' + err)
               })
           } else {
-            this.loadFormLoginDetails(db, personaId, host, form, event)
+            this.loadFormLoginDetails(db, host, form, event)
           }
         }
       })
-      electron.remote.ipcMain.on('form-submitted-with-password', (event, data) => {
+      electron.remote.ipcMain.on('form-submitted-with-password-' + personaId, (event, data) => {
+        // Is the login manager enabled?
         if (this.settings.enableLoginManager) {
+          // Has the user entered the master password?
           // TODO: Ask the user whether to save this username/password
           const db = this.$ldb
           if (db.persistence.isLoaded) {
-            const personaId = this.persona._id
             const host = data.host
             const fields = data.fields
             this.saveLoginDetails({ db, personaId, host, fields })
@@ -126,6 +131,16 @@
               })
           }
         }
+      })
+
+      // HACK: We need to get personaId into the webview preload somehow, so that it knows whether to
+      // handle login details that are sent to it, and so that it can send its personaId to its listeners
+      // We can't just pass parameters into preload, so instead we have to do this hacky back and forth
+      // communication via IPC to put the Id into document.__personaId using executeJavascript()
+      electron.remote.ipcMain.on('give-persona-id-please', (event, data) => {
+        const personaId = this.persona._id
+        webview.executeJavaScript(`document.__personaId = "${personaId}"`)
+        event.sender.send('here-is-persona-id', { personaId })
       })
 
       // TODO: Add a context menu to the webview
@@ -153,12 +168,13 @@
       getPartition () {
         return 'persist:' + this.persona._id
       },
-      loadFormLoginDetails (db, personaId, host, form, event) {
+      loadFormLoginDetails (db, host, form, event) {
         // TODO: to function
+        const personaId = this.persona._id
         this.loadLoginDetails({ db, personaId, host })
           .then((result) => {
             if (result && result.fields) {
-              event.sender.send('form-password-fill', { form, fields: result.fields })
+              event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
             }
           })
           .catch((error) => {
