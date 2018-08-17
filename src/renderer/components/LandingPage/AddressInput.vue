@@ -200,7 +200,7 @@
                     icon: history.icon,
                     text: history.title,
                     url: history.url,
-                    hintIcon: 'history',
+                    hintIcon: ['far', 'clock'],
                     hint: 'Open this page',
                     title: 'Open ' + history.url,
                     isActive: false
