@@ -15,7 +15,9 @@ const state = {
   showSettingsModal: false,
   settingsToUpdate: null,
   settingsToEdit: null,
-  showAboutInfo: false
+  showAboutInfo: false,
+  showLoginMenu: false,
+  loginSettings: {}
 }
 
 const getters = {
@@ -669,11 +671,21 @@ const mutations = {
   // ====
   // MISC
   // ====
-  showAboutInfo (state, data) {
+  openAboutInfo (state, data) {
     state.showAboutInfo = true
   },
   closeAboutInfo (state, data) {
     state.showAboutInfo = false
+  },
+  openLoginMenu (state, data) {
+    state.loginSettings = {
+      host: data.host,
+      fields: data.fields
+    }
+    state.showLoginMenu = true
+  },
+  closeLoginMenu (state, data) {
+    state.showLoginMenu = false
   }
 }
 

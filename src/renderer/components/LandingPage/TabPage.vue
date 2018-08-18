@@ -45,103 +45,8 @@
       // or the user types something in the address bar in the home page
       webview.focus()
 
-      // Listen to webview events
-      webview.addEventListener('did-start-loading', this.loadStarted)
-      webview.addEventListener('load-commit', this.loadCommitted)
-      webview.addEventListener('did-stop-loading', this.loadFinished)
-      webview.addEventListener('did-fail-load', this.loadFailed)
-
-      webview.addEventListener('page-title-updated', this.pageTitleUpdated)
-      webview.addEventListener('page-favicon-updated', this.pageIconUpdated)
-      webview.addEventListener('update-target-url', this.targetUrlUpdated)
-
-      webview.addEventListener('will-navigate', this.willNavigate)
-      webview.addEventListener('did-navigate', this.didNavigate)
-      webview.addEventListener('did-navigate-in-page', this.didNavigateInPage)
-
-      webview.addEventListener('new-window', this.newWindow)
-
-      // Listen to console messages from within the webview (handy for debugging the webview-preload script)
-      // But only listen to messages that start with a $ because those will be the ones that we have made
-      webview.addEventListener('console-message', (e) => {
-        if (e.message.indexOf('$') === 0) {
-          console.log('WEBVIEW:', e.message.substring(1))
-        }
-      })
-
-      // Set up password management for forms with password fields
-      const personaId = this.persona._id
-      electron.remote.ipcMain.on('form-found-with-password-' + personaId, (event, data) => {
-        // Is the login manager enabled?
-        if (this.settings.enableLoginManager) {
-          // Load the existing username/password
-          const db = this.$ldb
-          const form = data.form
-          const host = data.host
-
-          // Maybe load the logins database
-          if (!db.persistence.isLoaded) {
-            this.$swal({
-              title: 'Login Manager',
-              text: 'Enter your master password:',
-              input: 'password',
-              showConfirmButton: true,
-              showCancelButton: true,
-              allowOutsideClick: false,
-              animation: false,
-              customClass: 'dialog-custom'
-            })
-              .then((result) => {
-                if (result.value) {
-                  const crypt = new Encrypter(result.value)
-                  db.persistence.afterSerialization = crypt.encrypt
-                  db.persistence.beforeDeserialization = crypt.decrypt
-                  db.loadDatabase((err) => {
-                    if (err) {
-                      alert('Failed to unlock database.')
-                      return
-                    }
-                    db.persistence.isLoaded = true
-                    this.loadFormLoginDetails(db, host, form, event)
-                  })
-                } else {
-                  // Just do nothing?
-                }
-              })
-              .catch((err) => {
-                alert('ERROR: ' + err)
-              })
-          } else {
-            this.loadFormLoginDetails(db, host, form, event)
-          }
-        }
-      })
-      electron.remote.ipcMain.on('form-submitted-with-password-' + personaId, (event, data) => {
-        // Is the login manager enabled?
-        if (this.settings.enableLoginManager) {
-          // Has the user entered the master password?
-          // TODO: Ask the user whether to save this username/password
-          const db = this.$ldb
-          if (db.persistence.isLoaded) {
-            const host = data.host
-            const fields = data.fields
-            this.saveLoginDetails({ db, personaId, host, fields })
-              .catch((error) => {
-                alert('ERROR', error)
-              })
-          }
-        }
-      })
-
-      // HACK: We need to get personaId into the webview preload somehow, so that it knows whether to
-      // handle login details that are sent to it, and so that it can send its personaId to its listeners
-      // We can't just pass parameters into preload, so instead we have to do this hacky back and forth
-      // communication via IPC to put the Id into document.__personaId using executeJavascript()
-      electron.remote.ipcMain.on('give-persona-id-please', (event, data) => {
-        const personaId = this.persona._id
-        webview.executeJavaScript(`document.__personaId = "${personaId}"`)
-        event.sender.send('here-is-persona-id', { personaId })
-      })
+      this.setupWebviewListeners(webview)
+      this.setupLoginManager(webview)
 
       // TODO: Add a context menu to the webview
     },
@@ -158,7 +63,9 @@
       ...mapMutations([
         'setTabDetails',
         'openInTab',
-        'addToHistory'
+        'addToHistory',
+        'openLoginMenu',
+        'closeLoginMenu'
       ]),
       ...mapActions([
         'saveToHistory',
@@ -261,6 +168,119 @@
       },
       newWindow (e) {
         this.openInTab({ url: e.url, background: e.disposition === 'background-tab' })
+      },
+      setupWebviewListeners (webview) {
+        webview.addEventListener('did-start-loading', this.loadStarted)
+        webview.addEventListener('load-commit', this.loadCommitted)
+        webview.addEventListener('did-stop-loading', this.loadFinished)
+        webview.addEventListener('did-fail-load', this.loadFailed)
+
+        webview.addEventListener('page-title-updated', this.pageTitleUpdated)
+        webview.addEventListener('page-favicon-updated', this.pageIconUpdated)
+        webview.addEventListener('update-target-url', this.targetUrlUpdated)
+
+        webview.addEventListener('will-navigate', this.willNavigate)
+        webview.addEventListener('did-navigate', this.didNavigate)
+        webview.addEventListener('did-navigate-in-page', this.didNavigateInPage)
+
+        webview.addEventListener('new-window', this.newWindow)
+
+        // Listen to console messages from within the webview (handy for debugging the webview-preload script)
+        // But only listen to messages that start with a $ because those will be the ones that we have made
+        webview.addEventListener('console-message', (e) => {
+          if (e.message.indexOf('$') === 0) {
+            console.log('WEBVIEW:', e.message.substring(1))
+          }
+        })
+      },
+      setupLoginManager (webview) {
+        // Set up login management for forms with password fields
+        const personaId = this.persona._id
+        electron.remote.ipcMain.on('form-found-with-password-' + personaId, (event, data) => {
+          // Is the login manager enabled?
+          if (this.settings.enableLoginManager) {
+            // Load the existing username/password
+            const db = this.$ldb
+            const form = data.form
+            const host = data.host
+
+            // Maybe load the logins database
+            if (!db.persistence.isLoaded) {
+              this.$swal({
+                title: 'Login Manager',
+                text: 'Enter your master password:',
+                input: 'password',
+                showConfirmButton: true,
+                showCancelButton: true,
+                allowOutsideClick: false,
+                animation: false,
+                customClass: 'dialog-custom'
+              })
+                .then((result) => {
+                  if (result.value) {
+                    const crypt = new Encrypter(result.value)
+                    db.persistence.afterSerialization = crypt.encrypt
+                    db.persistence.beforeDeserialization = crypt.decrypt
+                    db.loadDatabase((err) => {
+                      if (err) {
+                        alert('Failed to unlock database.')
+                        return
+                      }
+                      db.persistence.isLoaded = true
+                      this.loadFormLoginDetails(db, host, form, event)
+                    })
+                  } else {
+                    // Just do nothing?
+                  }
+                })
+                .catch((err) => {
+                  alert('ERROR: ' + err)
+                })
+            } else {
+              this.loadFormLoginDetails(db, host, form, event)
+            }
+          }
+        })
+        electron.remote.ipcMain.on('form-submitted-with-password-' + personaId, (event, data) => {
+          // Is the login manager enabled?
+          if (this.settings.enableLoginManager) {
+            // Has the user entered the master password?
+            // TODO: If not, prompt them to enter it...
+            const db = this.$ldb
+            if (db.persistence.isLoaded) {
+              const host = data.host
+              const fields = data.fields
+              // If login details have already been saved for this host, update them
+              db.find({ personaId, host }).exec((err, dbDetails) => {
+                if (err) {
+                  alert('ERROR: ' + err)
+                }
+                if (dbDetails.length) {
+                  this.saveLoginDetails({ db, personaId, host, fields })
+                    .catch((error) => {
+                      alert('ERROR', error)
+                    })
+                } else {
+                  // Otherwise, ask the user whether to save the login details
+                  this.openLoginMenu({ host, fields })
+                  setInterval(() => {
+                    this.closeLoginMenu()
+                  }, 10 * 1000)
+                }
+              })
+            }
+          }
+        })
+
+        // HACK: We need to get personaId into the webview preload somehow, so that it knows whether to
+        // handle login details that are sent to it, and so that it can send its personaId to its listeners
+        // We can't just pass parameters into preload, so instead we have to do this hacky back and forth
+        // communication via IPC to put the id into document.__personaId using executeJavascript()
+        electron.remote.ipcMain.on('give-persona-id-please', (event, data) => {
+          const personaId = this.persona._id
+          webview.executeJavaScript(`document.__personaId = "${personaId}"`)
+          event.sender.send('here-is-persona-id', { personaId })
+        })
       }
     }
   }

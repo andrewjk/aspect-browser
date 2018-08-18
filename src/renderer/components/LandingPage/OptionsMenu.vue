@@ -18,7 +18,7 @@
       <span>Clear All History</span>
     </button>
     <div class="options-menu-separator"></div>
-    <button class="options-menu-item" @click="showAboutInfo" title="Show information about Aspect">
+    <button class="options-menu-item" @click="openAboutInfo" title="Show information about Aspect">
       <fa icon="info-circle"/>
       <span>About Aspect</span>
     </button>
@@ -36,7 +36,7 @@
       ...mapMutations([
         'editSettings',
         'showHistory',
-        'showAboutInfo'
+        'openAboutInfo'
       ]),
       ...mapActions([
         'clearHistory',

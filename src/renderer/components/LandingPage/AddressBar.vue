@@ -26,6 +26,7 @@
     <button v-if="updateExists" class="address-button" @click="getUpdate" title = "There is an updated version available">
       <fa icon="external-link-alt"/>
     </button>
+    <login-menu v-show="showLoginMenu" :persona="persona"></login-menu>
   </div>
 </template>
 
@@ -37,11 +38,12 @@
 
   import AddressInput from './AddressInput'
   import OptionsMenu from './OptionsMenu'
+  import LoginMenu from './LoginMenu'
 
   const octokit = octokitrest()
 
   export default {
-    components: { AddressInput, OptionsMenu },
+    components: { AddressInput, OptionsMenu, LoginMenu },
     props: {
       persona: null
     },
@@ -55,7 +57,8 @@
     computed: {
       ...mapState({
         activity: state => state.Store.activity,
-        systemSettings: state => state.Store.systemSettings
+        systemSettings: state => state.Store.systemSettings,
+        showLoginMenu: state => state.Store.showLoginMenu
       }),
       ...mapGetters([
         'getActiveTab'
