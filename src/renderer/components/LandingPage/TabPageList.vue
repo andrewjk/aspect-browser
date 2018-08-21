@@ -119,10 +119,12 @@
                   alert('ERROR: ' + err)
                 }
                 if (dbDetails.length) {
-                  this.saveLoginDetails({ db, personaId, host, fields })
-                    .catch((error) => {
-                      alert('ERROR', error)
-                    })
+                  if (!dbDetails[0].ignore) {
+                    this.saveLoginDetails({ db, personaId, host, fields })
+                      .catch((error) => {
+                        alert('ERROR', error)
+                      })
+                  }
                 } else {
                   // Otherwise, ask the user whether to save the login details
                   this.openLoginMenu({ host, fields })
@@ -140,7 +142,8 @@
         const personaId = this.persona._id
         this.loadLoginDetails({ db, personaId, host })
           .then((result) => {
-            if (result && result.fields) {
+            if (result && result.ignore) console.log('ignoring that one')
+            if (result && result.fields && !result.ignore) {
               event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
             }
           })

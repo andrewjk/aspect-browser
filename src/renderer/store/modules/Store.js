@@ -1070,6 +1070,43 @@ const actions = {
       })
     })
   },
+  ignoreLoginDetails ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const personaId = data.personaId
+      const host = data.host
+      db.find({ personaId, host }).exec(function (err, dbDetails) {
+        if (err) {
+          reject(err)
+        }
+        if (dbDetails.length) {
+          // Update the existing details
+          const id = dbDetails[0]._id
+          dbDetails[0].fields = undefined
+          dbDetails[0].ignore = true
+          db.update({ _id: id }, dbDetails[0], {}, function (err, numReplaced) {
+            if (err) {
+              reject(err)
+            }
+            resolve()
+          })
+        } else {
+          // Add the new details
+          const login = {
+            personaId,
+            host,
+            ignore: true
+          }
+          db.insert(login, function (err, dbDetails) {
+            if (err) {
+              reject(err)
+            }
+            resolve()
+          })
+        }
+      })
+    })
+  },
   // ===============
   // SYSTEM SETTINGS
   // ===============

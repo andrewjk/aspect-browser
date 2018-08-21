@@ -33,7 +33,8 @@
         'closeLoginMenu'
       ]),
       ...mapActions([
-        'saveLoginDetails'
+        'saveLoginDetails',
+        'ignoreLoginDetails'
       ]),
       saveLogin: function () {
         const db = this.$ldb
@@ -52,7 +53,16 @@
         this.closeLoginMenu()
       },
       neverSaveLogin: function () {
-
+        const db = this.$ldb
+        const personaId = this.persona._id
+        const host = this.loginSettings.host
+        this.ignoreLoginDetails({ db, personaId, host })
+          .then(() => {
+            this.closeLoginMenu()
+          })
+          .catch((error) => {
+            alert('ERROR', error)
+          })
       }
     }
   }
