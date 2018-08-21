@@ -4,55 +4,56 @@
 
 const { ipcRenderer } = require('electron')
 
-// HACK: We need to do some bad things to get the personaId of the webview we are in
-// See the comments in TabPage.vue for more info
-ipcRenderer.on('here-is-persona-id', (event, data) => {
-  // Set up login management for forms with password fields
-  document.addEventListener('DOMContentLoaded', () => {
-    // Get the personaId from the document
-    const personaId = document.__personaId
-
-    // Load forms with password fields
-    const allForms = document.getElementsByTagName('form')
-    const formsToHook = []
-    for (let form of allForms) {
-      if (form.querySelectorAll('input[type="password"]').length) {
-        formsToHook.push(form)
-      }
-    }
-
-    if (formsToHook.length) {
-      // Store passwords against the host - which means there should only be one password per host per persona
-      const host = document.location.host
-
-      // Let the caller know that we've found each form and may need its details
-      for (let form of formsToHook) {
-        ipcRenderer.send('form-found-with-password-' + personaId, { form: form.action, host })
-      }
-
-      // Listen to the submit event for each form
-      for (let form of formsToHook) {
-        form.addEventListener('submit', () => {
-          const fields = serialize(form)
-          ipcRenderer.send('form-submitted-with-password-' + personaId, { form: form.action, host, fields })
-        })
-      }
-    }
-
-    // Accept login details
-    ipcRenderer.on('form-password-fill-' + personaId, (event, data) => {
-      // NOTE: Can't use querySelectorAll here because the form action may have incompatible characters
-      for (let form of document.getElementsByTagName('form')) {
-        if (form.action === data.form) {
-          const fields = data.fields
-          deserialize(form, fields)
-        }
-      }
-    })
-  })
+// When the DOM content is loaded, request the personaId from TabPage
+document.addEventListener('DOMContentLoaded', () => {
+  ipcRenderer.send('persona-id-needed')
 })
 
-ipcRenderer.send('give-persona-id-please')
+// When the peronaId has been sent to us, request login details and listen to submits for forms with password fields
+ipcRenderer.on('persona-id-available', (event, data) => {
+  // Set up login management for forms with password fields
+
+  // Get the personaId from the document
+  let personaId = document.__personaId
+
+  // Load forms with password fields
+  const allForms = document.getElementsByTagName('form')
+  const formsToHook = []
+  for (let form of allForms) {
+    if (form.querySelectorAll('input[type="password"]').length) {
+      formsToHook.push(form)
+    }
+  }
+
+  if (formsToHook.length) {
+    // Store passwords against the host - which means there should only be one password per host per persona
+    const host = document.location.host
+
+    // Let the caller know that we've found each form and may need its details
+    for (let form of formsToHook) {
+      ipcRenderer.send('form-found-with-password-' + personaId, { form: form.action, host })
+    }
+
+    // Listen to the submit event for each form
+    for (let form of formsToHook) {
+      form.addEventListener('submit', () => {
+        const fields = serialize(form)
+        ipcRenderer.send('form-submitted-with-password-' + personaId, { form: form.action, host, fields })
+      })
+    }
+  }
+
+  // Accept login details
+  ipcRenderer.on('form-password-fill-' + personaId, (event, data) => {
+    // NOTE: Can't use querySelectorAll here because the form action may have incompatible characters
+    for (let form of document.getElementsByTagName('form')) {
+      if (form.action === data.form) {
+        const fields = data.fields
+        deserialize(form, fields)
+      }
+    }
+  })
+})
 
 // From https://stackoverflow.com/a/23140111
 function serialize (form) {

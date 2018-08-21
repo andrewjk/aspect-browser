@@ -40,7 +40,6 @@
       webview.focus()
 
       this.setupWebviewListeners(webview)
-      this.sendPersonaId(webview)
 
       // TODO: Add a context menu to the webview
     },
@@ -169,22 +168,17 @@
             console.log('WEBVIEW:', e.message.substring(1))
           }
         })
-      },
-      sendPersonaId (webview) {
-        // HACK: We need to get personaId into the webview preload somehow, so that it knows whether to
-        // handle login details that are sent to it, and so that it can send its personaId to its listeners
-        // We can't just pass parameters into preload, so instead we have to do this hacky back and forth
-        // communication via IPC to put the id into document.__personaId using executeJavascript()
-        electron.remote.ipcMain.on('give-persona-id-please', (event, data) => {
+
+        // HACK: We need to get personaId into the webview preload somehow, so that it knows whether
+        // to handle login details that are sent to it, and so that it can send events to the listeners
+        // for that persona. We can't just pass parameters into preload, so instead we have to do this
+        // hacky back and forth to put the id into document.__personaId using executeJavascript()
+        electron.remote.ipcMain.on('persona-id-needed', (event, data) => {
           const personaId = this.persona._id
           const javascript = `document.__personaId = "${personaId}"`
-          // HACK: executeJavascript doesn't work on the first load and so the callback is never called:
-          // E.g., start the program, press ctrl + ., enter a bookmark that needs a password, the password won't be loaded
-          // webview.executeJavaScript(javascript, false, (result) => {
-          //   event.sender.send('here-is-persona-id', { personaId })
-          // })
-          webview.executeJavaScript(javascript)
-          event.sender.send('here-is-persona-id', { personaId })
+          webview.executeJavaScript(javascript, false, () => {
+            event.sender.send('persona-id-available')
+          })
         })
       }
     }
