@@ -4,16 +4,14 @@
 
 const { ipcRenderer } = require('electron')
 
-ipcRenderer.send('give-persona-id-please')
-
 // HACK: We need to do some bad things to get the personaId of the webview we are in
 // See the comments in TabPage.vue for more info
 ipcRenderer.on('here-is-persona-id', (event, data) => {
-  // Get the personaId from the document
-  const personaId = document.__personaId
-
   // Set up login management for forms with password fields
   document.addEventListener('DOMContentLoaded', () => {
+    // Get the personaId from the document
+    const personaId = document.__personaId
+
     // Load forms with password fields
     const allForms = document.getElementsByTagName('form')
     const formsToHook = []
@@ -40,19 +38,21 @@ ipcRenderer.on('here-is-persona-id', (event, data) => {
         })
       }
     }
-  })
 
-  // Accept login details
-  ipcRenderer.on('form-password-fill-' + personaId, (event, data) => {
-    // NOTE: Can't use querySelectorAll here because the form action may have incompatible characters
-    for (let form of document.getElementsByTagName('form')) {
-      if (form.action === data.form) {
-        const fields = data.fields
-        deserialize(form, fields)
+    // Accept login details
+    ipcRenderer.on('form-password-fill-' + personaId, (event, data) => {
+      // NOTE: Can't use querySelectorAll here because the form action may have incompatible characters
+      for (let form of document.getElementsByTagName('form')) {
+        if (form.action === data.form) {
+          const fields = data.fields
+          deserialize(form, fields)
+        }
       }
-    }
+    })
   })
 })
+
+ipcRenderer.send('give-persona-id-please')
 
 // From https://stackoverflow.com/a/23140111
 function serialize (form) {
