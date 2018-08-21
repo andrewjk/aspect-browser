@@ -725,7 +725,7 @@ const actions = {
   // PERSONAS
   // ========
   loadPersonas ({ commit, dispatch }, db) {
-    db.find({}).sort({ order: 1 }).exec(function (err, dbPersonas) {
+    db.find({}).sort({ order: 1 }).exec((err, dbPersonas) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -761,7 +761,7 @@ const actions = {
       bookmarks: []
     }
     commit('addHomeTab', defaultPersona)
-    db.insert(defaultPersona, function (err, dbPersona) {
+    db.insert(defaultPersona, (err, dbPersona) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -776,7 +776,7 @@ const actions = {
     commit('movePersonaUp', index)
     commit('sanitizePersonaOrders')
     personas.forEach((p) => {
-      db.update({ _id: p._id }, p, {}, function (err, numReplaced) {
+      db.update({ _id: p._id }, p, {}, (err, numReplaced) => {
         if (err) {
           alert('ERROR: ' + err)
         }
@@ -790,7 +790,7 @@ const actions = {
     commit('movePersonaDown', index)
     commit('sanitizePersonaOrders')
     personas.forEach((p) => {
-      db.update({ _id: p._id }, p, {}, function (err, numReplaced) {
+      db.update({ _id: p._id }, p, {}, (err, numReplaced) => {
         if (err) {
           alert('ERROR: ' + err)
         }
@@ -803,7 +803,7 @@ const actions = {
     const personaToEdit = data.personaToEdit
     if (personaToUpdate) {
       commit('setPersonaDetails', { persona: personaToUpdate, name: personaToEdit.name, shortName: personaToEdit.shortName, color: personaToEdit.color })
-      db.update({ _id: personaToUpdate._id }, personaToUpdate, {}, function (err, numReplaced) {
+      db.update({ _id: personaToUpdate._id }, personaToUpdate, {}, (err, numReplaced) => {
         if (err) {
           alert('ERROR: ' + err)
           return
@@ -813,7 +813,7 @@ const actions = {
       })
     } else {
       commit('addHomeTab', personaToEdit)
-      db.insert(personaToEdit, function (err, dbPersona) {
+      db.insert(personaToEdit, (err, dbPersona) => {
         if (err) {
           alert('ERROR: ' + err)
           return
@@ -828,7 +828,7 @@ const actions = {
     if (confirm('Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.') && confirm('Are you really sure you want to delete this persona?')) {
       const db = data.db
       const persona = data.personaToUpdate
-      db.remove({ _id: persona._id }, {}, function (err, numReplaced) {
+      db.remove({ _id: persona._id }, {}, (err, numReplaced) => {
         if (err) {
           alert('ERROR: ' + err)
           return
@@ -847,7 +847,7 @@ const actions = {
     const index = data.index
     commit('moveBookmarkUp', { persona, index })
     commit('sanitizeBookmarkOrders', { persona })
-    db.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
+    db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
       if (err) {
         alert('ERROR: ' + err)
       }
@@ -859,7 +859,7 @@ const actions = {
     const index = data.index
     commit('moveBookmarkDown', { persona, index })
     commit('sanitizeBookmarkOrders', { persona })
-    db.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
+    db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
       if (err) {
         alert('ERROR: ' + err)
       }
@@ -876,7 +876,7 @@ const actions = {
       commit('insertBookmark', { persona, bookmark: bookmarkToEdit })
     }
     commit('sortBookmarks', persona)
-    db.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
+    db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -891,7 +891,7 @@ const actions = {
       const bookmark = data.bookmarkToUpdate
       commit('removeBookmark', { persona, bookmark })
       commit('sortBookmarks', persona)
-      db.update({ _id: persona._id }, persona, {}, function (err, numReplaced) {
+      db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
         if (err) {
           alert('ERROR: ' + err)
           return
@@ -910,7 +910,7 @@ const actions = {
     const skip = data.skip
     const limit = data.limit
     return new Promise((resolve, reject) => {
-      db.find({ $and: [{ personaId }, search ? { $or: [{ title: new RegExp(search, 'gi') }, { url: new RegExp(search, 'gi') }] } : {}] }).sort({ dateTime: -1 }).skip(skip).limit(limit).exec(function (err, dbHistory) {
+      db.find({ $and: [{ personaId }, search ? { $or: [{ title: new RegExp(search, 'gi') }, { url: new RegExp(search, 'gi') }] } : {}] }).sort({ dateTime: -1 }).skip(skip).limit(limit).exec((err, dbHistory) => {
         if (err) {
           reject(err)
         } else {
@@ -928,7 +928,7 @@ const actions = {
       title: data.title,
       dateTime: new Date()
     }
-    db.insert(history, function (err, dbHistory) {
+    db.insert(history, (err, dbHistory) => {
       if (err) {
         alert('ERROR: ' + err)
         // return
@@ -939,7 +939,7 @@ const actions = {
     const db = data.db
     const ids = data.ids
     return new Promise((resolve, reject) => {
-      db.remove({ _id: { $in: ids } }, { multi: true }, function (err, numRemoved) {
+      db.remove({ _id: { $in: ids } }, { multi: true }, (err, numRemoved) => {
         if (err) {
           reject(err)
         } else {
@@ -952,7 +952,7 @@ const actions = {
     if (confirm(`Are you sure you want to clear the browsing history for this persona?`)) {
       const db = data.db
       const personaId = data.personaId
-      db.remove({ personaId: personaId }, { multi: true }, function (err, numReplaced) {
+      db.remove({ personaId: personaId }, { multi: true }, (err, numReplaced) => {
         if (err) {
           alert('ERROR: ' + err)
           return
@@ -964,7 +964,7 @@ const actions = {
   clearAllHistory ({ commit }, data) {
     if (confirm(`Are you sure you want to clear the browsing history for all personas?`)) {
       const db = data.db
-      db.remove({}, { multi: true }, function (err, numReplaced) {
+      db.remove({}, { multi: true }, (err, numReplaced) => {
         if (err) {
           alert('ERROR: ' + err)
           return
@@ -977,7 +977,7 @@ const actions = {
   // SETTINGS
   // ========
   loadSettings ({ commit, dispatch }, db) {
-    db.find({}).exec(function (err, dbSettings) {
+    db.find({}).exec((err, dbSettings) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -996,7 +996,7 @@ const actions = {
       searchProvider: 'https://duckduckgo.com/?q={0}',
       enableLoginManager: false
     }
-    db.insert(defaultSettings, function (err, dbSettings) {
+    db.insert(defaultSettings, (err, dbSettings) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -1014,7 +1014,7 @@ const actions = {
       enableLoginManager: settingsToEdit.enableLoginManager
     }
     commit('setSettingsDetails', settingsDetails)
-    db.update({ _id: settingsToUpdate._id }, settingsToUpdate, {}, function (err, numReplaced) {
+    db.update({ _id: settingsToUpdate._id }, settingsToUpdate, {}, (err, numReplaced) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -1028,7 +1028,7 @@ const actions = {
   loadMasterPasswordRecord ({ commit }, data) {
     return new Promise((resolve, reject) => {
       const db = data.db
-      db.find({ masterPassword: 1 }).exec(function (err, dbDetails) {
+      db.find({ masterPassword: 1 }).exec((err, dbDetails) => {
         if (err) {
           reject(err)
         }
@@ -1039,7 +1039,7 @@ const actions = {
   saveMasterPasswordRecord ({ commit }, data) {
     return new Promise((resolve, reject) => {
       const db = data.db
-      db.insert({ 'masterPassword': 1 }, function (err, dbRecord) {
+      db.insert({ 'masterPassword': 1 }, (err, dbRecord) => {
         if (err) {
           reject(err)
         }
@@ -1052,7 +1052,7 @@ const actions = {
       const db = data.db
       const personaId = data.personaId
       const host = data.host
-      db.find({ personaId, host }).exec(function (err, dbDetails) {
+      db.find({ personaId, host }).exec((err, dbDetails) => {
         if (err) {
           reject(err)
         }
@@ -1069,7 +1069,7 @@ const actions = {
       const db = data.db
       const personaId = data.personaId
       const host = data.host
-      db.find({ personaId, host }).exec(function (err, dbDetails) {
+      db.find({ personaId, host }).exec((err, dbDetails) => {
         if (err) {
           reject(err)
         }
@@ -1077,7 +1077,7 @@ const actions = {
           // Update the existing details
           const id = dbDetails[0]._id
           Object.assign(dbDetails[0].fields, data.fields)
-          db.update({ _id: id }, dbDetails[0], {}, function (err, numReplaced) {
+          db.update({ _id: id }, dbDetails[0], {}, (err, numReplaced) => {
             if (err) {
               reject(err)
             }
@@ -1091,7 +1091,7 @@ const actions = {
             host,
             fields
           }
-          db.insert(login, function (err, dbDetails) {
+          db.insert(login, (err, dbDetails) => {
             if (err) {
               reject(err)
             }
@@ -1106,7 +1106,7 @@ const actions = {
       const db = data.db
       const personaId = data.personaId
       const host = data.host
-      db.find({ personaId, host }).exec(function (err, dbDetails) {
+      db.find({ personaId, host }).exec((err, dbDetails) => {
         if (err) {
           reject(err)
         }
@@ -1115,7 +1115,7 @@ const actions = {
           const id = dbDetails[0]._id
           dbDetails[0].fields = undefined
           dbDetails[0].ignore = true
-          db.update({ _id: id }, dbDetails[0], {}, function (err, numReplaced) {
+          db.update({ _id: id }, dbDetails[0], {}, (err, numReplaced) => {
             if (err) {
               reject(err)
             }
@@ -1128,7 +1128,7 @@ const actions = {
             host,
             ignore: true
           }
-          db.insert(login, function (err, dbDetails) {
+          db.insert(login, (err, dbDetails) => {
             if (err) {
               reject(err)
             }
@@ -1145,7 +1145,7 @@ const actions = {
     const skip = data.skip
     const limit = data.limit
     return new Promise((resolve, reject) => {
-      db.find({ $and: [{ personaId }, search ? { host: new RegExp(search, 'gi') } : {}] }).sort({ host: 1 }).skip(skip).limit(limit).exec(function (err, dbLogins) {
+      db.find({ $and: [{ personaId }, search ? { host: new RegExp(search, 'gi') } : {}] }).sort({ host: 1 }).skip(skip).limit(limit).exec((err, dbLogins) => {
         if (err) {
           reject(err)
         } else {
@@ -1163,7 +1163,7 @@ const actions = {
       title: data.title,
       dateTime: new Date()
     }
-    db.insert(logins, function (err, dbLogins) {
+    db.insert(logins, (err, dbLogins) => {
       if (err) {
         alert('ERROR: ' + err)
         // return
@@ -1174,7 +1174,7 @@ const actions = {
     const db = data.db
     const ids = data.ids
     return new Promise((resolve, reject) => {
-      db.remove({ _id: { $in: ids } }, { multi: true }, function (err, numRemoved) {
+      db.remove({ _id: { $in: ids } }, { multi: true }, (err, numRemoved) => {
         if (err) {
           reject(err)
         } else {
@@ -1187,7 +1187,7 @@ const actions = {
   // SYSTEM SETTINGS
   // ===============
   loadSystemSettings ({ commit, dispatch }, db) {
-    db.find({}).exec(function (err, dbSettings) {
+    db.find({}).exec((err, dbSettings) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -1207,7 +1207,7 @@ const actions = {
       updateExists: false,
       oldVersion: ''
     }
-    db.insert(defaultSettings, function (err, dbSettings) {
+    db.insert(defaultSettings, (err, dbSettings) => {
       if (err) {
         alert('ERROR: ' + err)
         return
@@ -1218,7 +1218,7 @@ const actions = {
   saveSystemSettings ({ commit }, data) {
     const db = data.db
     const settings = data.systemSettings
-    db.update({ _id: settings._id }, settings, {}, function (err, numReplaced) {
+    db.update({ _id: settings._id }, settings, {}, (err, numReplaced) => {
       if (err) {
         alert('ERROR: ' + err)
         // return

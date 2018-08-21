@@ -57,13 +57,13 @@
         }
       }
     },
-    mounted: function () {
+    mounted () {
       this.calculateBoxSize()
       window.addEventListener('resize', (e) => {
         this.calculateBoxSize()
       })
     },
-    updated: function () {
+    updated () {
       // HACK: Is this a good way to do this?
       if (this.results.length) {
         document.removeEventListener('click', this.closeFind)

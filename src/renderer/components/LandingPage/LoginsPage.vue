@@ -52,14 +52,14 @@
         selectedCount: 0
       }
     },
-    created: function () {
+    created () {
       this.loadLogins({ db: this.$ldb, personaId: this.persona._id, limit: 100 }).then((response) => {
         this.logins = response
       }).catch((error) => {
         alert('ERROR: ' + error)
       })
     },
-    mounted: function () {
+    mounted () {
       // Focus the search box when the logins page has been mounted
       const box = document.getElementById('logins-search-text-' + this.persona._id)
       box.focus()

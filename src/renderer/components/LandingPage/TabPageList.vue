@@ -43,7 +43,7 @@
       activity: state => state.Store.activity,
       settings: state => state.Store.settings
     }),
-    mounted: function () {
+    mounted () {
       this.setupLoginManager()
     },
     methods: {
@@ -55,7 +55,7 @@
         'loadLoginDetails',
         'saveLoginDetails'
       ]),
-      getZIndex: function (index) {
+      getZIndex (index) {
         return this.tabs[index].isActive ? 99 : -99
       },
       setupLoginManager () {

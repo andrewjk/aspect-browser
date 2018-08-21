@@ -74,12 +74,12 @@
       ...mapActions([
         'saveMasterPasswordRecord'
       ]),
-      loginsDatabaseExists: function () {
+      loginsDatabaseExists () {
         // Check whether there's already a database file
         const filename = path.join(remote.app.getPath('userData'), '/logins.db')
         return fs.existsSync(filename)
       },
-      maybeSetEnableLoginManager: function (value) {
+      maybeSetEnableLoginManager (value) {
         // TODO: This is some spaghetti that needs to be cleaned up...
         // If turning on and there's no existing database file, require setting the master password
         if (value && !this.loginsDatabaseExists()) {
@@ -136,7 +136,7 @@
           this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: value })
         }
       },
-      changeLoginManagerPassword: function () {
+      changeLoginManagerPassword () {
         // TODO: This is some spaghetti that needs to be cleaned up...
         // Get the existing master password
         this.$swal({
@@ -194,7 +194,7 @@
                         const recordCount = dbRecords.length
                         let recordIndex = 0
                         for (let record of dbRecords) {
-                          db.update({ _id: record._id }, record, {}, function (err, numReplaced) {
+                          db.update({ _id: record._id }, record, {}, (err, numReplaced) => {
                             if (err) {
                               // TODO: Really need to handle errors much better...
                               // Maybe could copy the database and restore it if anything goes wrong?

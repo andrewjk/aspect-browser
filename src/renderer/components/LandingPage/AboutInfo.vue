@@ -28,10 +28,10 @@
   export default {
     name: 'about-dialog',
     computed: {
-      imageSource: function () {
+      imageSource () {
         return 'file://' + path.join(__static, '/256x256.png')
       },
-      version: function () {
+      version () {
         return remote.app.getVersion()
       }
     },
@@ -40,11 +40,11 @@
         'openInTab',
         'closeAboutInfo'
       ]),
-      openWebsite: function () {
+      openWebsite () {
         this.openInTab({ url: 'https://github.com/andrewjk/aspect-browser', background: false })
         this.closeAboutInfo()
       },
-      openSource: function () {
+      openSource () {
         this.openInTab({ url: 'https://github.com/andrewjk/aspect-browser', background: false })
         this.closeAboutInfo()
       }

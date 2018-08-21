@@ -79,14 +79,14 @@
         }
       }
     },
-    created: function () {
+    created () {
       this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 }).then((response) => {
         this.history = response
       }).catch((error) => {
         alert('ERROR: ' + error)
       })
     },
-    mounted: function () {
+    mounted () {
       // Focus the search box when the history page has been mounted
       const box = document.getElementById('history-search-text-' + this.persona._id)
       box.focus()

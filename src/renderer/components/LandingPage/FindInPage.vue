@@ -38,7 +38,7 @@
       }
     },
     watch: {
-      findText: function (val, oldVal) {
+      findText (val, oldVal) {
         this.haveSearched = false
         if (val) {
           this.startFind()

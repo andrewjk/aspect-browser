@@ -69,7 +69,7 @@
         showEditBookmarkLinks: false
       }
     },
-    mounted: function () {
+    mounted () {
       // Focus the address box when the home page has been mounted e.g. when a new tab has been opened
       const box = document.getElementById('address-text-' + this.persona._id)
       box.focus()

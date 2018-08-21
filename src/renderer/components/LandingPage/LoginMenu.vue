@@ -36,7 +36,7 @@
         'saveLoginDetails',
         'ignoreLoginDetails'
       ]),
-      saveLogin: function () {
+      saveLogin () {
         const db = this.$ldb
         const personaId = this.persona._id
         const host = this.loginSettings.host
@@ -49,10 +49,10 @@
             alert('ERROR', error)
           })
       },
-      dontSaveLogin: function () {
+      dontSaveLogin () {
         this.closeLoginMenu()
       },
-      neverSaveLogin: function () {
+      neverSaveLogin () {
         const db = this.$ldb
         const personaId = this.persona._id
         const host = this.loginSettings.host

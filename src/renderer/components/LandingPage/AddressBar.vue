@@ -64,17 +64,17 @@
         'getActiveTab'
       ])
     },
-    mounted: function () {
+    mounted () {
       // HACK: Give it time to load the system settings database
       setTimeout(() => {
         this.updateExists = this.systemSettings.updateExists
         this.checkUpdate()
       }, 100)
     },
-    beforeUpdate: function () {
+    beforeUpdate () {
       this.checkUpdate()
     },
-    updated: function () {
+    updated () {
       // HACK: Is this a good way to do this?
       if (this.showOptionsMenu) {
         document.removeEventListener('click', this.toggleOptionsMenu)

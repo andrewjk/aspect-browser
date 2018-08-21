@@ -30,7 +30,7 @@
         preload: 'file://' + path.join(__static, '/webview-preload.js')
       }
     },
-    mounted: function () {
+    mounted () {
       const webview = document.getElementById(this.tab._id)
 
       this.setTabDetails({ persona: this.persona, tab: this.tab, webview })
@@ -43,7 +43,7 @@
 
       // TODO: Add a context menu to the webview
     },
-    updated: function () {
+    updated () {
       // Focus the webview when the URL has changed e.g. when the user has clicked a link or typed something
       // in the address bar
       if (this.tab.url !== this.previousUrl) {
@@ -100,7 +100,7 @@
       pageIconUpdated (e) {
         if (e.favicons.length) {
           let icon
-          e.favicons.forEach(function (item) {
+          e.favicons.forEach((item) => {
             if (item.indexOf('.ico') > 0) {
               icon = item
             }

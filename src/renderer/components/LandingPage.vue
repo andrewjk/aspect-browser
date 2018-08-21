@@ -109,17 +109,17 @@
         'getActiveTab'
       ])
     },
-    created: function () {
+    created () {
       this.loadPersonas(this.$pdb)
       this.loadSettings(this.$usdb)
       this.loadSystemSettings(this.$ssdb)
     },
-    mounted: function () {
+    mounted () {
       window.addEventListener('keydown', (e) => {
         this.keyDown(e)
       }, true)
     },
-    updated: function () {
+    updated () {
       if (this.focusFindBookmark) {
         this.focusFindBookmark = false
         this.focusFindBookmarkBox()

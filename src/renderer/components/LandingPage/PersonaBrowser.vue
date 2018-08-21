@@ -33,7 +33,7 @@
       ...mapMutations([
         'getZIndex'
       ]),
-      getZIndex: function (index) {
+      getZIndex (index) {
         return this.personas[index].isActive ? 99 : -99
       }
     }

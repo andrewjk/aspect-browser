@@ -42,7 +42,7 @@
         systemSettings: state => state.Store.systemSettings
       })
     },
-    mounted: function () {
+    mounted () {
       window.on('resize', (e) => {
         this.showMaximize = !window.isMaximized()
         this.showRestore = window.isMaximized()

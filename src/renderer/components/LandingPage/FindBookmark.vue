@@ -35,7 +35,7 @@
         'getActivePersona'
       ])
     },
-    mounted: function () {
+    mounted () {
       const box = document.getElementById('find-bookmark-text')
       const dropdown = document.getElementById('find-bookmark-dropdown')
       dropdown.style.width = box.getBoundingClientRect().width + 'px'
