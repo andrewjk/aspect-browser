@@ -26,16 +26,21 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 * Tabbed browsing makes it easy to keep your browsing confined to the one persona
 * Use keyboard shortcuts to switch between personas and tabs
 * Use Quick Find to search for personas and bookmarks
+* Manage history for each persona
+* Manage login details for each persona
+  * Can be turned on in Settings => Login Manager
+  * Requires a master password to be set
+  * Has not been audited - use at your own risk!
 
 ## Download
 
-![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.3/aspect-browser-setup-0.0.3.exe)
+![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.4/aspect-browser-setup-0.0.4.exe)
 
-![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.3/Aspect-0.0.3.dmg)
+![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.4/Aspect-0.0.4.dmg)
 
-![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.3/aspect-browser-0.0.3-x86_64.AppImage)
+![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.4/aspect-browser-0.0.4-x86_64.AppImage)
 
-![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.3)
+![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.4)
 
 ## Keyboard Shortcuts
 
@@ -64,8 +69,8 @@ The following is a very provisional roadmap of planned major features.
 | Date | Version | Feature | Done |
 | ---- | ------- | ------- | ---- |
 | 6 Aug | 0.0.4 | Check for updates | ✓ |
-| 13 Aug | 0.0.3 | History management | ✓ |
-| 20 Aug | 0.0.4 | Password storage | |
+| 13 Aug | 0.0.4 | History management | ✓ |
+| 20 Aug | 0.0.4 | Login management | ✓ |
 | 27 Aug | 0.0.5 | Ad blocking | |
 | 3 Sep | 0.0.6 | Session management | |
 | 10 Sep | 0.0.7 | Download management | |
