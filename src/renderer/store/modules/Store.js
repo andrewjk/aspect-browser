@@ -519,6 +519,10 @@ const mutations = {
             t.url = 'aspect://history'
             t.title = 'History'
             t.webview = null
+          } else if (url === 'aspect://logins') {
+            t.url = 'aspect://logins'
+            t.title = 'Logins'
+            t.webview = null
           } else if (t.webview) {
             t.webview.loadURL(url)
           } else {
@@ -551,6 +555,10 @@ const mutations = {
           } else if (url === 'aspect://history') {
             t.url = 'aspect://history'
             t.title = 'History'
+            t.webview = null
+          } else if (url === 'aspect://logins') {
+            t.url = 'aspect://logins'
+            t.title = 'Logins'
             t.webview = null
           } else if (t.webview) {
             t.webview.loadURL(url)
@@ -686,6 +694,29 @@ const mutations = {
   },
   closeLoginMenu (state, data) {
     state.showLoginMenu = false
+  },
+  showLogins (state) {
+    const activePersona = state.personas.find((p) => {
+      return p.isActive
+    })
+    if (activePersona) {
+      const tabs = state.activity[activePersona._id].tabs
+      tabs.push({
+        _id: uuid(),
+        url: 'aspect://logins',
+        addressText: null,
+        title: 'Logins',
+        icon: null,
+        isActive: true,
+        isLoading: false,
+        backHistory: [],
+        forwardHistory: []
+      })
+      const newIndex = tabs.length - 1
+      tabs.forEach((t, i) => {
+        t.isActive = (i === newIndex)
+      })
+    }
   }
 }
 
@@ -1103,6 +1134,51 @@ const actions = {
             }
             resolve()
           })
+        }
+      })
+    })
+  },
+  loadLogins ({ commit, dispatch }, data) {
+    const db = data.db
+    const personaId = data.personaId
+    const search = data.search
+    const skip = data.skip
+    const limit = data.limit
+    return new Promise((resolve, reject) => {
+      db.find({ $and: [{ personaId }, search ? { host: new RegExp(search, 'gi') } : {}] }).sort({ host: 1 }).skip(skip).limit(limit).exec(function (err, dbLogins) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(dbLogins)
+        }
+      })
+    })
+  },
+  saveToLogins ({ commit }, data) {
+    const db = data.db
+    const logins = {
+      personaId: data.personaId,
+      url: data.url,
+      icon: data.icon,
+      title: data.title,
+      dateTime: new Date()
+    }
+    db.insert(logins, function (err, dbLogins) {
+      if (err) {
+        alert('ERROR: ' + err)
+        // return
+      }
+    })
+  },
+  deleteLogins ({ commit }, data) {
+    const db = data.db
+    const ids = data.ids
+    return new Promise((resolve, reject) => {
+      db.remove({ _id: { $in: ids } }, { multi: true }, function (err, numRemoved) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(numRemoved)
         }
       })
     })

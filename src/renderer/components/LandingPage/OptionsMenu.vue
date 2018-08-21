@@ -18,6 +18,11 @@
       <span>Clear All History</span>
     </button>
     <div class="options-menu-separator"></div>
+    <button class="options-menu-item" @click="maybeShowLogins" title="Show login details for this persona">
+      <fa icon="key"/>
+      <span>View {{ this.persona.name }} Logins</span>
+    </button>
+    <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="openAboutInfo" title="Show information about Aspect">
       <fa icon="info-circle"/>
       <span>About Aspect</span>
@@ -28,6 +33,8 @@
 <script>
   import { mapMutations, mapActions } from 'vuex'
 
+  import Encrypter from '../../data/Encrypter'
+
   export default {
     props: {
       persona: null
@@ -36,12 +43,47 @@
       ...mapMutations([
         'editSettings',
         'showHistory',
+        'showLogins',
         'openAboutInfo'
       ]),
       ...mapActions([
         'clearHistory',
         'clearAllHistory'
-      ])
+      ]),
+      maybeShowLogins () {
+        // Always get the password before showing the saved logins
+        const db = this.$ldb
+        this.$swal({
+          title: 'Login Manager',
+          text: 'Enter your master password:',
+          input: 'password',
+          showConfirmButton: true,
+          showCancelButton: true,
+          allowOutsideClick: false,
+          animation: false,
+          customClass: 'dialog-custom'
+        })
+          .then((result) => {
+            if (result.value) {
+              const crypt = new Encrypter(result.value)
+              db.persistence.afterSerialization = crypt.encrypt
+              db.persistence.beforeDeserialization = crypt.decrypt
+              db.loadDatabase((err) => {
+                if (err) {
+                  alert('Failed to unlock database.')
+                  return
+                }
+                db.persistence.isLoaded = true
+                this.showLogins()
+              })
+            } else {
+              // Just do nothing?
+            }
+          })
+          .catch((err) => {
+            alert('ERROR: ' + err)
+          })
+      }
     }
   }
 </script>

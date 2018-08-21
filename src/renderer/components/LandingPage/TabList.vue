@@ -13,6 +13,9 @@
         <template v-else-if="item.url === 'aspect://history'">
           <fa :icon="['far', 'clock']" class="tab-icon"/>
         </template>
+        <template v-else-if="item.url === 'aspect://logins'">
+          <fa icon="key" class="tab-icon"/>
+        </template>
         <template v-else-if="item.isLoading">
           <fa icon="spinner" class="tab-icon" spin/>
         </template>

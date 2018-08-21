@@ -38,6 +38,7 @@ import {
   faEllipsisV,
   faFolder,
   faGlobe,
+  faKey,
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -88,6 +89,7 @@ library.add(faEllipsisV)
 library.add(faClock)
 library.add(faFolder)
 library.add(faGlobe)
+library.add(faKey)
 library.add(faInfoCircle)
 
 library.add(faWindowMinimize)
