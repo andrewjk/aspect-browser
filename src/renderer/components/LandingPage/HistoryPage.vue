@@ -82,8 +82,8 @@
     created () {
       this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 }).then((response) => {
         this.history = response
-      }).catch((error) => {
-        alert('ERROR: ' + error)
+      }).catch((err) => {
+        alert('ERROR: ' + err)
       })
     },
     mounted () {
@@ -112,8 +112,8 @@
           this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then((response) => {
             this.history = response
             this.searchCompleted = true
-          }).catch((error) => {
-            alert('ERROR: ' + error)
+          }).catch((err) => {
+            alert('ERROR: ' + err)
           })
         }, 500)
       },
@@ -175,8 +175,8 @@
             this.showSelectAll = true
             this.showDeleteButton = false
           })
-        }).catch((error) => {
-          alert('ERROR: ' + error)
+        }).catch((err) => {
+          alert('ERROR: ' + err)
         })
       }
     }

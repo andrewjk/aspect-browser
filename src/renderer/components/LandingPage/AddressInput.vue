@@ -213,8 +213,8 @@
               }
               this.results = results
               this.showDropDown = results.length
-            }).catch((error) => {
-              alert('ERROR: ' + error)
+            }).catch((err) => {
+              alert('ERROR: ' + err)
             })
           }
         }

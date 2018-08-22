@@ -45,8 +45,8 @@
           .then(() => {
             this.closeLoginMenu()
           })
-          .catch((error) => {
-            alert('ERROR', error)
+          .catch((err) => {
+            alert('ERROR', err)
           })
       },
       dontSaveLogin () {
@@ -60,8 +60,8 @@
           .then(() => {
             this.closeLoginMenu()
           })
-          .catch((error) => {
-            alert('ERROR', error)
+          .catch((err) => {
+            alert('ERROR', err)
           })
       }
     }

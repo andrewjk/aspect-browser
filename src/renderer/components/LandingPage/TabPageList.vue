@@ -125,8 +125,8 @@
                 if (dbDetails.length) {
                   if (!dbDetails[0].ignore) {
                     this.saveLoginDetails({ db, personaId, host, fields })
-                      .catch((error) => {
-                        alert('ERROR', error)
+                      .catch((err) => {
+                        alert('ERROR', err)
                       })
                   }
                 } else {
@@ -151,8 +151,8 @@
               event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
             }
           })
-          .catch((error) => {
-            alert('ERROR', error)
+          .catch((err) => {
+            alert('ERROR', err)
           })
       }
     }

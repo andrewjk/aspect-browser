@@ -55,8 +55,8 @@
     created () {
       this.loadLogins({ db: this.$ldb, personaId: this.persona._id, limit: 100 }).then((response) => {
         this.logins = response
-      }).catch((error) => {
-        alert('ERROR: ' + error)
+      }).catch((err) => {
+        alert('ERROR: ' + err)
       })
     },
     mounted () {
@@ -86,8 +86,8 @@
           this.loadLogins({ db: this.$ldb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then((response) => {
             this.logins = response
             this.searchCompleted = true
-          }).catch((error) => {
-            alert('ERROR: ' + error)
+          }).catch((err) => {
+            alert('ERROR: ' + err)
           })
         }, 500)
       },
@@ -115,8 +115,8 @@
             this.showSelectAll = true
             this.showDeleteButton = false
           })
-        }).catch((error) => {
-          alert('ERROR: ' + error)
+        }).catch((err) => {
+          alert('ERROR: ' + err)
         })
       }
     }
