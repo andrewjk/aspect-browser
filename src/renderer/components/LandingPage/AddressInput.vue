@@ -35,7 +35,7 @@
     data () {
       return {
         lastAddressText: '',
-        results: Array,
+        results: [],
         showDropDown: false
       }
     },

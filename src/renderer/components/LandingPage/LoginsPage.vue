@@ -37,13 +37,13 @@
 
   export default {
     props: {
-      persona: null,
-      tabs: Array
+      persona: null
     },
     data () {
       return {
-        logins: Array,
+        logins: [],
         searchText: null,
+        focusSearchText: false,
         searchInterval: 0,
         searchCompleted: false,
         selectAll: false,
@@ -55,14 +55,18 @@
     created () {
       this.loadLogins({ db: this.$ldb, personaId: this.persona._id, limit: 100 }).then((response) => {
         this.logins = response
+        this.focusSearchText = true
       }).catch((err) => {
         alert('ERROR: ' + err)
       })
     },
-    mounted () {
-      // Focus the search box when the logins page has been mounted
-      const box = document.getElementById('logins-search-text-' + this.persona._id)
-      box.focus()
+    updated () {
+      if (this.focusSearchText) {
+        // Focus the search box when the logins have been loaded
+        this.focusSearchText = false
+        const box = document.getElementById('logins-search-text-' + this.persona._id)
+        if (box) box.focus()
+      }
     },
     methods: {
       ...mapActions([

@@ -23,7 +23,7 @@
       return {
         lastFindText: '',
         findText: '',
-        results: Array
+        results: []
       }
     },
     computed: {

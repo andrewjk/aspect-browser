@@ -6,13 +6,13 @@
         This persona's browsing history is empty.
       </p>
     </div>
-    <div v-if="(history && history.length) || searchText" class="history-search">
+    <div v-if="history.length || searchText" class="history-search">
       <input type="text" :id="'history-search-text-' + this.persona._id" v-model="searchText" @input="searchHistory" onfocus="this.select();" placeholder="Search history" title="Search this persona's browsing history by title or url">
     </div>
     <div v-if="searchText && searchCompleted" class="history-search">
         Found {{ this.history.length }} search results for '{{ this.searchText }}'
     </div>
-    <div v-if="history && history.length" class="history-edit">
+    <div v-if="history.length" class="history-edit">
       <label class="history-select-all">
         <input type="checkbox" :checked="selectAll" @change="toggleAll"> {{ showSelectAll ? 'Select all' : 'Select none' }}
       </label>
@@ -53,8 +53,9 @@
     },
     data () {
       return {
-        history: Array,
+        history: [],
         searchText: null,
+        focusSearchText: false,
         searchInterval: 0,
         searchCompleted: false,
         selectAll: false,
@@ -67,14 +68,12 @@
       historyDates: {
         get () {
           const results = []
-          if (this.history && this.history.length && this.history.forEach) {
-            this.history.forEach((item) => {
-              const lastResult = results[results.length - 1]
-              if (!lastResult || !this.areDatesEqual(lastResult, item.dateTime)) {
-                results.push(item.dateTime)
-              }
-            })
-          }
+          this.history.forEach((item) => {
+            const lastResult = results[results.length - 1]
+            if (!lastResult || !this.areDatesEqual(lastResult, item.dateTime)) {
+              results.push(item.dateTime)
+            }
+          })
           return results
         }
       }
@@ -82,14 +81,18 @@
     created () {
       this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 }).then((response) => {
         this.history = response
+        this.focusSearchText = true
       }).catch((err) => {
         alert('ERROR: ' + err)
       })
     },
-    mounted () {
-      // Focus the search box when the history page has been mounted
-      const box = document.getElementById('history-search-text-' + this.persona._id)
-      box.focus()
+    updated () {
+      if (this.focusSearchText) {
+        // Focus the search box when the history items have been loaded
+        this.focusSearchText = false
+        const box = document.getElementById('history-search-text-' + this.persona._id)
+        if (box) box.focus()
+      }
     },
     methods: {
       ...mapMutations([
