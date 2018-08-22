@@ -6,6 +6,8 @@ const state = {
   settings: {},
   systemSettings: {},
   activity: {},
+  showFindInPage: false,
+  focusFindInPage: false,
   showPersonaModal: false,
   personaToUpdate: null,
   personaToEdit: null,
@@ -200,6 +202,7 @@ const mutations = {
         closingTab.backHistory = []
         closingTab.forwardHistory = []
         closingTab.webview = null
+        state.showFindInPage = false
       }
       activity.hasOpenTab = activity.tabs.some((tab) => {
         return tab.url
@@ -634,6 +637,19 @@ const mutations = {
         t.isActive = (i === newIndex)
       })
     }
+  },
+  // ====
+  // FIND
+  // ====
+  openFindInPage (state, data) {
+    state.showFindInPage = true
+    state.focusFindInPage = true
+  },
+  closeFindInPage (state, data) {
+    state.showFindInPage = false
+  },
+  unfocusFindInPage (state, data) {
+    state.focusFindInPage = false
   },
   // ========
   // SETTINGS

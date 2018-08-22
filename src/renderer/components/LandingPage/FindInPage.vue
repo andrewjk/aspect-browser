@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapState, mapMutations } from 'vuex'
 
   export default {
     props: {
@@ -55,6 +55,9 @@
       })
     },
     methods: {
+      ...mapMutations([
+        'closeFindInPage'
+      ]),
       getActiveWebview () {
         const tabs = this.activity[this.persona._id].tabs
         const activeTab = tabs.find((item) => {
@@ -111,7 +114,7 @@
           this.activeWebview.focus()
           this.activeWebview = null
         }
-        this.$emit('close-find-in-page')
+        this.closeFindInPage()
       },
       foundInPage (e) {
         this.haveFoundText = true

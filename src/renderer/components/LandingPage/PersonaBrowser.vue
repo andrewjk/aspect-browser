@@ -5,14 +5,14 @@
         <tab-list :persona="item" class="persona-tab-list"></tab-list>
         <address-bar :persona="item" class="persona-address-bar"></address-bar>
         <tab-page-list :persona="item" :show-welcome="personas.length === 1" class="persona-tab-page-list"></tab-page-list>
-        <find-in-page v-show="showFindInPage" :persona="item" class="persona-find-in-page" @close-find-in-page="$emit('close-find-in-page')"></find-in-page>
+        <find-in-page v-show="showFindInPage" :persona="item" class="persona-find-in-page"></find-in-page>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapState, mapGetters, mapMutations } from 'vuex'
 
   import TabList from './TabList'
   import AddressBar from './AddressBar'
@@ -21,20 +21,38 @@
 
   export default {
     components: { TabList, AddressBar, TabPageList, FindInPage },
-    props: {
-      showFindInPage: false
+    computed: {
+      ...mapState({
+        personas: state => state.Store.personas,
+        activity: state => state.Store.activity,
+        settings: state => state.Store.settings,
+        showFindInPage: state => state.Store.showFindInPage,
+        focusFindInPage: state => state.Store.focusFindInPage
+      }),
+      ...mapGetters([
+        'getActivePersona'
+      ])
     },
-    computed: mapState({
-      personas: state => state.Store.personas,
-      activity: state => state.Store.activity,
-      settings: state => state.Store.settings
-    }),
+    updated () {
+      if (this.focusFindInPage) {
+        this.focusFindInPageBox()
+        this.unfocusFindInPage()
+      }
+    },
     methods: {
       ...mapMutations([
-        'getZIndex'
+        'getZIndex',
+        'unfocusFindInPage'
       ]),
       getZIndex (index) {
         return this.personas[index].isActive ? 99 : -99
+      },
+      focusFindInPageBox () {
+        const activePersona = this.getActivePersona
+        if (activePersona) {
+          const box = document.getElementById('find-text-' + activePersona._id)
+          box.focus()
+        }
       }
     }
   }

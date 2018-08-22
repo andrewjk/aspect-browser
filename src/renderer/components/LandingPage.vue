@@ -4,7 +4,7 @@
       <persona-list @show-find-bookmark="showFindBookmarkModal"></persona-list>
     </div>
     <div class="persona-browser-container">
-      <persona-browser :showFindInPage="showFindInPage" :focusFindInPage="focusFindInPage" @close-find-in-page="closeFindInPage"></persona-browser>
+      <persona-browser></persona-browser>
     </div>
     <modal v-if="showPersonaModal">
       <h3 slot="header">{{ personaToUpdate ? 'Edit Persona:' : 'Add Persona:' }}</h3>
@@ -83,9 +83,7 @@
       return {
         zoomLevel: 0,
         showFindBookmark: false,
-        focusFindBookmark: false,
-        showFindInPage: false,
-        focusFindInPage: false
+        focusFindBookmark: false
       }
     },
     computed: {
@@ -124,10 +122,6 @@
         this.focusFindBookmark = false
         this.focusFindBookmarkBox()
       }
-      if (this.focusFindInPage) {
-        this.focusFindInPage = false
-        this.focusFindInPageBox()
-      }
     },
     methods: {
       ...mapMutations([
@@ -141,6 +135,7 @@
         'closeTab',
         'reopenTab',
         'showHistory',
+        'openFindInPage',
         'closePersonaModal',
         'closeBookmarkModal',
         'closeSettingsModal',
@@ -242,7 +237,7 @@
             break
           }
           case 'ctrl+f': {
-            this.findInPage()
+            this.openFindInPage()
             break
           }
           case 'ctrl+h': {
@@ -261,13 +256,6 @@
       focusFindBookmarkBox () {
         const box = document.getElementById('find-bookmark-text')
         box.focus()
-      },
-      focusFindInPageBox () {
-        const activePersona = this.getActivePersona
-        if (activePersona) {
-          const box = document.getElementById('find-text-' + activePersona._id)
-          box.focus()
-        }
       },
       zoomIn () {
         if (this.zoomLevel === 8) {
@@ -302,16 +290,6 @@
       },
       closeFindBookmarkModal () {
         this.showFindBookmark = false
-      },
-      findInPage () {
-        const activePersona = this.getActivePersona
-        if (activePersona) {
-          this.showFindInPage = true
-          this.focusFindInPage = true
-        }
-      },
-      closeFindInPage () {
-        this.showFindInPage = false
       }
     }
   }
