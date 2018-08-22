@@ -177,29 +177,30 @@ const mutations = {
           }
         }
       }
-      activity.tabs[index].index = index
-      activity.closedTabs.push(activity.tabs[index])
+      const closingTab = activity.tabs[index]
+      closingTab.index = index
+      activity.closedTabs.push(closingTab)
       while (activity.closedTabs.length > 20) {
         activity.closedTabs.splice(0, 1)
       }
-      activity.tabs.splice(index, 1)
-      if (!activity.tabs.length) {
-        // HACK: Don't feel great about duplicating this:
-        activity.tabs.push({
-          _id: uuid(),
-          url: 'aspect://home',
-          addressText: null,
-          title: 'Home',
-          icon: null,
-          isLoading: false,
-          backHistory: [],
-          forwardHistory: []
+      if (activity.tabs.length > 1) {
+        activity.tabs.splice(index, 1)
+        const newIndex = Math.min(index, activity.tabs.length - 1)
+        activity.tabs.forEach((tab, i) => {
+          tab.isActive = (i === newIndex)
         })
+      } else {
+        // HACK: Don't feel great about duplicating this:
+        closingTab.url = 'aspect://home'
+        closingTab.addressText = null
+        closingTab.title = 'Home'
+        closingTab.icon = null
+        closingTab.isActive = true
+        closingTab.isLoading = false
+        closingTab.backHistory = []
+        closingTab.forwardHistory = []
+        closingTab.webview = null
       }
-      const newIndex = Math.min(index, activity.tabs.length - 1)
-      activity.tabs.forEach((tab, i) => {
-        tab.isActive = (i === newIndex)
-      })
       activity.hasOpenTab = activity.tabs.some((tab) => {
         return tab.url
       })
