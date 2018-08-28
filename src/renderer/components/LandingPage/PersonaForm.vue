@@ -7,7 +7,7 @@
             <label for="name">Name</label>
           </td>
           <td>
-            <input id="name" v-model="name" placeholder="Name" autofocus>
+            <input type="text" id="name" v-model="name" placeholder="Name" autofocus>
           </td>
         </tr>
         <tr>
@@ -15,7 +15,7 @@
             <label for="shortName">Initials</label>
           </td>
           <td>
-            <input id="shortName" v-model="shortName" placeholder="Initials">
+            <input type="text" id="shortName" v-model="shortName" placeholder="Initials">
           </td>
         </tr>
         <tr>
@@ -23,7 +23,7 @@
             <label for="color">Color</label>
           </td>
           <td>
-            <input id="color" v-model="color" placeholder="Color">
+            <input type="text" id="color" v-model="color" placeholder="Color">
           </td>
         </tr>
       </tbody>

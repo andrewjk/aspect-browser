@@ -7,7 +7,7 @@
             <label for="title">Title</label>
           </td>
           <td>
-            <input id="title" v-model="title" placeholder="Title">
+            <input type="text" id="title" v-model="title" placeholder="Title">
           </td>
         </tr>
       </tbody>
