@@ -42,7 +42,8 @@
     computed: {
       ...mapState({
         activity: state => state.Store.activity,
-        systemSettings: state => state.Store.systemSettings
+        settings: state => state.Settings.settings,
+        systemSettings: state => state.SystemSettings.settings
       }),
       ...mapGetters([
         'getActiveTab'
@@ -296,7 +297,7 @@
               this.addToHistory({ tab: activeTab, url, title: activeTab.title })
             }
             if (url) {
-              this.goToUrl({ tab: activeTab, url })
+              this.goToUrl({ tab: activeTab, url, searchProvider: this.settings.searchProvider })
             } else {
               this.goHome(activeTab)
             }

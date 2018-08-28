@@ -57,8 +57,8 @@
     computed: {
       ...mapState({
         activity: state => state.Store.activity,
-        systemSettings: state => state.Store.systemSettings,
-        showLoginMenu: state => state.Store.showLoginMenu
+        systemSettings: state => state.SystemSettings.settings,
+        showLoginMenu: state => state.Logins.showLoginMenu
       }),
       ...mapGetters([
         'getActiveTab'
@@ -89,7 +89,6 @@
         'addBookmark',
         'goBack',
         'goForward',
-        'goToUrl',
         'goHome',
         'setUpdateChecked',
         'setUpdateExists'

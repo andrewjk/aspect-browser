@@ -25,7 +25,7 @@
     },
     computed: {
       ...mapState({
-        loginSettings: state => state.Store.loginSettings
+        loginSettings: state => state.Logins.loginSettings
       })
     },
     methods: {

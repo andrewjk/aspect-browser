@@ -3,8 +3,6 @@ import uuid from 'uuid/v4'
 
 const state = {
   personas: [],
-  settings: {},
-  systemSettings: {},
   activity: {},
   showFindInPage: false,
   focusFindInPage: false,
@@ -13,13 +11,7 @@ const state = {
   personaToEdit: null,
   showBookmarkModal: false,
   bookmarkToUpdate: null,
-  bookmarkToEdit: null,
-  showSettingsModal: false,
-  settingsToUpdate: null,
-  settingsToEdit: null,
-  showAboutInfo: false,
-  showLoginMenu: false,
-  loginSettings: {}
+  bookmarkToEdit: null
 }
 
 const getters = {
@@ -576,6 +568,7 @@ const mutations = {
   goToUrl (state, data) {
     const tab = data.tab
     let url = data.url
+    const searchProvider = data.searchProvider
 
     if (url.indexOf('.') !== -1 && url.indexOf(' ') === -1) {
       // If it has a dot and no spaces, treat it as a URL
@@ -585,7 +578,7 @@ const mutations = {
       }
     } else {
       // Search for whatever was typed in
-      url = state.settings.searchProvider.replace('{0}', url)
+      url = searchProvider.replace('{0}', url)
     }
     tab.addressText = url
 
@@ -650,90 +643,6 @@ const mutations = {
   },
   unfocusFindInPage (state, data) {
     state.focusFindInPage = false
-  },
-  // ========
-  // SETTINGS
-  // ========
-  setSettings (state, settings) {
-    state.settings = settings
-  },
-  editSettings (state) {
-    // Create a new settings object to be edited
-    const settings = state.settings
-    state.settingsToUpdate = settings
-    state.settingsToEdit = {
-      _id: settings._id,
-      searchProvider: settings.searchProvider,
-      enableLoginManager: settings.enableLoginManager
-    }
-    state.showSettingsModal = true
-  },
-  setSettingsDetails (state, data) {
-    const settings = data.settings
-    if (data.searchProvider !== undefined) settings.searchProvider = data.searchProvider
-    if (data.enableLoginManager !== undefined) settings.enableLoginManager = data.enableLoginManager
-  },
-  closeSettingsModal (state) {
-    state.settingsToUpdate = null
-    state.settingsToEdit = null
-    state.showSettingsModal = false
-  },
-  // ===============
-  // SYSTEM SETTINGS
-  // ===============
-  setSystemSettings (state, systemSettings) {
-    state.systemSettings = systemSettings
-  },
-  setUpdateChecked (state, updateChecked) {
-    state.systemSettings.updateChecked = updateChecked
-  },
-  setUpdateExists (state, data) {
-    const updateExists = data.updateExists
-    const oldVersion = data.oldVersion
-    state.systemSettings.updateExists = updateExists
-    state.systemSettings.oldVersion = oldVersion
-  },
-  // ====
-  // MISC
-  // ====
-  openAboutInfo (state, data) {
-    state.showAboutInfo = true
-  },
-  closeAboutInfo (state, data) {
-    state.showAboutInfo = false
-  },
-  openLoginMenu (state, data) {
-    state.loginSettings = {
-      host: data.host,
-      fields: data.fields
-    }
-    state.showLoginMenu = true
-  },
-  closeLoginMenu (state, data) {
-    state.showLoginMenu = false
-  },
-  showLogins (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
-      tabs.push({
-        _id: uuid(),
-        url: 'aspect://logins',
-        addressText: null,
-        title: 'Logins',
-        icon: null,
-        isActive: true,
-        isLoading: false,
-        backHistory: [],
-        forwardHistory: []
-      })
-      const newIndex = tabs.length - 1
-      tabs.forEach((t, i) => {
-        t.isActive = (i === newIndex)
-      })
-    }
   }
 }
 
@@ -989,258 +898,6 @@ const actions = {
         alert('Browsing history cleared.')
       })
     }
-  },
-  // ========
-  // SETTINGS
-  // ========
-  loadSettings ({ commit, dispatch }, db) {
-    db.find({}).exec((err, dbSettings) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        return
-      }
-      // Create default settings if nothing was loaded
-      if (dbSettings.length) {
-        commit('setSettings', dbSettings[0])
-      } else {
-        dispatch('createDefaultSettings', db)
-      }
-    })
-  },
-  createDefaultSettings ({ commit }, db) {
-    const defaultSettings = {
-      _id: uuid(),
-      searchProvider: 'https://duckduckgo.com/?q={0}',
-      enableLoginManager: false
-    }
-    db.insert(defaultSettings, (err, dbSettings) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        return
-      }
-      commit('setSettings', dbSettings)
-    })
-  },
-  saveSettings ({ commit }, data) {
-    const db = data.db
-    const settingsToUpdate = data.settingsToUpdate
-    const settingsToEdit = data.settingsToEdit
-    const settingsDetails = {
-      settings: settingsToUpdate,
-      searchProvider: settingsToEdit.searchProvider,
-      enableLoginManager: settingsToEdit.enableLoginManager
-    }
-    commit('setSettingsDetails', settingsDetails)
-    db.update({ _id: settingsToUpdate._id }, settingsToUpdate, {}, (err, numReplaced) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        return
-      }
-      commit('closeSettingsModal')
-    })
-  },
-  // ======
-  // LOGINS
-  // ======
-  loadMasterPasswordRecord ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      db.find({ masterPassword: 1 }).exec((err, dbDetails) => {
-        if (err) {
-          reject(err)
-        }
-        resolve()
-      })
-    })
-  },
-  saveMasterPasswordRecord ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      db.insert({ 'masterPassword': 1 }, (err, dbRecord) => {
-        if (err) {
-          reject(err)
-        }
-        resolve()
-      })
-    })
-  },
-  loadLoginDetails ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      const personaId = data.personaId
-      const host = data.host
-      db.find({ personaId, host }).exec((err, dbDetails) => {
-        if (err) {
-          reject(err)
-        }
-        if (dbDetails.length) {
-          resolve(dbDetails[0])
-        } else {
-          resolve()
-        }
-      })
-    })
-  },
-  saveLoginDetails ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      const personaId = data.personaId
-      const host = data.host
-      db.find({ personaId, host }).exec((err, dbDetails) => {
-        if (err) {
-          reject(err)
-        }
-        if (dbDetails.length) {
-          // Update the existing details
-          const id = dbDetails[0]._id
-          Object.assign(dbDetails[0].fields, data.fields)
-          db.update({ _id: id }, dbDetails[0], {}, (err, numReplaced) => {
-            if (err) {
-              reject(err)
-            }
-            resolve()
-          })
-        } else {
-          // Add the new details
-          const fields = data.fields
-          const login = {
-            personaId,
-            host,
-            fields
-          }
-          db.insert(login, (err, dbDetails) => {
-            if (err) {
-              reject(err)
-            }
-            resolve()
-          })
-        }
-      })
-    })
-  },
-  ignoreLoginDetails ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      const personaId = data.personaId
-      const host = data.host
-      db.find({ personaId, host }).exec((err, dbDetails) => {
-        if (err) {
-          reject(err)
-        }
-        if (dbDetails.length) {
-          // Update the existing details
-          const id = dbDetails[0]._id
-          dbDetails[0].fields = undefined
-          dbDetails[0].ignore = true
-          db.update({ _id: id }, dbDetails[0], {}, (err, numReplaced) => {
-            if (err) {
-              reject(err)
-            }
-            resolve()
-          })
-        } else {
-          // Add the new details
-          const login = {
-            personaId,
-            host,
-            ignore: true
-          }
-          db.insert(login, (err, dbDetails) => {
-            if (err) {
-              reject(err)
-            }
-            resolve()
-          })
-        }
-      })
-    })
-  },
-  loadLogins ({ commit, dispatch }, data) {
-    const db = data.db
-    const personaId = data.personaId
-    const search = data.search
-    const skip = data.skip
-    const limit = data.limit
-    return new Promise((resolve, reject) => {
-      db.find({ $and: [{ personaId }, search ? { host: new RegExp(search, 'gi') } : {}] }).sort({ host: 1 }).skip(skip).limit(limit).exec((err, dbLogins) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(dbLogins)
-        }
-      })
-    })
-  },
-  saveToLogins ({ commit }, data) {
-    const db = data.db
-    const logins = {
-      personaId: data.personaId,
-      url: data.url,
-      icon: data.icon,
-      title: data.title,
-      dateTime: new Date()
-    }
-    db.insert(logins, (err, dbLogins) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        // return
-      }
-    })
-  },
-  deleteLogins ({ commit }, data) {
-    const db = data.db
-    const ids = data.ids
-    return new Promise((resolve, reject) => {
-      db.remove({ _id: { $in: ids } }, { multi: true }, (err, numRemoved) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(numRemoved)
-        }
-      })
-    })
-  },
-  // ===============
-  // SYSTEM SETTINGS
-  // ===============
-  loadSystemSettings ({ commit, dispatch }, db) {
-    db.find({}).exec((err, dbSettings) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        return
-      }
-      // Create default settings if nothing was loaded
-      if (dbSettings.length) {
-        commit('setSystemSettings', dbSettings[0])
-      } else {
-        dispatch('createDefaultSystemSettings', db)
-      }
-    })
-  },
-  createDefaultSystemSettings ({ commit }, db) {
-    const defaultSettings = {
-      _id: uuid(),
-      updateChecked: new Date(1900, 1, 1),
-      updateExists: false,
-      oldVersion: ''
-    }
-    db.insert(defaultSettings, (err, dbSettings) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        return
-      }
-      commit('setSystemSettings', dbSettings)
-    })
-  },
-  saveSystemSettings ({ commit }, data) {
-    const db = data.db
-    const settings = data.systemSettings
-    db.update({ _id: settings._id }, settings, {}, (err, numReplaced) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        // return
-      }
-    })
   }
 }
 

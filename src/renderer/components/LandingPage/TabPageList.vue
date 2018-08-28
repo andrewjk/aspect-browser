@@ -41,7 +41,7 @@
     },
     computed: mapState({
       activity: state => state.Store.activity,
-      settings: state => state.Store.settings
+      settings: state => state.Settings.settings
     }),
     mounted () {
       this.setupLoginManager()

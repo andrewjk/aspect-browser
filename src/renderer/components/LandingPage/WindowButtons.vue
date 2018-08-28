@@ -39,7 +39,7 @@
       ...mapState({
         personas: state => state.Store.personas,
         activity: state => state.Store.activity,
-        systemSettings: state => state.Store.systemSettings
+        systemSettings: state => state.SystemSettings.settings
       })
     },
     mounted () {

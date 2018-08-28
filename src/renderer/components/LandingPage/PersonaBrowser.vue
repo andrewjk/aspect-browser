@@ -25,7 +25,7 @@
       ...mapState({
         personas: state => state.Store.personas,
         activity: state => state.Store.activity,
-        settings: state => state.Store.settings,
+        settings: state => state.Settings.settings,
         showFindInPage: state => state.Store.showFindInPage,
         focusFindInPage: state => state.Store.focusFindInPage
       }),

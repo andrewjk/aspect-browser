@@ -90,17 +90,17 @@
       ...mapState({
         personas: state => state.Store.personas,
         activity: state => state.Store.activity,
-        settings: state => state.Store.settings,
+        settings: state => state.Settings.settings,
         showPersonaModal: state => state.Store.showPersonaModal,
         personaToEdit: state => state.Store.personaToEdit,
         personaToUpdate: state => state.Store.personaToUpdate,
         showBookmarkModal: state => state.Store.showBookmarkModal,
         bookmarkToEdit: state => state.Store.bookmarkToEdit,
         bookmarkToUpdate: state => state.Store.bookmarkToUpdate,
-        showSettingsModal: state => state.Store.showSettingsModal,
-        settingsToEdit: state => state.Store.settingsToEdit,
-        settingsToUpdate: state => state.Store.settingsToUpdate,
-        showAboutInfo: state => state.Store.showAboutInfo
+        showSettingsModal: state => state.Settings.showSettingsModal,
+        settingsToEdit: state => state.Settings.settingsToEdit,
+        settingsToUpdate: state => state.Settings.settingsToUpdate,
+        showAboutInfo: state => state.AboutInfo.showAboutInfo
       }),
       ...mapGetters([
         'getActivePersona',
