@@ -58,13 +58,11 @@
         }
       }
     },
-    mounted () {
-      this.calculateBoxSize()
-      window.addEventListener('resize', (e) => {
-        this.calculateBoxSize()
-      })
-    },
     updated () {
+      const box = document.getElementById('address-text-' + this.persona._id)
+      const dropdown = document.getElementById('address-text-dropdown-' + this.persona._id)
+      dropdown.style.width = box.getBoundingClientRect().width + 'px'
+
       // HACK: Is this a good way to do this?
       if (this.results.length) {
         document.removeEventListener('click', this.closeFind)
@@ -84,11 +82,6 @@
       ...mapActions([
         'loadHistory'
       ]),
-      calculateBoxSize () {
-        const box = document.getElementById('address-text-' + this.persona._id)
-        const dropdown = document.getElementById('address-text-dropdown-' + this.persona._id)
-        dropdown.style.width = box.getBoundingClientRect().width + 'px'
-      },
       keyPressed (e) {
         // if (e.keyCode === 13) {
         //   let tab = this.getActiveTab
