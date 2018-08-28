@@ -52,7 +52,7 @@ const actions = {
   },
   saveSystemSettings ({ commit }, data) {
     const db = data.db
-    const settings = data.settings
+    const settings = data.systemSettings
     db.update({ _id: settings._id }, settings, {}, (err, numReplaced) => {
       if (err) {
         alert('ERROR: ' + err)
