@@ -1,17 +1,23 @@
 <template>
-  <div id="logins-menu">
-    <button class="logins-menu-item" @click="saveLogin" title="Save these login details">
-      <fa icon="check"/>
-      <span>Save this login</span>
+  <div id="login-menu">
+    <button class="login-menu-item" @click="saveLogin" title="Save these login details">
+      <div class="login-menu-item-grid">
+        <fa icon="check" class="login-menu-icon"/>
+        <span>Save this login</span>
+      </div>
     </button>
-    <button class="logins-menu-item" @click="dontSaveLogin" title="Don't save these login details">
-      <fa icon="times"/>
-      <span>Don't save this login</span>
+    <button class="login-menu-item" @click="dontSaveLogin" title="Don't save these login details">
+      <div class="login-menu-item-grid">
+        <fa icon="times" class="login-menu-icon"/>
+        <span>Don't save this login</span>
+      </div>
     </button>
-    <div class="logins-menu-separator"></div>
-    <button class="logins-menu-item" @click="neverSaveLogin" title="Never save login details for this site">
-      <fa icon="times"/>
-      <span>Never save logins for {{ this.loginSettings.host }}</span>
+    <div class="login-menu-separator"></div>
+    <button class="login-menu-item" @click="neverSaveLogin" title="Never save login details for this site">
+      <div class="login-menu-item-grid">
+        <fa icon="times" class="login-menu-icon"/>
+        <span>Never save logins for {{ this.loginSettings.host }}</span>
+      </div>
     </button>
   </div>
 </template>
@@ -70,7 +76,7 @@
 
 <style scoped>
 
-  #logins-menu {
+  #login-menu {
     border: 1px solid #ddd;
     border-radius: 2px;
     background-color: white;
@@ -81,18 +87,32 @@
     padding: 4px 0;
   }
 
-  .logins-menu-item {
+  .login-menu-item {
     text-align: left;
     width: 100%;
     padding: 4px 8px;
   }
 
-  .logins-menu-item:hover,
-  .logins-menu-item:focus {
+  .login-menu-item-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  .login-menu-item:hover,
+  .login-menu-item:focus {
     background-color: #eee;
   }
 
-  .logins-menu-separator {
+  .login-menu-item-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  .login-menu-icon {
+    margin-right: 10px;
+  }
+
+  .login-menu-separator {
     height: 1px;
     border-bottom: 1px solid #ddd;
     margin: 2px 0;

@@ -1,31 +1,43 @@
 <template>
   <div id="options-menu">
     <button class="options-menu-item" @click="editSettings" title="Edit application settings">
-      <fa icon="cog"/>
-      <span>Settings</span>
+      <div class="options-menu-item-grid">
+        <fa icon="cog" class="options-menu-icon"/>
+        <span>Settings</span>
+      </div>
     </button>
     <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="showHistory" title="Show browsing history for this persona">
-      <fa :icon="['far', 'clock']"/>
-      <span>View {{ this.persona.name }} History</span>
+      <div class="options-menu-item-grid">
+        <fa :icon="['far', 'clock']" class="options-menu-icon"/>
+        <span>View {{ this.persona.name }} History</span>
+      </div>
     </button>
     <button class="options-menu-item" @click="clearHistory({ db: $hdb, personaId: persona._id })" title="Clear the browsing history for this persona">
-      <fa icon="trash"/>
-      <span>Clear {{ this.persona.name }} History</span>
+      <div class="options-menu-item-grid">
+        <fa icon="trash" class="options-menu-icon"/>
+        <span>Clear {{ this.persona.name }} History</span>
+      </div>
     </button>
     <button class="options-menu-item" @click="clearAllHistory({ db: $hdb, personaId: persona._id })" title="Clear the browsing history for all personas">
-      <fa icon="trash"/>
-      <span>Clear All History</span>
+      <div class="options-menu-item-grid">
+        <fa icon="trash" class="options-menu-icon"/>
+        <span>Clear All History</span>
+      </div>
     </button>
     <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="maybeShowLogins" title="Show login details for this persona">
-      <fa icon="key"/>
-      <span>View {{ this.persona.name }} Logins</span>
+      <div class="options-menu-item-grid">
+        <fa icon="key" class="options-menu-icon"/>
+        <span>View {{ this.persona.name }} Logins</span>
+      </div>
     </button>
     <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="openAboutInfo" title="Show information about Aspect">
-      <fa icon="info-circle"/>
-      <span>About Aspect</span>
+      <div class="options-menu-item-grid">
+        <fa icon="info-circle" class="options-menu-icon"/>
+        <span>About Aspect</span>
+      </div>
     </button>
   </div>
 </template>
@@ -110,6 +122,15 @@
   .options-menu-item:hover,
   .options-menu-item:focus {
     background-color: #eee;
+  }
+
+  .options-menu-item-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  .options-menu-icon {
+    margin-right: 10px;
   }
 
   .options-menu-separator {
