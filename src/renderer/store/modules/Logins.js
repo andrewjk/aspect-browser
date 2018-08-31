@@ -19,8 +19,7 @@ const mutations = {
   },
   showLogins (state, data) {
     const persona = data.persona
-    const activity = data.activity
-    const tabs = activity[persona._id].tabs
+    const tabs = persona.tabs
     tabs.push({
       _id: uuid(),
       url: 'aspect://logins',

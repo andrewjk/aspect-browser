@@ -46,7 +46,7 @@
 </template>
 
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapMutations } from 'vuex'
 
   import WindowButtons from './WindowButtons'
 
@@ -59,13 +59,10 @@
       return {
         canScrollLeft: true,
         canScrollRight: false,
-        tabs: this.$store.state.Store.activity[this.persona._id].tabs
+        tabs: this.persona.tabs
       }
     },
     computed: {
-      ...mapState({
-        activity: state => state.Store.activity
-      }),
       showTabNavigation () {
         if (this.tabs.length > 1) {
           const el = document.getElementById('tab-list-' + this.persona._id)

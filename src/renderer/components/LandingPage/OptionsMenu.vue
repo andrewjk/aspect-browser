@@ -54,8 +54,7 @@
 
   export default {
     props: {
-      persona: null,
-      activity: null
+      persona: null
     },
     computed: {
       ...mapState({
@@ -93,7 +92,7 @@
                   return
                 }
                 db.persistence.isLoaded = true
-                this.showLogins({ persona: this.persona, activity: this.activity })
+                this.showLogins({ persona: this.persona })
               })
             }
           })

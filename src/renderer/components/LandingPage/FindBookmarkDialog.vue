@@ -36,8 +36,7 @@
     },
     computed: {
       ...mapState({
-        personas: state => state.Store.personas,
-        activity: state => state.Store.activity
+        personas: state => state.Store.personas
       }),
       ...mapGetters([
         'getActivePersona'
@@ -135,7 +134,7 @@
           if (result.url) {
             const activePersona = this.getActivePersona
             if (activePersona) {
-              const tabs = this.activity[activePersona._id].tabs
+              const tabs = activePersona.tabs
               if (tabs.length === 1 && tabs[0].url.indexOf('aspect://') === 0) {
                 const activeTab = tabs[0]
                 this.setTabDetails({ persona: activePersona, tab: activeTab, isLoading: true, url: result.url })

@@ -5,8 +5,8 @@
         <fa v-if="platform !== 'darwin'" icon="bars"/>
       </div>
       <div class="list">
-        <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersonaIndexClick(index)">
-          <div v-show="hasOpenTab(item)" class="open-tab-indicator"></div>
+        <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersona(index)">
+          <div v-show="item.hasOpenTab" class="open-tab-indicator"></div>
           <div class="persona-info">
             <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(item) }">
               {{ item.shortName }}
@@ -49,7 +49,6 @@
   export default {
     computed: mapState({
       personas: state => state.Store.personas,
-      activity: state => state.Store.activity,
       settings: state => state.Settings.settings,
       ...mapGetters([
         'getActiveTab'
@@ -76,19 +75,14 @@
         'addPersona',
         'editPersona'
       ]),
-      hasOpenTab (persona) {
-        // TODO: This doesn't get updated when opening a page in the current persona
-        // I think we might have to change everything to be displayed off activity rather than personas?
-        return this.activity[persona._id].hasOpenTab
-      },
       getBackgroundColor (persona) {
-        // TODO: Move persona.isActive into activity
         if (persona.isActive) {
           return persona.color
         }
       },
-      setActivePersonaIndexClick (index) {
-        if (this.personas[index].isActive) {
+      setActivePersona (index) {
+        const persona = this.personas[index]
+        if (persona.isActive) {
           const activeTab = this.getActiveTab
           this.openNewTab(activeTab)
         } else {

@@ -41,7 +41,6 @@
     },
     computed: {
       ...mapState({
-        activity: state => state.Store.activity,
         settings: state => state.Settings.settings,
         systemSettings: state => state.SystemSettings.settings
       }),
@@ -162,7 +161,7 @@
           }
 
           // 3. Tabs that are open (other than this one)
-          this.activity[this.persona._id].tabs.forEach((tab, index) => {
+          this.persona.tabs.forEach((tab, index) => {
             if (!tab.isActive) {
               if (tab.title.toLowerCase().indexOf(this.addressText.toLowerCase()) !== -1 ||
                   tab.url.toLowerCase().indexOf(this.addressText.toLowerCase()) !== -1) {

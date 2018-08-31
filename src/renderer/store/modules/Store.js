@@ -9,7 +9,6 @@ import BookmarkDialog from '../../components/LandingPage/BookmarkDialog'
 
 const state = {
   personas: [],
-  activity: {},
   showFindInPage: false,
   focusFindInPage: false
 }
@@ -25,7 +24,7 @@ const getters = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const tabs = activePersona.tabs
       return tabs.find((t) => {
         return t.isActive
       })
@@ -48,7 +47,33 @@ const mutations = {
   // PERSONAS
   // ========
   setPersonas (state, personas) {
-    state.personas = personas
+    // We need to create personas with all of the extra fields we want to be tracked
+    state.personas = personas.map((persona) => {
+      return {
+        _id: persona._id,
+        name: persona.name,
+        shortName: persona.shortName,
+        color: persona.color,
+        order: persona.order,
+        bookmarks: persona.bookmarks,
+        isActive: false,
+        hasOpenTab: false,
+        tabs: [
+          {
+            _id: uuid(),
+            url: 'aspect://home',
+            addressText: null,
+            title: 'Home',
+            icon: null,
+            isActive: true,
+            isLoading: false,
+            backHistory: [],
+            forwardHistory: []
+          }
+        ],
+        closedTabs: []
+      }
+    })
   },
   setActivePersonaIndex (state, index) {
     if (index < 0 || index >= state.personas.length) {
@@ -63,7 +88,7 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const tabs = activePersona.tabs
       if (index < 0 || index >= tabs.length) {
         return
       }
@@ -77,23 +102,22 @@ const mutations = {
     state.personas = state.personas.sort(sorter)
   },
   addHomeTab (state, persona) {
-    state.activity[persona._id] = {
-      tabs: [
-        {
-          _id: uuid(),
-          url: 'aspect://home',
-          addressText: null,
-          title: 'Home',
-          icon: null,
-          isActive: true,
-          isLoading: false,
-          backHistory: [],
-          forwardHistory: []
-        }
-      ],
-      closedTabs: [],
-      hasOpenTab: false
-    }
+    persona.isActive = false
+    persona.hasOpenTab = false
+    persona.tabs = [
+      {
+        _id: uuid(),
+        url: 'aspect://home',
+        addressText: null,
+        title: 'Home',
+        icon: null,
+        isActive: true,
+        isLoading: false,
+        backHistory: [],
+        forwardHistory: []
+      }
+    ]
+    persona.closedTabs = []
   },
   nextPersona (state) {
     let index
@@ -124,7 +148,7 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const tabs = activePersona.tabs
       let index
       for (let i = 0; i < tabs.length; i++) {
         if (tabs[i].isActive) {
@@ -143,7 +167,7 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const tabs = activePersona.tabs
       let index
       for (let i = 0; i < tabs.length; i++) {
         if (tabs[i].isActive) {
@@ -162,25 +186,24 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const activity = state.activity[activePersona._id]
       if (index === undefined) {
-        for (let i = 0; i < activity.tabs.length; i++) {
-          if (activity.tabs[i].isActive) {
+        for (let i = 0; i < activePersona.tabs.length; i++) {
+          if (activePersona.tabs[i].isActive) {
             index = i
             break
           }
         }
       }
-      const closingTab = activity.tabs[index]
+      const closingTab = activePersona.tabs[index]
       closingTab.index = index
-      activity.closedTabs.push(closingTab)
-      while (activity.closedTabs.length > 20) {
-        activity.closedTabs.splice(0, 1)
+      activePersona.closedTabs.push(closingTab)
+      while (activePersona.closedTabs.length > 20) {
+        activePersona.closedTabs.splice(0, 1)
       }
-      if (activity.tabs.length > 1) {
-        activity.tabs.splice(index, 1)
-        const newIndex = Math.min(index, activity.tabs.length - 1)
-        activity.tabs.forEach((tab, i) => {
+      if (activePersona.tabs.length > 1) {
+        activePersona.tabs.splice(index, 1)
+        const newIndex = Math.min(index, activePersona.tabs.length - 1)
+        activePersona.tabs.forEach((tab, i) => {
           tab.isActive = (i === newIndex)
         })
       } else {
@@ -196,7 +219,7 @@ const mutations = {
         closingTab.webview = null
         state.showFindInPage = false
       }
-      activity.hasOpenTab = activity.tabs.some((tab) => {
+      activePersona.hasOpenTab = activePersona.tabs.some((tab) => {
         return tab.url
       })
     }
@@ -206,13 +229,12 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const activity = state.activity[activePersona._id]
-      if (activity.closedTabs && activity.closedTabs.length) {
-        const closedTab = activity.closedTabs.pop()
-        const newIndex = Math.min(closedTab.index, activity.tabs.length)
-        activity.tabs.splice(newIndex, 0, closedTab)
+      if (activePersona.closedTabs && activePersona.closedTabs.length) {
+        const closedTab = activePersona.closedTabs.pop()
+        const newIndex = Math.min(closedTab.index, activePersona.tabs.length)
+        activePersona.tabs.splice(newIndex, 0, closedTab)
         closedTab.index = undefined
-        activity.tabs.forEach((t, i) => {
+        activePersona.tabs.forEach((t, i) => {
           t.isActive = (i === newIndex)
         })
       }
@@ -223,7 +245,7 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const tabs = activePersona.tabs
       tabs.push({
         _id: uuid(),
         url: 'aspect://home',
@@ -248,8 +270,7 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const activity = state.activity[activePersona._id]
-      const tabs = activity.tabs
+      const tabs = activePersona.tabs
       tabs.push({
         _id: uuid(),
         url: url,
@@ -267,7 +288,7 @@ const mutations = {
           t.isActive = (i === newIndex)
         })
       }
-      activity.hasOpenTab = tabs.some((tab) => {
+      activePersona.hasOpenTab = tabs.some((tab) => {
         return tab.url
       })
     }
@@ -401,19 +422,22 @@ const mutations = {
   setTabDetails (state, data) {
     const persona = data.persona
     const tab = data.tab
-    const activity = state.activity[persona._id]
-    activity.tabs.forEach((t) => {
-      if (t._id === tab._id) {
-        if (data.webview !== undefined) t.webview = data.webview
-        if (data.url !== undefined) t.url = data.url
-        if (data.addressText !== undefined) t.addressText = data.addressText
-        if (data.title !== undefined) t.title = data.title
-        if (data.icon !== undefined) t.icon = data.icon
-        if (data.isLoading !== undefined) t.isLoading = data.isLoading
+    state.personas.forEach((p) => {
+      if (p._id === persona._id) {
+        p.tabs.forEach((t) => {
+          if (t._id === tab._id) {
+            if (data.webview !== undefined) t.webview = data.webview
+            if (data.url !== undefined) t.url = data.url
+            if (data.addressText !== undefined) t.addressText = data.addressText
+            if (data.title !== undefined) t.title = data.title
+            if (data.icon !== undefined) t.icon = data.icon
+            if (data.isLoading !== undefined) t.isLoading = data.isLoading
+          }
+        })
+        p.hasOpenTab = p.tabs.some((tab) => {
+          return tab.url
+        })
       }
-    })
-    activity.hasOpenTab = activity.tabs.some((tab) => {
-      return tab.url
     })
   },
   // ========
@@ -436,7 +460,7 @@ const mutations = {
   goBack (state, data) {
     const persona = data.persona
     const tab = data.tab
-    state.activity[persona._id].tabs.forEach((t) => {
+    persona.tabs.forEach((t) => {
       if (t._id === tab._id) {
         if (t.backHistory.length) {
           t.forwardHistory.push({
@@ -470,7 +494,7 @@ const mutations = {
   goForward (state, data) {
     const persona = data.persona
     const tab = data.tab
-    state.activity[persona._id].tabs.forEach((t) => {
+    persona.tabs.forEach((t) => {
       if (t._id === tab._id) {
         if (t.forwardHistory.length) {
           if (!t.forwardHistory) {
@@ -552,7 +576,7 @@ const mutations = {
       return p.isActive
     })
     if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
+      const tabs = activePersona.tabs
       tabs.push({
         _id: uuid(),
         url: 'aspect://history',
@@ -604,11 +628,6 @@ const actions = {
       // Ensure that the first persona is active
       commit('setActivePersonaIndex', 0)
 
-      // Create a home tab for each persona
-      dbPersonas.forEach((item, i) => {
-        commit('addHomeTab', item)
-      })
-
       // If there are no personas, add a default one that the user can edit
       if (!dbPersonas.length) {
         dispatch('createDefaultPersona', db)
@@ -622,10 +641,8 @@ const actions = {
       shortName: 'P',
       color: '#25B76D',
       order: 1,
-      isActive: true,
       bookmarks: []
     }
-    commit('addHomeTab', defaultPersona)
     db.insert(defaultPersona, (err, dbPersona) => {
       if (err) {
         alert('ERROR: ' + err)
@@ -668,41 +685,45 @@ const actions = {
     // Create a new persona object to be edited
     const personaToEdit = {
       _id: uuid(),
-      name: null,
       order: personas.length + 1,
-      isActive: true,
+      name: null,
+      shortName: null,
+      color: null,
       bookmarks: []
     }
     const showForm = create(PersonaDialog)
     showForm({ persona: personaToEdit, adding: true }).transition()
       .then((result) => {
         if (result) {
-          commit('addHomeTab', personaToEdit)
           db.insert(personaToEdit, (err, dbPersona) => {
             if (err) {
               alert('ERROR: ' + err)
               return
             }
+            commit('addHomeTab', personaToEdit)
             commit('insertPersona', personaToEdit)
             commit('sortPersonas')
           })
         }
       })
   },
-  editPersona ({ commit }, data) {
+  editPersona ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
     // Create a new persona object to be edited
     const personaToEdit = {
       _id: persona._id,
+      order: persona.order,
       name: persona.name,
       shortName: persona.shortName,
-      color: persona.color
+      color: persona.color,
+      bookmarks: persona.bookmarks
     }
     const showForm = create(PersonaDialog)
     showForm({ persona: personaToEdit }).transition()
       .then((result) => {
         if (result) {
+          // Update the persona's fields
           const personaDetails = {
             persona,
             name: personaToEdit.name,
@@ -710,13 +731,7 @@ const actions = {
             color: personaToEdit.color
           }
           commit('setPersonaDetails', personaDetails)
-          db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-            if (err) {
-              alert('ERROR: ' + err)
-              return
-            }
-            commit('sortPersonas')
-          })
+          dispatch('savePersona', { db, persona })
         }
       })
   },
@@ -751,34 +766,57 @@ const actions = {
         })
     })
   },
+  savePersona ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const persona = data.persona
+      // Save only the fields that we are interested in
+      const personaToSave = {
+        _id: persona._id,
+        order: persona.order,
+        name: persona.name,
+        shortName: persona.shortName,
+        color: persona.color,
+        bookmarks: persona.bookmarks.map((bookmark) => {
+          return {
+            _id: bookmark._id,
+            url: bookmark.url,
+            title: bookmark.title,
+            icon: bookmark.icon,
+            order: bookmark.order
+          }
+        })
+      }
+      db.update({ _id: personaToSave._id }, personaToSave, {}, (err, numReplaced) => {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+        commit('sortPersonas')
+        resolve()
+      })
+    })
+  },
   // =========
   // BOOKMARKS
   // =========
-  moveBookmarkUpAndSave ({ commit }, data) {
+  moveBookmarkUpAndSave ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
     const index = data.index
     commit('moveBookmarkUp', { persona, index })
     commit('sanitizeBookmarkOrders', { persona })
-    db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-      if (err) {
-        alert('ERROR: ' + err)
-      }
-    })
+    dispatch('savePersona', { db, persona })
   },
-  moveBookmarkDownAndSave ({ commit }, data) {
+  moveBookmarkDownAndSave ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
     const index = data.index
     commit('moveBookmarkDown', { persona, index })
     commit('sanitizeBookmarkOrders', { persona })
-    db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-      if (err) {
-        alert('ERROR: ' + err)
-      }
-    })
+    dispatch('savePersona', { db, persona })
   },
-  addBookmark ({ commit }, data) {
+  addBookmark ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
     // Create a new bookmark object to be edited
@@ -796,16 +834,11 @@ const actions = {
         if (result) {
           commit('insertBookmark', { persona, bookmark: bookmarkToEdit })
           commit('sortBookmarks', persona)
-          db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-            if (err) {
-              alert('ERROR: ' + err)
-              // return
-            }
-          })
+          dispatch('savePersona', { db, persona })
         }
       })
   },
-  editBookmark ({ commit }, data) {
+  editBookmark ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
     const index = data.index
@@ -821,16 +854,11 @@ const actions = {
         if (result) {
           commit('setBookmarkDetails', { bookmark, title: bookmarkToEdit.title })
           commit('sortBookmarks', persona)
-          db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-            if (err) {
-              alert('ERROR: ' + err)
-              // return
-            }
-          })
+          dispatch('savePersona', { db, persona })
         }
       })
   },
-  deleteBookmark ({ commit }, data) {
+  deleteBookmark ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
     const bookmark = data.bookmark
@@ -844,11 +872,7 @@ const actions = {
                 if (result) {
                   commit('removeBookmark', { persona, bookmark })
                   commit('sortBookmarks', persona)
-                  db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-                    if (err) {
-                      alert('ERROR: ' + err)
-                      return
-                    }
+                  dispatch('savePersona', { db, persona }).then(() => {
                     resolve()
                   })
                 }

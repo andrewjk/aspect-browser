@@ -40,11 +40,10 @@
     },
     data () {
       return {
-        tabs: this.$store.state.Store.activity[this.persona._id].tabs
+        tabs: this.persona.tabs
       }
     },
     computed: mapState({
-      activity: state => state.Store.activity,
       settings: state => state.Settings.settings
     }),
     mounted () {

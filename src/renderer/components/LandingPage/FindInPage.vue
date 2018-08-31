@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapMutations } from 'vuex'
 
   export default {
     props: {
@@ -49,18 +49,12 @@
         }
       }
     },
-    computed: {
-      ...mapState({
-        activity: state => state.Store.activity
-      })
-    },
     methods: {
       ...mapMutations([
         'closeFindInPage'
       ]),
       getActiveWebview () {
-        const tabs = this.activity[this.persona._id].tabs
-        const activeTab = tabs.find((item) => {
+        const activeTab = this.persona.tabs.find((item) => {
           return item.isActive
         })
         return activeTab.webview

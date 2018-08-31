@@ -41,7 +41,6 @@
     computed: {
       ...mapState({
         personas: state => state.Store.personas,
-        activity: state => state.Store.activity,
         systemSettings: state => state.SystemSettings.settings
       })
     },
@@ -71,9 +70,8 @@
         let personaCount = 0
         let tabCount = 0
         this.personas.forEach(persona => {
-          const activity = this.activity[persona._id]
-          personaCount = personaCount + (persona.isActive || activity.hasOpenTab ? 1 : 0)
-          activity.tabs.forEach(tab => {
+          personaCount = personaCount + (persona.isActive || persona.hasOpenTab ? 1 : 0)
+          persona.tabs.forEach(tab => {
             tabCount = tabCount + (tab.url.indexOf('aspect://') === -1 ? 1 : 0)
           })
         })
