@@ -17,28 +17,25 @@ const mutations = {
   closeLoginMenu (state, data) {
     state.showLoginMenu = false
   },
-  showLogins (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
+  showLogins (state, data) {
+    const persona = data.persona
+    const activity = data.activity
+    const tabs = activity[persona._id].tabs
+    tabs.push({
+      _id: uuid(),
+      url: 'aspect://logins',
+      addressText: null,
+      title: 'Logins',
+      icon: null,
+      isActive: true,
+      isLoading: false,
+      backHistory: [],
+      forwardHistory: []
     })
-    if (activePersona) {
-      const tabs = state.activity[activePersona._id].tabs
-      tabs.push({
-        _id: uuid(),
-        url: 'aspect://logins',
-        addressText: null,
-        title: 'Logins',
-        icon: null,
-        isActive: true,
-        isLoading: false,
-        backHistory: [],
-        forwardHistory: []
-      })
-      const newIndex = tabs.length - 1
-      tabs.forEach((t, i) => {
-        t.isActive = (i === newIndex)
-      })
-    }
+    const newIndex = tabs.length - 1
+    tabs.forEach((t, i) => {
+      t.isActive = (i === newIndex)
+    })
   }
 }
 
