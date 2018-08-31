@@ -113,6 +113,8 @@
     line-height: 28px;
     font-size: 11px;
     text-align: center;
+    -ms-overflow-style: scrollbar;
+    -webkit-app-region: drag;
   }
 
   .persona-list {
@@ -122,8 +124,6 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    -ms-overflow-style: scrollbar;
-    -webkit-app-region: drag;
   }
 
   .persona-list.editing {

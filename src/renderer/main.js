@@ -51,7 +51,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // Dialogs
-import VueSweetalert2 from 'vue-sweetalert2'
+import * as ModalDialogs from 'vue-modal-dialogs'
 
 // Normalize.css
 // HACK: We have to refer to its location explicitly to avoid import errors
@@ -100,7 +100,7 @@ library.add(faWindowClose)
 Vue.component('fa', FontAwesomeIcon)
 
 // Dialogs
-Vue.use(VueSweetalert2)
+Vue.use(ModalDialogs)
 
 if (!process.env.IS_WEB) {
   Vue.use(require('vue-electron'))

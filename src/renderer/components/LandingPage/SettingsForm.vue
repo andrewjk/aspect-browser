@@ -38,6 +38,11 @@
 
 <script>
   import { mapState, mapMutations, mapActions } from 'vuex'
+  import { create } from 'vue-modal-dialogs'
+
+  import AlertDialog from './AlertDialog'
+  import CreatePasswordDialog from './CreatePasswordDialog'
+  import ChangePasswordDialog from './ChangePasswordDialog'
 
   import { remote } from 'electron'
   import fs from 'fs'
@@ -83,27 +88,49 @@
         // TODO: This is some spaghetti that needs to be cleaned up...
         // If turning on and there's no existing database file, require setting the master password
         if (value && !this.loginsDatabaseExists()) {
-          this.$swal({
-            title: 'Login Manager',
-            text: 'Enter a master password below. This password will be used to encrypt your login details. You will be required to enter it the first time you encounter a password field after starting Aspect.',
-            input: 'password',
-            showConfirmButton: true,
-            showCancelButton: true,
-            allowOutsideClick: false,
-            animation: false,
-            customClass: 'dialog-custom'
-          })
+          const prompt = create(CreatePasswordDialog)
+          prompt({ content: 'Enter a master password below. This password will be used to encrypt your login details. You will be required to enter it the first time you encounter a password field after starting Aspect.' }).transition()
             .then((result) => {
-              if (result.value) {
-                const db = this.$ldb
+              if (result) {
+                if (!result.password || !result.confirmPassword) {
+                  const dialog = create(AlertDialog)
+                  dialog({ content: 'A password is required.' }).transition()
+                    .catch((err) => {
+                      alert('ERROR: ' + err)
+                    })
+                  // Turn it back off
+                  document.getElementById('enableLoginManager').checked = false
+                  this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: false })
+                  return
+                }
+                if (result.password !== result.confirmPassword) {
+                  const dialog = create(AlertDialog)
+                  dialog({ content: 'The password and confirmation don\'t match.' }).transition()
+                    .catch((err) => {
+                      alert('ERROR: ' + err)
+                    })
+                  // Turn it back off
+                  document.getElementById('enableLoginManager').checked = false
+                  this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: false })
+                  return
+                }
+
                 // Maybe load the database
+                const db = this.$ldb
                 if (!db.persistence.isLoaded) {
-                  const crypt = new Encrypter(result.value)
+                  const crypt = new Encrypter(result.password)
                   db.persistence.afterSerialization = crypt.encrypt
                   db.persistence.beforeDeserialization = crypt.decrypt
                   db.loadDatabase((err) => {
                     if (err) {
-                      alert('Failed to unlock database.')
+                      const dialog = create(AlertDialog)
+                      dialog({ content: 'Failed to unlock database.' }).transition()
+                        .catch((err) => {
+                          alert('ERROR: ' + err)
+                        })
+                      // Turn it back off
+                      document.getElementById('enableLoginManager').checked = false
+                      this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: false })
                       return
                     }
                     db.persistence.isLoaded = true
@@ -139,78 +166,78 @@
       changeLoginManagerPassword () {
         // TODO: This is some spaghetti that needs to be cleaned up...
         // Get the existing master password
-        this.$swal({
-          title: 'Login Manager',
-          text: 'Enter your old master password:',
-          input: 'password',
-          showConfirmButton: true,
-          showCancelButton: true,
-          allowOutsideClick: false,
-          animation: false,
-          customClass: 'dialog-custom'
-        })
+        const prompt = create(ChangePasswordDialog)
+        prompt({ content: 'Enter your old master password and new master password below:', type: 'password' }).transition()
           .then((result) => {
-            if (result.value) {
+            if (result) {
+              if (!result.newPassword || !result.confirmPassword) {
+                const dialog = create(AlertDialog)
+                dialog({ content: 'A password is required.' }).transition()
+                  .catch((err) => {
+                    alert('ERROR: ' + err)
+                  })
+                return
+              }
+              if (result.newPassword !== result.confirmPassword) {
+                const dialog = create(AlertDialog)
+                dialog({ content: 'The password and confirmation don\'t match.' }).transition()
+                  .catch((err) => {
+                    alert('ERROR: ' + err)
+                  })
+                return
+              }
+
               // Try to load the database with the supplied password
               const db = this.$ldb
-              const oldcrypt = new Encrypter(result.value)
+              const oldcrypt = new Encrypter(result.oldPassword)
               db.persistence.afterSerialization = oldcrypt.encrypt
               db.persistence.beforeDeserialization = oldcrypt.decrypt
               db.loadDatabase((err) => {
                 if (err) {
-                  alert('Failed to unlock database.')
+                  const dialog = create(AlertDialog)
+                  dialog({ content: 'Failed to unlock database.' }).transition()
+                    .catch((err) => {
+                      alert('ERROR: ' + err)
+                    })
                   // Require the correct password to be entered before using this database again
                   db.persistence.isLoaded = false
                   return
                 }
                 db.persistence.isLoaded = true
-                this.$swal({
-                  title: 'Login Manager',
-                  text: 'Enter your new master password:',
-                  input: 'password',
-                  showConfirmButton: true,
-                  showCancelButton: true,
-                  allowOutsideClick: false,
-                  animation: false,
-                  customClass: 'dialog-custom'
+
+                // Load every record with the old encrypter
+                db.find({}, (err, dbRecords) => {
+                  if (err) {
+                    alert('ERROR: ' + err)
+                    return
+                  }
+
+                  // Delete the old database file
+                  const filename = path.join(remote.app.getPath('userData'), '/logins.db')
+                  fs.unlinkSync(filename)
+
+                  // Encrypt every record with the new encrypter
+                  const newcrypt = new Encrypter(result.newPassword)
+                  db.persistence.afterSerialization = newcrypt.encrypt
+
+                  const recordCount = dbRecords.length
+                  let recordIndex = 0
+                  for (let record of dbRecords) {
+                    db.update({ _id: record._id }, record, {}, (err, numReplaced) => {
+                      if (err) {
+                        // TODO: Really need to handle errors much better...
+                        // Maybe could copy the database and restore it if anything goes wrong?
+                        alert('ERROR: ' + err)
+                        return
+                      }
+                      recordIndex = recordIndex + 1
+                      if (recordIndex === recordCount) {
+                        // If this is the last record, update the decrypter with the new password
+                        db.persistence.beforeDeserialization = newcrypt.decrypt
+                      }
+                    })
+                  }
                 })
-                  .then((newresult) => {
-                    if (newresult.value) {
-                      // Load every record with the old encrypter
-                      db.find({}, (err, dbRecords) => {
-                        if (err) {
-                          alert('ERROR: ' + err)
-                          return
-                        }
-
-                        // Delete the old database file
-                        const filename = path.join(remote.app.getPath('userData'), '/logins.db')
-                        fs.unlinkSync(filename)
-
-                        // Encrypt every record with the new encrypter
-                        const newcrypt = new Encrypter(newresult.value)
-                        db.persistence.afterSerialization = newcrypt.encrypt
-
-                        const recordCount = dbRecords.length
-                        let recordIndex = 0
-                        for (let record of dbRecords) {
-                          db.update({ _id: record._id }, record, {}, (err, numReplaced) => {
-                            if (err) {
-                              // TODO: Really need to handle errors much better...
-                              // Maybe could copy the database and restore it if anything goes wrong?
-                              alert('ERROR: ' + err)
-                              return
-                            }
-                            recordIndex = recordIndex + 1
-                            if (recordIndex === recordCount) {
-                              // If this is the last record, update the decrypter with the new password
-                              db.persistence.beforeDeserialization = newcrypt.decrypt
-                            }
-                          })
-                        }
-                      })
-                    }
-                  })
               })
             }
           })

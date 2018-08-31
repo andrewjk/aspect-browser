@@ -7,7 +7,7 @@
       <persona-browser></persona-browser>
     </div>
     <modal v-if="showPersonaModal">
-      <h3 slot="header">{{ personaToUpdate ? 'Edit Persona:' : 'Add Persona:' }}</h3>
+      <h2 slot="header">{{ personaToUpdate ? 'Edit Persona:' : 'Add Persona:' }}</h2>
       <persona-form slot="body"></persona-form>
       <div slot="footer" class="modal-button-footer">
         <a v-show="personaToUpdate" href="#" class="delete-link" @click="deletePersona({ db: $pdb, personaToUpdate })">Delete persona</a>
@@ -20,7 +20,7 @@
       </div>
     </modal>
     <modal v-if="showBookmarkModal">
-      <h3 slot="header">{{ bookmarkToUpdate ? 'Edit Bookmark:' : 'Add Bookmark:' }}</h3>
+      <h2 slot="header">{{ bookmarkToUpdate ? 'Edit Bookmark:' : 'Add Bookmark:' }}</h2>
       <bookmark-form slot="body"></bookmark-form>
       <div slot="footer" class="modal-button-footer">
         <a v-show="bookmarkToUpdate" href="#" class="delete-link" @click="deleteBookmark({ db: $pdb, persona: getActivePersona, bookmarkToUpdate })">Delete bookmark</a>
@@ -33,7 +33,7 @@
       </div>
     </modal>
     <modal v-if="showSettingsModal">
-      <h3 slot="header">Settings:</h3>
+      <h2 slot="header">Settings:</h2>
       <settings-form slot="body"></settings-form>
       <div slot="footer" class="modal-button-footer">
         <button @click="saveSettings({ db: $usdb, settingsToEdit, settingsToUpdate })">
@@ -45,7 +45,7 @@
       </div>
     </modal>
     <modal v-if="showFindBookmark">
-      <h3 slot="header">Search:</h3>
+      <h2 slot="header">Search:</h2>
       <find-bookmark slot="body" @close-find-bookmark="closeFindBookmarkModal"></find-bookmark>
       <div slot="footer" class="modal-button-footer">
         <button @click="closeFindBookmarkModal">

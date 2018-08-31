@@ -36,8 +36,8 @@
 
 <style>
 
-  .modal-header h3 {
-    margin-top: 0;
+  .modal-header h2 {
+    margin: 0 0 20px;
   }
 
   .modal-body {

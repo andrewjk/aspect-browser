@@ -1,6 +1,9 @@
 <template>
   <div id="app">
     <router-view></router-view>
+
+    <!-- Wrapper for ModalDialogs -->
+    <dialogs-wrapper transition-name="dialog-fade"></dialogs-wrapper>
   </div>
 </template>
 
@@ -25,11 +28,22 @@
     line-height: 24px;
   }
 
+  h1 {
+    font-size: 36px;
+    font-weight: normal;
+  }
+
+  h2 {
+    font-size: 28px;
+    font-weight: normal;
+  }
+
   label {
     color: #666;
   }
 
-  input[type="text"] {
+  input[type="text"],
+  input[type="password"] {
     border-radius: 2px;
     border: 1px solid #ddd;
     padding: 4px 6px;
@@ -78,6 +92,7 @@
   input[type="reset"],
   input[type="button"],
   input[type="text"],
+  input[type="password"]
   button,
   textarea {
     -webkit-app-region: no-drag;
@@ -86,33 +101,121 @@
   .delete-link {
     color: red;
   }
-  
-  .dialog-custom {
-    border-radius: 2px;
+
+  /* Styles for ModalDialogs, copied from the demos at https://hjkcai.github.io/vue-modal-dialogs/ */
+  .dialog-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, .4);
+    z-index: 999;
   }
 
-  .dialog-custom #swal2-title {
+  .dialog-content {
+    margin: 0 20px;
+    padding: 25px 30px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
     color: #222;
-    font-weight: normal;
+  }
+
+  .dialog-content header {
+    margin: 10px 0 26px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .dialog-content footer {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .dialog-content p {
+    white-space: pre-wrap;
+  }
+
+  .dialog-content input {
+    margin: 10px 0;
+    padding: 6px;
+  }
+
+  .dialog-content button {
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 10px 15px;
+    margin: 0 7.5px;
+    min-width: 85px;
+  }
+
+  .dialog-content button.confirm {
+    color: white;
+    background-color: #338fff;
+  }
+
+  .dialog-content button.confirm:hover,
+  .dialog-content button.confirm:focus {
+    background-color: #0073ff;
+  }
+
+  .dialog-content button.cancel {
+    color: white;
+    background-color: #999;
+  }
+
+  .dialog-content button.cancel:hover,
+  .dialog-content button.cancel:focus {
+    background-color: #7f7f7f;
+  }
+
+  .message-box .dialog-content {
+    min-width: 240px;
+    max-width: 480px;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .dialog-fade-enter-active {
+    animation: dialog-fade-in .3s;
+  }
+
+  .dialog-fade-leave-active {
+    animation: dialog-fade-out .3s;
   }
   
-  .dialog-custom #swal2-content {
-    color: #666;
-    font-size: 15px;
-    line-height: 20px;
+  @keyframes dialog-fade-in {
+    0% {
+      -webkit-transform: scale(1.1);
+      transform: scale(1.1);
+      opacity: 0;
+    }
+    to {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 
-  .dialog-custom .swal2-input {
-    font-size: 18px;
-    border-radius: 2px;
-    border: 1px solid #ddd;
-    padding: 6px;
-    height: auto;
+  @keyframes dialog-fade-out {
+    0% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      opacity: 1;
+    }
+    to {
+      -webkit-transform: scale(1.1);
+      transform: scale(1.1);
+      opacity: 0;
+    }
   }
-
-  .dialog-custom .swal2-input:focus {
-    border: 1px solid #ddd;
-    box-shadow: none;
-  }
-
 </style>

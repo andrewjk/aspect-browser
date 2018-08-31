@@ -19,6 +19,10 @@
 
 <script>
   import { mapState, mapMutations, mapActions } from 'vuex'
+  import { create } from 'vue-modal-dialogs'
+
+  import AlertDialog from './AlertDialog'
+  import PromptDialog from './PromptDialog'
 
   import HomePage from './HomePage'
   import HistoryPage from './HistoryPage'
@@ -73,35 +77,26 @@
 
             // Maybe load the logins database
             if (!db.persistence.isLoaded) {
-              this.$swal({
-                title: 'Login Manager',
-                text: 'Enter your master password:',
-                input: 'password',
-                showConfirmButton: true,
-                showCancelButton: true,
-                allowOutsideClick: false,
-                animation: false,
-                customClass: 'dialog-custom'
-              })
+              const prompt = create(PromptDialog)
+              prompt({ content: 'Enter your master password:', type: 'password' }).transition()
                 .then((result) => {
-                  if (result.value) {
-                    const crypt = new Encrypter(result.value)
+                  if (result) {
+                    const crypt = new Encrypter(result)
                     db.persistence.afterSerialization = crypt.encrypt
                     db.persistence.beforeDeserialization = crypt.decrypt
                     db.loadDatabase((err) => {
                       if (err) {
-                        alert('Failed to unlock database.')
+                        const dialog = create(AlertDialog)
+                        dialog({ content: 'Failed to unlock database.' }).transition()
+                          .catch((err) => {
+                            alert('ERROR: ' + err)
+                          })
                         return
                       }
                       db.persistence.isLoaded = true
                       this.loadFormLoginDetails(db, host, form, event)
                     })
-                  } else {
-                    // Just do nothing?
                   }
-                })
-                .catch((err) => {
-                  alert('ERROR: ' + err)
                 })
             } else {
               this.loadFormLoginDetails(db, host, form, event)

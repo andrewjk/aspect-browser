@@ -22,6 +22,9 @@
   import { mapState } from 'vuex'
   import os from 'os'
   import electron from 'electron'
+  import { create } from 'vue-modal-dialogs'
+
+  import ConfirmDialog from './ConfirmDialog'
 
   const window = electron.remote.getCurrentWindow()
 
@@ -75,13 +78,14 @@
           })
         })
         if (tabCount > 0) {
-          const message = `You are about to close ${tabCount} open tab${tabCount === 1 ? '' : 's'} in ${personaCount} persona${personaCount === 1 ? '' : 's'}. Are you sure you want to continue?`
-          const dialogOptions = { title: 'Close Browser', type: 'question', buttons: ['Close', 'Cancel'], message }
-          electron.remote.dialog.showMessageBox(dialogOptions, (index) => {
-            if (index === 0) {
-              window.close()
-            }
-          })
+          const prompt = create(ConfirmDialog)
+          const content = `You are about to close ${tabCount} tab${tabCount === 1 ? '' : 's'} in ${personaCount} persona${personaCount === 1 ? '' : 's'}. Are you sure you want to continue?`
+          prompt({ content, confirmText: 'Close tabs' }).transition()
+            .then((result) => {
+              if (result) {
+                window.close()
+              }
+            })
         } else {
           window.close()
         }

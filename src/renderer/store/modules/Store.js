@@ -1,5 +1,9 @@
 // NOTE: V4 uses random numbers
 import uuid from 'uuid/v4'
+import { create } from 'vue-modal-dialogs'
+
+import AlertDialog from '../../components/LandingPage/AlertDialog'
+import ConfirmDialog from '../../components/LandingPage/ConfirmDialog'
 
 const state = {
   personas: [],
@@ -751,18 +755,33 @@ const actions = {
     }
   },
   deletePersona ({ commit }, data) {
-    if (confirm('Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.') && confirm('Are you really sure you want to delete this persona?')) {
-      const db = data.db
-      const persona = data.personaToUpdate
-      db.remove({ _id: persona._id }, {}, (err, numReplaced) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
+    const dialog = create(ConfirmDialog)
+    dialog({ content: 'Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.' }).transition()
+      .then((result) => {
+        if (result) {
+          dialog({ content: 'Are you really sure you want to delete this persona?' }).transition()
+            .then((result) => {
+              if (result) {
+                const db = data.db
+                const persona = data.personaToUpdate
+                db.remove({ _id: persona._id }, {}, (err, numReplaced) => {
+                  if (err) {
+                    alert('ERROR: ' + err)
+                    return
+                  }
+                  commit('removePersona', persona)
+                  commit('closePersonaModal')
+                })
+              }
+            })
+            .catch((err) => {
+              alert('ERROR: ' + err)
+            })
         }
-        commit('removePersona', persona)
-        commit('closePersonaModal')
       })
-    }
+      .catch((err) => {
+        alert('ERROR: ' + err)
+      })
   },
   // =========
   // BOOKMARKS
@@ -811,20 +830,35 @@ const actions = {
     })
   },
   deleteBookmark ({ commit }, data) {
-    if (confirm('Are you sure you want to delete this bookmark? This will delete all bookmarks and saved data associated with it.') && confirm('Are you really sure you want to delete this bookmark?')) {
-      const db = data.db
-      const persona = data.persona
-      const bookmark = data.bookmarkToUpdate
-      commit('removeBookmark', { persona, bookmark })
-      commit('sortBookmarks', persona)
-      db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
+    const dialog = create(ConfirmDialog)
+    dialog({ content: 'Are you sure you want to delete this bookmark? This will delete all saved data associated with it.' }).transition()
+      .then((result) => {
+        if (result) {
+          dialog({ content: 'Are you really sure you want to delete this bookmark?' }).transition()
+            .then((result) => {
+              if (result) {
+                const db = data.db
+                const persona = data.persona
+                const bookmark = data.bookmarkToUpdate
+                commit('removeBookmark', { persona, bookmark })
+                commit('sortBookmarks', persona)
+                db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
+                  if (err) {
+                    alert('ERROR: ' + err)
+                    return
+                  }
+                  commit('closeBookmarkModal')
+                })
+              }
+            })
+            .catch((err) => {
+              alert('ERROR: ' + err)
+            })
         }
-        commit('closeBookmarkModal')
       })
-    }
+      .catch((err) => {
+        alert('ERROR: ' + err)
+      })
   },
   // ========
   // ACTIVITY
@@ -875,29 +909,51 @@ const actions = {
     })
   },
   clearHistory ({ commit }, data) {
-    if (confirm(`Are you sure you want to clear the browsing history for this persona?`)) {
-      const db = data.db
-      const personaId = data.personaId
-      db.remove({ personaId: personaId }, { multi: true }, (err, numReplaced) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
+    const dialog = create(ConfirmDialog)
+    dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
+      .then((result) => {
+        if (result) {
+          const db = data.db
+          const personaId = data.personaId
+          db.remove({ personaId: personaId }, { multi: true }, (err, numReplaced) => {
+            if (err) {
+              alert('ERROR: ' + err)
+              return
+            }
+            const dialog = create(AlertDialog)
+            dialog({ content: 'Browsing history cleared.' }).transition()
+              .catch((err) => {
+                alert('ERROR: ' + err)
+              })
+          })
         }
-        alert('Browsing history cleared.')
       })
-    }
+      .catch((err) => {
+        alert('ERROR: ' + err)
+      })
   },
   clearAllHistory ({ commit }, data) {
-    if (confirm(`Are you sure you want to clear the browsing history for all personas?`)) {
-      const db = data.db
-      db.remove({}, { multi: true }, (err, numReplaced) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
+    const dialog = create(ConfirmDialog)
+    dialog({ content: 'Are you sure you want to clear the browsing history for all personas?' }).transition()
+      .then((result) => {
+        if (result) {
+          const db = data.db
+          db.remove({}, { multi: true }, (err, numReplaced) => {
+            if (err) {
+              alert('ERROR: ' + err)
+              return
+            }
+            const dialog = create(AlertDialog)
+            dialog({ content: 'Browsing history cleared.' }).transition()
+              .catch((err) => {
+                alert('ERROR: ' + err)
+              })
+          })
         }
-        alert('Browsing history cleared.')
       })
-    }
+      .catch((err) => {
+        alert('ERROR: ' + err)
+      })
   }
 }
 
