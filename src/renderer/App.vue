@@ -117,6 +117,7 @@
   }
 
   .dialog-content {
+    width: 480px;
     margin: 0 20px;
     padding: 25px 30px;
     border: 1px solid #ddd;
@@ -127,13 +128,14 @@
   }
 
   .dialog-content header {
-    margin: 10px 0 26px;
-    font-size: 18px;
-    font-weight: 700;
+    margin: 10px 0 15px;
+  }
+
+  .dialog-content header h2 {
+    margin: 0;
   }
 
   .dialog-content footer {
-    text-align: center;
     margin-top: 20px;
   }
 
@@ -141,8 +143,11 @@
     white-space: pre-wrap;
   }
 
+  .dialog-content label {
+    margin-right: 20px;
+  }
+
   .dialog-content input {
-    margin: 10px 0;
     padding: 6px;
   }
 
@@ -154,7 +159,6 @@
     -moz-appearance: none;
     appearance: none;
     padding: 10px 15px;
-    margin: 0 7.5px;
     min-width: 85px;
   }
 
@@ -179,10 +183,33 @@
   }
 
   .message-box .dialog-content {
-    min-width: 240px;
-    max-width: 480px;
     text-align: center;
     font-size: 16px;
+  }
+
+  .message-box footer {
+    text-align: center;
+  }
+
+  .message-box footer button {
+    margin: 0 7.5px;
+  }
+
+  .message-box input {
+    margin: 10px 0;
+  }
+
+  .edit-dialog .dialog-content {
+    text-align: left;
+    font-size: 16px;
+  }
+
+  .edit-dialog footer {
+    text-align: right;
+  }
+
+  .edit-dialog footer button {
+    margin-left: 15px;
   }
 
   .dialog-fade-enter-active {

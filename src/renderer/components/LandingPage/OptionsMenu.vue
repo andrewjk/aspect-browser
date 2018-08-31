@@ -1,6 +1,6 @@
 <template>
   <div id="options-menu">
-    <button class="options-menu-item" @click="editSettings" title="Edit application settings">
+    <button class="options-menu-item" @click="editSettings({ db: $usdb, settings })" title="Edit application settings">
       <div class="options-menu-item-grid">
         <fa icon="cog" class="options-menu-icon"/>
         <span>Settings</span>
@@ -33,7 +33,7 @@
       </div>
     </button>
     <div class="options-menu-separator"></div>
-    <button class="options-menu-item" @click="openAboutInfo" title="Show information about Aspect">
+    <button class="options-menu-item" @click="showAboutDialog" title="Show information about Aspect">
       <div class="options-menu-item-grid">
         <fa icon="info-circle" class="options-menu-icon"/>
         <span>About Aspect</span>
@@ -43,11 +43,12 @@
 </template>
 
 <script>
-  import { mapMutations, mapActions } from 'vuex'
+  import { mapState, mapMutations, mapActions } from 'vuex'
   import { create } from 'vue-modal-dialogs'
 
   import AlertDialog from './AlertDialog'
   import PromptDialog from './PromptDialog'
+  import AboutDialog from './AboutDialog'
 
   import Encrypter from '../../data/Encrypter'
 
@@ -56,14 +57,18 @@
       persona: null,
       activity: null
     },
+    computed: {
+      ...mapState({
+        settings: state => state.Settings.settings
+      })
+    },
     methods: {
       ...mapMutations([
-        'editSettings',
         'showHistory',
-        'showLogins',
-        'openAboutInfo'
+        'showLogins'
       ]),
       ...mapActions([
+        'editSettings',
         'clearHistory',
         'clearAllHistory'
       ]),
@@ -91,6 +96,13 @@
                 this.showLogins({ persona: this.persona, activity: this.activity })
               })
             }
+          })
+      },
+      showAboutDialog () {
+        const dialog = create(AboutDialog)
+        dialog({}).transition()
+          .catch((err) => {
+            alert('ERROR: ' + err)
           })
       }
     }

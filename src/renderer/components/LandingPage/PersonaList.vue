@@ -17,7 +17,7 @@
             <button class="edit-persona-button" @click.stop="movePersonaUpAndSave({ db: $pdb, personas, index })" title="Move this persona up">
               <fa icon="chevron-up"/>
             </button>
-            <button class="edit-persona-button" @click.stop="editPersona(index)" title="Edit this persona">
+            <button class="edit-persona-button" @click.stop="editPersona({ db: $pdb, persona: item })" title="Edit this persona">
               <fa icon="user-edit"/>
             </button>
             <button class="edit-persona-button" @click.stop="movePersonaDownAndSave({ db: $pdb, personas, index })" title="Move this persona down">
@@ -29,7 +29,7 @@
       <button v-if="!showEditPersonaLinks" class="persona-button" @click="findBookmark" title="Search for a bookmark">
         <fa icon="search"/>
       </button>
-      <button v-if="showEditPersonaLinks" class="persona-button" @click="addPersona" title="Add a persona">
+      <button v-if="showEditPersonaLinks" class="persona-button" @click="addPersona({ db: $pdb, personas })" title="Add a persona">
         <fa icon="plus"/>
       </button>
       <button v-if="showEditPersonaLinks" class="persona-button" @click="editPersonas" title="Done editing">
@@ -58,23 +58,23 @@
     data () {
       return {
         platform: os.platform(),
-        showEditPersonaLinks: false,
-        showEditPersonaModal: false,
-        showAddPersonaModal: false,
-        newPersona: {},
-        showEditSettingsModal: false
+        showEditPersonaLinks: false
       }
     },
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
         'openNewTab',
-        'addPersona',
-        'editPersona'
+        'addHomeTab',
+        'insertPersona',
+        'sortPersonas',
+        'setPersonaDetails'
       ]),
       ...mapActions([
         'movePersonaUpAndSave',
-        'movePersonaDownAndSave'
+        'movePersonaDownAndSave',
+        'addPersona',
+        'editPersona'
       ]),
       hasOpenTab (persona) {
         // TODO: This doesn't get updated when opening a page in the current persona

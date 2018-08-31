@@ -1,37 +1,21 @@
 // NOTE: V4 uses random numbers
 import uuid from 'uuid/v4'
+import { create } from 'vue-modal-dialogs'
+
+import SettingsDialog from '../../components/LandingPage/SettingsDialog'
 
 const state = {
-  settings: {},
-  showSettingsModal: false,
-  settingsToUpdate: null,
-  settingsToEdit: null
+  settings: {}
 }
 
 const mutations = {
   setSettings (state, settings) {
     state.settings = settings
   },
-  editSettings (state) {
-    // Create a new settings object to be edited
-    const settings = state.settings
-    state.settingsToUpdate = settings
-    state.settingsToEdit = {
-      _id: settings._id,
-      searchProvider: settings.searchProvider,
-      enableLoginManager: settings.enableLoginManager
-    }
-    state.showSettingsModal = true
-  },
   setSettingsDetails (state, data) {
     const settings = data.settings
     if (data.searchProvider !== undefined) settings.searchProvider = data.searchProvider
     if (data.enableLoginManager !== undefined) settings.enableLoginManager = data.enableLoginManager
-  },
-  closeSettingsModal (state) {
-    state.settingsToUpdate = null
-    state.settingsToEdit = null
-    state.showSettingsModal = false
   }
 }
 
@@ -64,23 +48,33 @@ const actions = {
       commit('setSettings', dbSettings)
     })
   },
-  saveSettings ({ commit }, data) {
+  editSettings ({ commit }, data) {
     const db = data.db
-    const settingsToUpdate = data.settingsToUpdate
-    const settingsToEdit = data.settingsToEdit
-    const settingsDetails = {
-      settings: settingsToUpdate,
-      searchProvider: settingsToEdit.searchProvider,
-      enableLoginManager: settingsToEdit.enableLoginManager
+    const settings = data.settings
+    // Create a new settings object to be edited
+    const settingsToEdit = {
+      _id: settings._id,
+      searchProvider: settings.searchProvider,
+      enableLoginManager: settings.enableLoginManager
     }
-    commit('setSettingsDetails', settingsDetails)
-    db.update({ _id: settingsToUpdate._id }, settingsToUpdate, {}, (err, numReplaced) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        return
-      }
-      commit('closeSettingsModal')
-    })
+    const showForm = create(SettingsDialog)
+    showForm({ settings: settingsToEdit }).transition()
+      .then((result) => {
+        if (result) {
+          const settingsDetails = {
+            settings,
+            searchProvider: settingsToEdit.searchProvider,
+            enableLoginManager: settingsToEdit.enableLoginManager
+          }
+          commit('setSettingsDetails', settingsDetails)
+          db.update({ _id: settings._id }, settings, {}, (err, numReplaced) => {
+            if (err) {
+              alert('ERROR: ' + err)
+              // return
+            }
+          })
+        }
+      })
   }
 }
 

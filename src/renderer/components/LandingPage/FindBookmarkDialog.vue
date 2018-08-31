@@ -1,16 +1,24 @@
 <template>
-  <div class="find-bookmark-wrapper">
-    <div class="find-bookmark">
-      <div class="find-input">
-        <input type="text" id="find-bookmark-text" v-model="findText" onfocus="this.select();" @keyup="startFind" @keyup.enter="openResult" @keyup.esc="closeFind" @keyup.up="previousResult" @keyup.down="nextResult" placeholder="Find a bookmark">
-        <div v-show="results.length" id="find-bookmark-dropdown">
-          <ul class="find-bookmark-dropdown-list">
-            <li v-for="(item, index) in results" :key="item.tid" :class="['find-bookmark-dropdown-item', item.isActive ? 'active' : '']" @mouseenter="setActiveIndex(index)" @click="openResult">
-              {{ item.text }}
-            </li>
-          </ul>
+  <div class="edit-dialog dialog-mask" @click="$close(false)">
+    <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
+      <header>
+        <h2>Find Bookmark:</h2>
+      </header>
+      <div class="dialog-body">
+        <div class="find-input">
+          <input type="text" id="find-bookmark-text" v-model="findText" autofocus onfocus="this.select();" @keyup="startFind" @keyup.enter="openResult" @keyup.esc="closeFind" @keyup.up="previousResult" @keyup.down="nextResult" placeholder="Find a bookmark">
+          <div v-show="results.length" id="find-bookmark-dropdown">
+            <ul class="find-bookmark-dropdown-list">
+              <li v-for="(item, index) in results" :key="item.tid" :class="['find-bookmark-dropdown-item', item.isActive ? 'active' : '']" @mouseenter="setActiveIndex(index)" @click="openResult">
+                {{ item.text }}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
+      <footer>
+        <button id="dialog-cancel" class="cancel" @click="$close(false)">Cancel</button>
+      </footer>
     </div>
   </div>
 </template>
@@ -35,6 +43,10 @@
         'getActivePersona'
       ])
     },
+    mounted () {
+      // HACK: The autofocus attribute doesn't seem to work all the time?
+      document.getElementById('find-bookmark-text').focus()
+    },
     updated () {
       const box = document.getElementById('find-bookmark-text')
       const dropdown = document.getElementById('find-bookmark-dropdown')
@@ -48,6 +60,9 @@
         'openInTab',
         'addToHistory'
       ]),
+      doNothing () {
+        // HACK: This just prevents clicks on the dialog-content bubbling to the dialog-mask. There's probably a better way to do this...
+      },
       startFind () {
         if (this.findText !== this.lastFindText) {
           if (!this.findText.length) {
@@ -141,11 +156,6 @@
 </script>
 
 <style scoped>
-
-  .find-bookmark-wrapper {
-    font-size: 16px;
-    padding: 4px;
-  }
 
   #find-bookmark-dropdown {
     background-color: white;

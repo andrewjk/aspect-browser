@@ -36,10 +36,10 @@
           <button class="bookmark-edit-button" @click.stop="moveBookmarkDownAndSave({ db: $pdb, persona, index })" title="Move this bookmark down">
             <fa icon="chevron-down"/>
           </button>
-          <button class="bookmark-edit-button" @click.stop="editBookmark({ persona, index })" title="Edit this bookmark">
+          <button class="bookmark-edit-button" @click.stop="editBookmark({ db: $pdb, persona, index })" title="Edit this bookmark">
             <fa icon="edit"/>
           </button>
-          <button class="bookmark-edit-button delete-link" @click.stop="deleteBookmark({ db: $pdb, persona, bookmarkToUpdate: item })" title="Delete this bookmark">
+          <button class="bookmark-edit-button delete-link" @click.stop="deleteBookmark({ db: $pdb, persona, bookmark: item })" title="Delete this bookmark">
             <fa icon="trash"/>
           </button>
         </div>
@@ -78,12 +78,12 @@
       ...mapMutations([
         'setTabDetails',
         'openInTab',
-        'addToHistory',
-        'editBookmark'
+        'addToHistory'
       ]),
       ...mapActions([
         'moveBookmarkUpAndSave',
         'moveBookmarkDownAndSave',
+        'editBookmark',
         'deleteBookmark'
       ]),
       openBookmark (bookmark, e) {

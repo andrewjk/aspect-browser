@@ -1,39 +1,52 @@
 <template>
-  <form>
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <label for="searchProvider">Search</label>
-          </td>
-          <td>
-            <input type="text" id="searchProvider" v-model="searchProvider" placeholder="Search provider">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="enableLoginManager">Login Manager</label>
-          </td>
-          <td>
-            <label>
-              <input type="checkbox" id="enableLoginManager" v-model="enableLoginManager">
-              {{ enableLoginManager ? "Enabled" : "Disabled" }}
-            </label>
-          </td>
-        </tr>
-        <tr v-show="this.enableLoginManager && this.loginsDatabaseExists">
-          <td>
-            &nbsp;
-          </td>
-          <td>
-            <button class="settings-button" @click="changeLoginManagerPassword">
-              Change Password
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </form>
+  <div class="edit-dialog dialog-mask" @click="$close(false)">
+    <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
+      <header>
+        <h2>Edit Settings:</h2>
+      </header>
+      <div class="dialog-body">
+        <form>
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <label for="searchProvider">Search</label>
+                </td>
+                <td>
+                  <input type="text" id="searchProvider" v-model="settings.searchProvider" placeholder="Search provider">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="enableLoginManager">Login manager</label>
+                </td>
+                <td>
+                  <label>
+                    <input type="checkbox" id="enableLoginManager" v-model="settings.enableLoginManager">
+                    {{ settings.enableLoginManager ? "Enabled" : "Disabled" }}
+                  </label>
+                </td>
+              </tr>
+              <tr v-show="this.settings.enableLoginManager && this.loginsDatabaseExists">
+                <td>
+                  &nbsp;
+                </td>
+                <td>
+                  <button class="settings-button" @click="changeLoginManagerPassword">
+                    Change Password
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <footer>
+        <button id="dialog-confirm" class="confirm" @click="$close(true)">Save</button>
+        <button id="dialog-cancel" class="cancel" @click="$close(false)">Cancel</button>
+      </footer>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -50,27 +63,13 @@
   import Encrypter from '../../data/Encrypter'
 
   export default {
+    props: {
+      settings: null
+    },
     computed: {
       ...mapState({
         settingsToEdit: state => state.Settings.settingsToEdit
-      }),
-      // Computed properties for v-model binding
-      searchProvider: {
-        get () {
-          return this.settingsToEdit.searchProvider
-        },
-        set (value) {
-          this.setSettingsDetails({ settings: this.settingsToEdit, searchProvider: value })
-        }
-      },
-      enableLoginManager: {
-        get () {
-          return this.settingsToEdit.enableLoginManager
-        },
-        set (value) {
-          this.maybeSetEnableLoginManager(value)
-        }
-      }
+      })
     },
     methods: {
       ...mapMutations([
@@ -79,6 +78,9 @@
       ...mapActions([
         'saveMasterPasswordRecord'
       ]),
+      doNothing () {
+        // HACK: This just prevents clicks on the dialog-content bubbling to the dialog-mask. There's probably a better way to do this...
+      },
       loginsDatabaseExists () {
         // Check whether there's already a database file
         const filename = path.join(remote.app.getPath('userData'), '/logins.db')

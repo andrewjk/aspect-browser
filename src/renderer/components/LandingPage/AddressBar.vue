@@ -10,7 +10,7 @@
       <fa icon="home"/>
     </button>
     <address-input :persona="persona"></address-input>
-    <button class="address-button" @click="addBookmark({ persona, url: getActiveTab.url, title: getActiveTab.title, icon: getActiveTab.icon })" title="Add the current page to this persona's bookmarks">
+    <button class="address-button" @click="addBookmark({ db: $pdb, persona, url: getActiveTab.url, title: getActiveTab.title, icon: getActiveTab.icon })" title="Add the current page to this persona's bookmarks">
       <fa icon="star"/>
     </button>
     <button v-if="getActiveTab.isLoading" class="address-button" @click="stopLoad" title = "Stop loading the current page">
@@ -86,7 +86,6 @@
     methods: {
       ...mapMutations([
         'setTabDetails',
-        'addBookmark',
         'goBack',
         'goForward',
         'goHome',
@@ -94,7 +93,8 @@
         'setUpdateExists'
       ]),
       ...mapActions([
-        'saveSystemSettings'
+        'saveSystemSettings',
+        'addBookmark'
       ]),
       canGoBack () {
         const tab = this.getActiveTab

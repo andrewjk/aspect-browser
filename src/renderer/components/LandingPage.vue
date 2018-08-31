@@ -1,84 +1,25 @@
 <template>
   <main>
     <div class="persona-list-container">
-      <persona-list @show-find-bookmark="showFindBookmarkModal"></persona-list>
+      <persona-list @show-find-bookmark="showFindBookmarkDialog"></persona-list>
     </div>
     <div class="persona-browser-container">
       <persona-browser></persona-browser>
     </div>
-    <modal v-if="showPersonaModal">
-      <h2 slot="header">{{ personaToUpdate ? 'Edit Persona:' : 'Add Persona:' }}</h2>
-      <persona-form slot="body"></persona-form>
-      <div slot="footer" class="modal-button-footer">
-        <a v-show="personaToUpdate" href="#" class="delete-link" @click="deletePersona({ db: $pdb, personaToUpdate })">Delete persona</a>
-        <button @click="savePersona({ db: $pdb, personaToEdit, personaToUpdate })">
-          Save
-        </button>
-        <button @click="closePersonaModal">
-          Cancel
-        </button>
-      </div>
-    </modal>
-    <modal v-if="showBookmarkModal">
-      <h2 slot="header">{{ bookmarkToUpdate ? 'Edit Bookmark:' : 'Add Bookmark:' }}</h2>
-      <bookmark-form slot="body"></bookmark-form>
-      <div slot="footer" class="modal-button-footer">
-        <a v-show="bookmarkToUpdate" href="#" class="delete-link" @click="deleteBookmark({ db: $pdb, persona: getActivePersona, bookmarkToUpdate })">Delete bookmark</a>
-        <button @click="saveBookmark({ db: $pdb, persona: getActivePersona, bookmarkToEdit, bookmarkToUpdate })">
-          Save
-        </button>
-        <button @click="closeBookmarkModal">
-          Cancel
-        </button>
-      </div>
-    </modal>
-    <modal v-if="showSettingsModal">
-      <h2 slot="header">Settings:</h2>
-      <settings-form slot="body"></settings-form>
-      <div slot="footer" class="modal-button-footer">
-        <button @click="saveSettings({ db: $usdb, settingsToEdit, settingsToUpdate })">
-          Save
-        </button>
-        <button @click="closeSettingsModal">
-          Cancel
-        </button>
-      </div>
-    </modal>
-    <modal v-if="showFindBookmark">
-      <h2 slot="header">Search:</h2>
-      <find-bookmark slot="body" @close-find-bookmark="closeFindBookmarkModal"></find-bookmark>
-      <div slot="footer" class="modal-button-footer">
-        <button @click="closeFindBookmarkModal">
-          Cancel
-        </button>
-      </div>
-    </modal>
-    <modal v-if="showAboutInfo">
-      <about-info slot="body"></about-info>
-      <div slot="footer" class="modal-button-footer">
-        <button @click="closeAboutInfo">
-          Close
-        </button>
-      </div>
-    </modal>
   </main>
 </template>
 
 <script>
   import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+  import { create } from 'vue-modal-dialogs'
 
   import PersonaList from './LandingPage/PersonaList'
   import PersonaBrowser from './LandingPage/PersonaBrowser'
-  import Modal from './LandingPage/Modal'
-  import PersonaForm from './LandingPage/PersonaForm'
-  import BookmarkForm from './LandingPage/BookmarkForm'
-  import SettingsForm from './LandingPage/SettingsForm'
-  import FindBookmark from './LandingPage/FindBookmark'
-  import AboutInfo from './LandingPage/AboutInfo'
+  import FindBookmarkDialog from './LandingPage/FindBookmarkDialog.vue'
 
   export default {
     name: 'landing-page',
-    components: { PersonaList, PersonaBrowser, Modal, PersonaForm, BookmarkForm, SettingsForm, FindBookmark, AboutInfo },
+    components: { PersonaList, PersonaBrowser },
     data () {
       return {
         zoomLevel: 0,
@@ -90,17 +31,7 @@
       ...mapState({
         personas: state => state.Store.personas,
         activity: state => state.Store.activity,
-        settings: state => state.Settings.settings,
-        showPersonaModal: state => state.Store.showPersonaModal,
-        personaToEdit: state => state.Store.personaToEdit,
-        personaToUpdate: state => state.Store.personaToUpdate,
-        showBookmarkModal: state => state.Store.showBookmarkModal,
-        bookmarkToEdit: state => state.Store.bookmarkToEdit,
-        bookmarkToUpdate: state => state.Store.bookmarkToUpdate,
-        showSettingsModal: state => state.Settings.showSettingsModal,
-        settingsToEdit: state => state.Settings.settingsToEdit,
-        settingsToUpdate: state => state.Settings.settingsToUpdate,
-        showAboutInfo: state => state.AboutInfo.showAboutInfo
+        settings: state => state.Settings.settings
       }),
       ...mapGetters([
         'getActivePersona',
@@ -134,23 +65,13 @@
         'openNewTab',
         'closeTab',
         'reopenTab',
-        'showHistory',
-        'openFindInPage',
-        'closePersonaModal',
-        'closeBookmarkModal',
-        'closeSettingsModal',
-        'closeAboutInfo'
+        'showHistory'
       ]),
       ...mapActions([
         'loadPersonas',
         'loadSettings',
         'loadHistory',
-        'loadSystemSettings',
-        'savePersona',
-        'deletePersona',
-        'saveBookmark',
-        'deleteBookmark',
-        'saveSettings'
+        'loadSystemSettings'
       ]),
       keyDown (e) {
         let keys = ''
@@ -217,7 +138,7 @@
             break
           }
           case 'ctrl+.': {
-            this.showFindBookmarkModal()
+            this.showFindBookmarkDialog()
             break
           }
           case 'ctrl+l': {
@@ -284,12 +205,13 @@
           activeTab.webview.setZoomLevel(this.zoomLevel)
         }
       },
-      showFindBookmarkModal () {
-        this.showFindBookmark = true
+      showFindBookmarkDialog () {
+        const dialog = create(FindBookmarkDialog)
+        dialog({}).transition()
+          .catch((err) => {
+            alert('ERROR: ' + err)
+          })
         this.focusFindBookmark = true
-      },
-      closeFindBookmarkModal () {
-        this.showFindBookmark = false
       }
     }
   }
@@ -310,21 +232,6 @@
     display: flex;
     height: 100vh;
     width: 100vw;
-  }
-
-  .modal-button-footer {
-    text-align: right;
-  }
-
-  .modal-button-footer button {
-    margin-left: 10px;
-    border: 1px solid #aaa;
-    border-radius: 10px;
-  }
-
-  .modal-button-footer button:hover,
-  .modal-button-footer button:focus {
-    background-color: #ddd;
   }
 
 </style>

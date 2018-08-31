@@ -4,18 +4,14 @@ import { create } from 'vue-modal-dialogs'
 
 import AlertDialog from '../../components/LandingPage/AlertDialog'
 import ConfirmDialog from '../../components/LandingPage/ConfirmDialog'
+import PersonaDialog from '../../components/LandingPage/PersonaDialog'
+import BookmarkDialog from '../../components/LandingPage/BookmarkDialog'
 
 const state = {
   personas: [],
   activity: {},
   showFindInPage: false,
-  focusFindInPage: false,
-  showPersonaModal: false,
-  personaToUpdate: null,
-  personaToEdit: null,
-  showBookmarkModal: false,
-  bookmarkToUpdate: null,
-  bookmarkToEdit: null
+  focusFindInPage: false
 }
 
 const getters = {
@@ -303,30 +299,6 @@ const mutations = {
       state.personas[i].order = i + 1
     }
   },
-  addPersona (state) {
-    // Create a new persona object to be edited
-    state.personaToUpdate = null
-    state.personaToEdit = {
-      _id: uuid(),
-      name: null,
-      order: state.personas.length + 1,
-      isActive: true,
-      bookmarks: []
-    }
-    state.showPersonaModal = true
-  },
-  editPersona (state, index) {
-    // Create a new persona object to be edited
-    const persona = state.personas[index]
-    state.personaToUpdate = persona
-    state.personaToEdit = {
-      _id: persona._id,
-      name: persona.name,
-      shortName: persona.shortName,
-      color: persona.color
-    }
-    state.showPersonaModal = true
-  },
   setPersonaDetails (state, data) {
     const persona = data.persona
     if (data.name !== undefined) persona.name = data.name
@@ -350,11 +322,6 @@ const mutations = {
     state.personas.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
-  },
-  closePersonaModal (state) {
-    state.personaToUpdate = null
-    state.personaToEdit = null
-    state.showPersonaModal = false
   },
   // =========
   // BOOKMARKS
@@ -405,33 +372,6 @@ const mutations = {
       activePersona.bookmarks = activePersona.bookmarks.sort(sorter)
     }
   },
-  addBookmark (state, data) {
-    const persona = data.persona
-    // Create a new bookmark object to be edited
-    state.bookmarkToUpdate = null
-    state.bookmarkToEdit = {
-      _id: uuid(),
-      url: data.url,
-      title: data.title,
-      icon: data.icon,
-      order: persona.bookmarks.length + 1,
-      isActive: true
-    }
-    state.showBookmarkModal = true
-  },
-  editBookmark (state, data) {
-    // Create a new bookmark object to be edited
-    const persona = data.persona
-    const index = data.index
-    const bookmark = persona.bookmarks[index]
-    state.bookmarkToUpdate = bookmark
-    state.bookmarkToEdit = {
-      _id: bookmark._id,
-      title: bookmark.title,
-      color: bookmark.color
-    }
-    state.showBookmarkModal = true
-  },
   setBookmarkDetails (state, data) {
     const bookmark = data.bookmark
     if (data.title !== undefined) bookmark.title = data.title
@@ -454,11 +394,6 @@ const mutations = {
     persona.bookmarks.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
-  },
-  closeBookmarkModal (state) {
-    state.bookmarkToUpdate = null
-    state.bookmarkToEdit = null
-    state.showBookmarkModal = false
   },
   // ====
   // TABS
@@ -727,61 +662,94 @@ const actions = {
       })
     })
   },
-  savePersona ({ commit }, data) {
+  addPersona ({ commit }, data) {
     const db = data.db
-    const personaToUpdate = data.personaToUpdate
-    const personaToEdit = data.personaToEdit
-    if (personaToUpdate) {
-      commit('setPersonaDetails', { persona: personaToUpdate, name: personaToEdit.name, shortName: personaToEdit.shortName, color: personaToEdit.color })
-      db.update({ _id: personaToUpdate._id }, personaToUpdate, {}, (err, numReplaced) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
-        }
-        commit('sortPersonas')
-        commit('closePersonaModal')
-      })
-    } else {
-      commit('addHomeTab', personaToEdit)
-      db.insert(personaToEdit, (err, dbPersona) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
-        }
-        commit('insertPersona', personaToEdit)
-        commit('sortPersonas')
-        commit('closePersonaModal')
-      })
+    const personas = data.personas
+    // Create a new persona object to be edited
+    const personaToEdit = {
+      _id: uuid(),
+      name: null,
+      order: personas.length + 1,
+      isActive: true,
+      bookmarks: []
     }
-  },
-  deletePersona ({ commit }, data) {
-    const dialog = create(ConfirmDialog)
-    dialog({ content: 'Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.' }).transition()
+    const showForm = create(PersonaDialog)
+    showForm({ persona: personaToEdit, adding: true }).transition()
       .then((result) => {
         if (result) {
-          dialog({ content: 'Are you really sure you want to delete this persona?' }).transition()
-            .then((result) => {
-              if (result) {
-                const db = data.db
-                const persona = data.personaToUpdate
-                db.remove({ _id: persona._id }, {}, (err, numReplaced) => {
-                  if (err) {
-                    alert('ERROR: ' + err)
-                    return
-                  }
-                  commit('removePersona', persona)
-                  commit('closePersonaModal')
-                })
-              }
-            })
-            .catch((err) => {
+          commit('addHomeTab', personaToEdit)
+          db.insert(personaToEdit, (err, dbPersona) => {
+            if (err) {
               alert('ERROR: ' + err)
-            })
+              return
+            }
+            commit('insertPersona', personaToEdit)
+            commit('sortPersonas')
+          })
         }
       })
-      .catch((err) => {
-        alert('ERROR: ' + err)
+  },
+  editPersona ({ commit }, data) {
+    const db = data.db
+    const persona = data.persona
+    // Create a new persona object to be edited
+    const personaToEdit = {
+      _id: persona._id,
+      name: persona.name,
+      shortName: persona.shortName,
+      color: persona.color
+    }
+    const showForm = create(PersonaDialog)
+    showForm({ persona: personaToEdit }).transition()
+      .then((result) => {
+        if (result) {
+          const personaDetails = {
+            persona,
+            name: personaToEdit.name,
+            shortName: personaToEdit.shortName,
+            color: personaToEdit.color
+          }
+          commit('setPersonaDetails', personaDetails)
+          db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
+            if (err) {
+              alert('ERROR: ' + err)
+              return
+            }
+            commit('sortPersonas')
+          })
+        }
       })
+  },
+  deletePersona ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const persona = data.persona
+      const dialog = create(ConfirmDialog)
+      dialog({ content: 'Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.' }).transition()
+        .then((result) => {
+          if (result) {
+            dialog({ content: 'Are you really sure you want to delete this persona?' }).transition()
+              .then((result) => {
+                if (result) {
+                  db.remove({ _id: persona._id }, {}, (err, numReplaced) => {
+                    if (err) {
+                      alert('ERROR: ' + err)
+                      return
+                    }
+                    commit('removePersona', persona)
+                    resolve()
+                  })
+                }
+              })
+              .catch((err) => {
+                alert('ERROR: ' + err)
+              })
+          }
+        })
+        .catch((err) => {
+          alert('ERROR: ' + err)
+        })
+    })
   },
   // =========
   // BOOKMARKS
@@ -810,55 +778,90 @@ const actions = {
       }
     })
   },
-  saveBookmark ({ commit }, data) {
+  addBookmark ({ commit }, data) {
     const db = data.db
     const persona = data.persona
-    const bookmarkToUpdate = data.bookmarkToUpdate
-    const bookmarkToEdit = data.bookmarkToEdit
-    if (bookmarkToUpdate) {
-      commit('setBookmarkDetails', { bookmark: bookmarkToUpdate, title: bookmarkToEdit.title })
-    } else {
-      commit('insertBookmark', { persona, bookmark: bookmarkToEdit })
+    // Create a new bookmark object to be edited
+    const bookmarkToEdit = {
+      _id: uuid(),
+      url: data.url,
+      title: data.title,
+      icon: data.icon,
+      order: persona.bookmarks.length + 1,
+      isActive: true
     }
-    commit('sortBookmarks', persona)
-    db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-      if (err) {
-        alert('ERROR: ' + err)
-        return
-      }
-      commit('closeBookmarkModal')
-    })
-  },
-  deleteBookmark ({ commit }, data) {
-    const dialog = create(ConfirmDialog)
-    dialog({ content: 'Are you sure you want to delete this bookmark? This will delete all saved data associated with it.' }).transition()
+    const showForm = create(BookmarkDialog)
+    showForm({ bookmark: bookmarkToEdit, persona, adding: true }).transition()
       .then((result) => {
         if (result) {
-          dialog({ content: 'Are you really sure you want to delete this bookmark?' }).transition()
-            .then((result) => {
-              if (result) {
-                const db = data.db
-                const persona = data.persona
-                const bookmark = data.bookmarkToUpdate
-                commit('removeBookmark', { persona, bookmark })
-                commit('sortBookmarks', persona)
-                db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
-                  if (err) {
-                    alert('ERROR: ' + err)
-                    return
-                  }
-                  commit('closeBookmarkModal')
-                })
-              }
-            })
-            .catch((err) => {
+          commit('insertBookmark', { persona, bookmark: bookmarkToEdit })
+          commit('sortBookmarks', persona)
+          db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
+            if (err) {
               alert('ERROR: ' + err)
-            })
+              // return
+            }
+          })
         }
       })
-      .catch((err) => {
-        alert('ERROR: ' + err)
+  },
+  editBookmark ({ commit }, data) {
+    const db = data.db
+    const persona = data.persona
+    const index = data.index
+    const bookmark = persona.bookmarks[index]
+    // Create a new bookmark object to be edited
+    const bookmarkToEdit = {
+      _id: bookmark._id,
+      title: bookmark.title
+    }
+    const showForm = create(BookmarkDialog)
+    showForm({ bookmark: bookmarkToEdit, persona }).transition()
+      .then((result) => {
+        if (result) {
+          commit('setBookmarkDetails', { bookmark, title: bookmarkToEdit.title })
+          commit('sortBookmarks', persona)
+          db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
+            if (err) {
+              alert('ERROR: ' + err)
+              // return
+            }
+          })
+        }
       })
+  },
+  deleteBookmark ({ commit }, data) {
+    const db = data.db
+    const persona = data.persona
+    const bookmark = data.bookmark
+    return new Promise((resolve, reject) => {
+      const dialog = create(ConfirmDialog)
+      dialog({ content: 'Are you sure you want to delete this bookmark? This will delete all saved data associated with it.' }).transition()
+        .then((result) => {
+          if (result) {
+            dialog({ content: 'Are you really sure you want to delete this bookmark?' }).transition()
+              .then((result) => {
+                if (result) {
+                  commit('removeBookmark', { persona, bookmark })
+                  commit('sortBookmarks', persona)
+                  db.update({ _id: persona._id }, persona, {}, (err, numReplaced) => {
+                    if (err) {
+                      alert('ERROR: ' + err)
+                      return
+                    }
+                    resolve()
+                  })
+                }
+              })
+              .catch((err) => {
+                alert('ERROR: ' + err)
+              })
+          }
+        })
+        .catch((err) => {
+          alert('ERROR: ' + err)
+        })
+    })
   },
   // ========
   // ACTIVITY
