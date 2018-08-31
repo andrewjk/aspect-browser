@@ -30,7 +30,6 @@
     computed: {
       ...mapState({
         personas: state => state.Store.personas,
-        activity: state => state.Store.activity,
         settings: state => state.Settings.settings
       }),
       ...mapGetters([
@@ -75,10 +74,16 @@
       ]),
       keyDown (e) {
         let keys = ''
-        if (e.ctrlKey || e.metaKey) keys = keys + 'ctrl+'
-        if (e.altKey || e.optionKey) keys = keys + 'alt+'
-        if (e.shiftKey) keys = keys + 'shift+'
-        keys = keys + e.key
+        if (e.ctrlKey || e.metaKey) {
+          keys = keys + 'ctrl+'
+        }
+        if (e.altKey || e.optionKey) {
+          keys = keys + 'alt+'
+        }
+        if (e.shiftKey) {
+          keys = keys + 'shift+'
+        }
+        keys = keys + e.key.toLowerCase()
 
         // console.log('keydown: ' + keys)
         switch (keys) {
@@ -86,7 +91,7 @@
             this.nextPersona()
             break
           }
-          case 'ctrl+shift+`': {
+          case 'ctrl+shift+~': {
             this.previousPersona()
             break
           }
