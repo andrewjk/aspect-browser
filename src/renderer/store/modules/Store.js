@@ -649,6 +649,7 @@ const actions = {
         return
       }
       commit('setPersonas', [ dbPersona ])
+      commit('setActivePersonaIndex', 0)
     })
   },
   movePersonaUpAndSave ({ commit }, data) {
