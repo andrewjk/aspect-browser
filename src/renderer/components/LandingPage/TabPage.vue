@@ -59,7 +59,9 @@
         'addToHistory'
       ]),
       ...mapActions([
-        'saveToHistory'
+        'saveToHistory',
+        'saveToActivity',
+        'updateActivity'
       ]),
       getPartition () {
         return 'persist:' + this.persona._id
@@ -86,6 +88,28 @@
             icon: this.tab.icon,
             title: this.tab.title
           })
+          if (this.tab.activityId) {
+            this.updateActivity({
+              db: this.$adb,
+              activityId: this.tab.activityId,
+              url: this.tab.url,
+              icon: this.tab.icon,
+              title: this.tab.title
+            })
+          } else {
+            this.saveToActivity({
+              db: this.$adb,
+              name: 'session',
+              personaId: this.persona._id,
+              url: this.tab.url,
+              icon: this.tab.icon,
+              title: this.tab.title,
+              // TODO: Save the order so that we can reopen things in order
+              displayOrder: 1
+            }).then((_id) => {
+              this.tab.activityId = _id
+            })
+          }
         }
         this.historyUrl = this.tab.url
       },

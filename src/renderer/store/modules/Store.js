@@ -441,7 +441,7 @@ const mutations = {
     })
   },
   // ========
-  // ACTIVITY
+  // HISTORY
   // ========
   addToHistory (state, data) {
     // HACK: We have to store history ourselves because I can't figure out a way to view the HomePage route in a webview
@@ -888,16 +888,16 @@ const actions = {
         })
     })
   },
-  // ========
-  // ACTIVITY
-  // ========
+  // =======
+  // HISTORY
+  // =======
   loadHistory ({ commit, dispatch }, data) {
-    const db = data.db
-    const personaId = data.personaId
-    const search = data.search
-    const skip = data.skip
-    const limit = data.limit
     return new Promise((resolve, reject) => {
+      const db = data.db
+      const personaId = data.personaId
+      const search = data.search
+      const skip = data.skip
+      const limit = data.limit
       db.find({ $and: [{ personaId }, search ? { $or: [{ title: new RegExp(search, 'gi') }, { url: new RegExp(search, 'gi') }] } : {}] }).sort({ dateTime: -1 }).skip(skip).limit(limit).exec((err, dbHistory) => {
         if (err) {
           reject(err)
@@ -924,9 +924,9 @@ const actions = {
     })
   },
   deleteHistory ({ commit }, data) {
-    const db = data.db
-    const ids = data.ids
     return new Promise((resolve, reject) => {
+      const db = data.db
+      const ids = data.ids
       db.remove({ _id: { $in: ids } }, { multi: true }, (err, numRemoved) => {
         if (err) {
           reject(err)
@@ -982,6 +982,62 @@ const actions = {
       .catch((err) => {
         alert('ERROR: ' + err)
       })
+  },
+  // ACTIVITY
+  saveToActivity ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const activity = {
+        _id: uuid(),
+        name: data.name,
+        personaId: data.personaId,
+        url: data.url,
+        icon: data.icon,
+        title: data.title,
+        displayOrder: data.displayOrder,
+        // HACK: Won't need this once displayOrder is working:
+        dateTime: new Date()
+      }
+      db.insert(activity, (err, dbActivity) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(dbActivity._id)
+        }
+      })
+    })
+  },
+  updateActivity ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const activityId = data.activityId
+      const activity = {
+        url: data.url,
+        icon: data.icon,
+        title: data.title,
+        displayOrder: data.displayOrder
+      }
+      db.update({ _id: activityId }, { $set: activity }, {}, (err, numReplaced) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  },
+  removeFromActivity ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      const activityId = data.activityId
+      db.remove({ _id: activityId }, {}, (err, numReplaced) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
   }
 }
 

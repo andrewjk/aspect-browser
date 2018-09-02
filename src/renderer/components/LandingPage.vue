@@ -70,7 +70,8 @@
         'loadPersonas',
         'loadSettings',
         'loadHistory',
-        'loadSystemSettings'
+        'loadSystemSettings',
+        'removeFromActivity'
       ]),
       keyDown (e) {
         let keys = ''
@@ -156,6 +157,8 @@
           }
           case 'ctrl+w': {
             this.closeTab()
+            const tab = this.getActiveTab()
+            this.removeFromActivity({ db: this.$adb, activityId: tab.activityId })
             break
           }
           case 'ctrl+shift+t': {

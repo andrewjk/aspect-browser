@@ -6,7 +6,7 @@
       </button>
     </button>
     <div :id="'tab-list-' + persona._id" class="tab-list" :style="{ maxWidth: maxTabListWidth }">
-      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveTabIndex(index)" @click.middle="closeTab(index)" :title="item.title">
+      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveTabIndex(index)" @click.middle="closeTabAndRemoveActivity(index)" :title="item.title">
         <template v-if="item.url === 'aspect://home'">
           <fa icon="home" class="tab-icon"/>
         </template>
@@ -23,7 +23,7 @@
           <img class="tab-icon" :src="item.icon">
         </template>
         <span class="tab-title">{{ item.title }}</span>
-        <button class="tab-close" @click.stop="closeTab(index)">
+        <button class="tab-close" @click.stop="closeTabAndRemoveActivity(index)">
           <fa icon="times"/>
         </button>
       </button>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-  import { mapMutations } from 'vuex'
+  import { mapMutations, mapActions } from 'vuex'
 
   import WindowButtons from './WindowButtons'
 
@@ -95,6 +95,9 @@
         'closeTab',
         'openNewTab'
       ]),
+      ...mapActions([
+        'removeFromActivity'
+      ]),
       getActiveTab () {
         return this.tabs.find((item) => {
           return item.isActive
@@ -116,6 +119,11 @@
         el.scrollLeft = Math.min(width, scrollTo)
         this.canScrollLeft = true
         this.canScrollRight = scrollTo < width
+      },
+      closeTabAndRemoveActivity (index) {
+        this.closeTab(index)
+        const tab = this.tabs[index]
+        this.removeFromActivity({ db: this.$adb, activityId: tab.activityId })
       }
     }
   }

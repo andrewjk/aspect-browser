@@ -10,6 +10,7 @@ import pdb from './data/personas'
 import usdb from './data/user-settings'
 import hdb from './data/history'
 import ldb from './data/logins'
+import adb from './data/activity'
 import ssdb from './data/system-settings'
 
 // FontAwesome icons
@@ -62,6 +63,7 @@ Vue.prototype.$pdb = pdb
 Vue.prototype.$usdb = usdb
 Vue.prototype.$hdb = hdb
 Vue.prototype.$ldb = ldb
+Vue.prototype.$adb = adb
 Vue.prototype.$ssdb = ssdb
 
 // Add the FontAwesome icons that we will use
