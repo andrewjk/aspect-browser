@@ -27,6 +27,7 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 * Use keyboard shortcuts to switch between personas and tabs
 * Use Quick Find to search for personas and bookmarks
 * Manage history for each persona
+* Restore, save and load sessions
 * Manage login details for each persona
   * Can be turned on in Settings => Login Manager
   * Requires a master password to be set
