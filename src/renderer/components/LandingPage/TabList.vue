@@ -121,8 +121,8 @@
         this.canScrollRight = scrollTo < width
       },
       closeTabAndRemoveActivity (index) {
-        this.closeTab(index)
         const tab = this.tabs[index]
+        this.closeTab(index)
         this.removeFromActivity({ db: this.$adb, activityId: tab.activityId })
       }
     }
