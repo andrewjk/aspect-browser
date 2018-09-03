@@ -34,13 +34,13 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 
 ## Download
 
-![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.4/aspect-browser-setup-0.0.4.exe)
+![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.6/aspect-browser-setup-0.0.6.exe)
 
-![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.4/Aspect-0.0.4.dmg)
+![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.6/Aspect-0.0.6.dmg)
 
-![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.4/aspect-browser-0.0.4-x86_64.AppImage)
+![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.6/aspect-browser-0.0.6-x86_64.AppImage)
 
-![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.4)
+![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.6)
 
 ## Keyboard Shortcuts
 
@@ -68,11 +68,11 @@ The following is a very provisional roadmap of planned major features.
 
 | Date | Version | Feature | Done |
 | ---- | ------- | ------- | ---- |
-| 6 Aug | 0.0.4 | Check for updates | ✓ |
-| 13 Aug | 0.0.4 | History management | ✓ |
+| 6 Aug | 0.0.2 | Check for updates | ✓ |
+| 13 Aug | 0.0.3 | History management | ✓ |
 | 20 Aug | 0.0.4 | Login management | ✓ |
-| 27 Aug | 0.0.5 | Ad blocking | |
-| 3 Sep | 0.0.6 | Session management | |
+| 27 Aug | 0.0.5 | Ad blocking | ✗ |
+| 3 Sep | 0.0.6 | Session management | ✓ |
 | 10 Sep | 0.0.7 | Download management | |
 | 17 Sep | 0.0.8 | Memory management | |
 | 24 Sep | 0.0.9 | Notifications | |
