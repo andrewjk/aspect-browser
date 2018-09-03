@@ -299,6 +299,31 @@ const mutations = {
       })
     }
   },
+  openInPersona (state, data) {
+    const url = data.url
+    const personaId = data.personaId
+    const persona = state.personas.find((p) => {
+      return p._id === personaId
+    })
+    if (persona) {
+      const tabs = persona.tabs
+      tabs.push({
+        _id: uuid(),
+        url: url,
+        addressText: url,
+        title: url.replace(/http[s]*:\/\/[www.]*/, ''),
+        index: tabs.length,
+        icon: null,
+        isActive: false,
+        isLoading: false,
+        backHistory: [],
+        forwardHistory: []
+      })
+      persona.hasOpenTab = tabs.some((tab) => {
+        return tab.url
+      })
+    }
+  },
   movePersonaUp (state, index) {
     if (index === 0) {
       return
@@ -1008,12 +1033,10 @@ const actions = {
         if (err) {
           reject(err)
         } else {
-          console.log('updating')
           db.update({ isCurrentSession: true }, { $set: { isCurrentSession: false, isPreviousSession: true } }, { multi: true }, (err, numReplaced) => {
             if (err) {
               reject(err)
             } else {
-              console.log('replaced ' + numReplaced)
               resolve()
             }
           })
@@ -1074,6 +1097,21 @@ const actions = {
       })
     })
   },
+  restoreSession ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      db.find({ isPreviousSession: true }).sort({ index: 1 }).exec((err, dbActivity) => {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+        dbActivity.forEach((item) => {
+          // TODO: Set icon and title and don't load until clicked
+          commit('openInPersona', { url: item.url, personaId: item.personaId })
+        })
+      })
+    })
+  },
   saveSession ({ commit }, data) {
     return new Promise((resolve, reject) => {
       const db = data.db
@@ -1083,13 +1121,35 @@ const actions = {
           return
         }
         dbActivity.forEach((item) => {
-          const activity = Object.assign({ name: data.name }, item)
-          activity.isCurrentSession = undefined
+          const activity = {
+            _id: uuid(),
+            personaId: item.personaId,
+            url: item.url,
+            icon: item.icon,
+            title: item.title,
+            index: item.index,
+            name: data.name
+          }
           db.insert(activity, (err, dbActivity) => {
             if (err) {
               reject(err)
             }
           })
+        })
+      })
+    })
+  },
+  loadSession ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      db.find({ name: data.name }).sort({ index: 1 }).exec((err, dbActivity) => {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+        dbActivity.forEach((item) => {
+          // TODO: Set icon and title and don't load until clicked
+          commit('openInPersona', { url: item.url, personaId: item.personaId })
         })
       })
     })

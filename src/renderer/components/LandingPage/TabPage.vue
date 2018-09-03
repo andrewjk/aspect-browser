@@ -99,7 +99,6 @@
           } else {
             this.saveToActivity({
               db: this.$adb,
-              name: 'session',
               personaId: this.persona._id,
               url: this.tab.url,
               icon: this.tab.icon,

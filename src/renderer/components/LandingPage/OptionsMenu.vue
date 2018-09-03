@@ -10,26 +10,45 @@
     <button class="options-menu-item" @click="showHistory" title="Show browsing history for this persona">
       <div class="options-menu-item-grid">
         <fa :icon="['far', 'clock']" class="options-menu-icon"/>
-        <span>View {{ this.persona.name }} History</span>
+        <span>View {{ this.persona.name }} history</span>
       </div>
     </button>
-    <button class="options-menu-item" @click="clearHistory({ db: $hdb, personaId: persona._id })" title="Clear the browsing history for this persona">
+    <button class="options-menu-item" @click="clearHistory({ db: $hdb, adb: $adb, personaId: persona._id })" title="Clear the browsing history for this persona">
       <div class="options-menu-item-grid">
         <fa icon="trash" class="options-menu-icon"/>
-        <span>Clear {{ this.persona.name }} History</span>
+        <span>Clear {{ this.persona.name }} history</span>
       </div>
     </button>
     <button class="options-menu-item" @click="clearAllHistory({ db: $hdb, personaId: persona._id })" title="Clear the browsing history for all personas">
       <div class="options-menu-item-grid">
         <fa icon="trash" class="options-menu-icon"/>
-        <span>Clear All History</span>
+        <span>Clear all history</span>
+      </div>
+    </button>
+    <div class="options-menu-separator"></div>
+    <button class="options-menu-item" @click="restoreSession({ db: $adb })" title="Restore the session that was active when you last closed Aspect">
+      <div class="options-menu-item-grid">
+        <fa icon="table" class="options-menu-icon"/>
+        <span>Restore previous session</span>
+      </div>
+    </button>
+    <button class="options-menu-item" @click="saveSessionWithName" title="Save the active tabs for this session so they can be reopened later">
+      <div class="options-menu-item-grid">
+        <fa icon="table" class="options-menu-icon"/>
+        <span>Save this session</span>
+      </div>
+    </button>
+    <button class="options-menu-item" @click="loadSessionWithName" title="Load a previously-saved session">
+      <div class="options-menu-item-grid">
+        <fa icon="table" class="options-menu-icon"/>
+        <span>Load a session</span>
       </div>
     </button>
     <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="maybeShowLogins" title="Show login details for this persona">
       <div class="options-menu-item-grid">
         <fa icon="key" class="options-menu-icon"/>
-        <span>View {{ this.persona.name }} Logins</span>
+        <span>View {{ this.persona.name }} logins</span>
       </div>
     </button>
     <div class="options-menu-separator"></div>
@@ -69,8 +88,29 @@
       ...mapActions([
         'editSettings',
         'clearHistory',
-        'clearAllHistory'
+        'clearAllHistory',
+        'restoreSession',
+        'saveSession',
+        'loadSession'
       ]),
+      saveSessionWithName () {
+        const prompt = create(PromptDialog)
+        prompt({ content: 'Enter a name for this session:' }).transition()
+          .then((result) => {
+            if (result) {
+              this.saveSession({ db: this.$adb, name: result })
+            }
+          })
+      },
+      loadSessionWithName () {
+        const prompt = create(PromptDialog)
+        prompt({ content: 'Enter the name of the session to load:' }).transition()
+          .then((result) => {
+            if (result) {
+              this.loadSession({ db: this.$adb, name: result })
+            }
+          })
+      },
       maybeShowLogins () {
         // Always get the password before showing the saved logins
         // TODO: Loop this until we get the right password
