@@ -104,8 +104,7 @@
               url: this.tab.url,
               icon: this.tab.icon,
               title: this.tab.title,
-              // TODO: Save the order so that we can reopen things in order
-              displayOrder: 1
+              index: this.tab.index
             }).then((_id) => {
               this.tab.activityId = _id
             })

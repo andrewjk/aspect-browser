@@ -64,6 +64,7 @@ const mutations = {
             url: 'aspect://home',
             addressText: null,
             title: 'Home',
+            index: 0,
             icon: null,
             isActive: true,
             isLoading: false,
@@ -110,6 +111,7 @@ const mutations = {
         url: 'aspect://home',
         addressText: null,
         title: 'Home',
+        index: 0,
         icon: null,
         isActive: true,
         isLoading: false,
@@ -222,6 +224,7 @@ const mutations = {
       activePersona.hasOpenTab = activePersona.tabs.some((tab) => {
         return tab.url
       })
+      // TODO: Update the tab indexes
     }
   },
   reopenTab (state) {
@@ -233,7 +236,8 @@ const mutations = {
         const closedTab = activePersona.closedTabs.pop()
         const newIndex = Math.min(closedTab.index, activePersona.tabs.length)
         activePersona.tabs.splice(newIndex, 0, closedTab)
-        closedTab.index = undefined
+        // TODO: Need to reorganise the other tab indexes
+        closedTab.index = newIndex
         activePersona.tabs.forEach((t, i) => {
           t.isActive = (i === newIndex)
         })
@@ -251,6 +255,7 @@ const mutations = {
         url: 'aspect://home',
         addressText: null,
         title: 'Home',
+        index: tabs.length,
         icon: null,
         isActive: true,
         isLoading: false,
@@ -276,6 +281,7 @@ const mutations = {
         url: url,
         addressText: url,
         title: url.replace(/http[s]*:\/\/[www.]*/, ''),
+        index: tabs.length,
         icon: null,
         isActive: false,
         isLoading: false,
@@ -582,6 +588,7 @@ const mutations = {
         url: 'aspect://history',
         addressText: null,
         title: 'History',
+        index: tabs.length,
         icon: null,
         isActive: true,
         isLoading: false,
@@ -942,17 +949,25 @@ const actions = {
       .then((result) => {
         if (result) {
           const db = data.db
+          const adb = data.adb
           const personaId = data.personaId
-          db.remove({ personaId: personaId }, { multi: true }, (err, numReplaced) => {
+          db.remove({ personaId }, { multi: true }, (err, numReplaced) => {
             if (err) {
               alert('ERROR: ' + err)
               return
             }
-            const dialog = create(AlertDialog)
-            dialog({ content: 'Browsing history cleared.' }).transition()
-              .catch((err) => {
+            // Also delete history activity
+            adb.remove({ personaId, isPreviousSession: true }, { multi: true }, (err, numRemoved) => {
+              if (err) {
                 alert('ERROR: ' + err)
-              })
+              } else {
+                const dialog = create(AlertDialog)
+                dialog({ content: 'Browsing history cleared.' }).transition()
+                  .catch((err) => {
+                    alert('ERROR: ' + err)
+                  })
+              }
+            })
           })
         }
       })
@@ -983,20 +998,40 @@ const actions = {
         alert('ERROR: ' + err)
       })
   },
+  // ========
   // ACTIVITY
+  // ========
+  loadActivity ({ commit }, db) {
+    return new Promise((resolve, reject) => {
+      // Delete records with isPreviousSession and update records with isCurrentSession to isPreviousSession on load
+      db.remove({ isPreviousSession: true }, { multi: true }, (err, numRemoved) => {
+        if (err) {
+          reject(err)
+        } else {
+          console.log('updating')
+          db.update({ isCurrentSession: true }, { $set: { isCurrentSession: false, isPreviousSession: true } }, { multi: true }, (err, numReplaced) => {
+            if (err) {
+              reject(err)
+            } else {
+              console.log('replaced ' + numReplaced)
+              resolve()
+            }
+          })
+        }
+      })
+    })
+  },
   saveToActivity ({ commit }, data) {
     return new Promise((resolve, reject) => {
       const db = data.db
       const activity = {
         _id: uuid(),
-        name: data.name,
         personaId: data.personaId,
         url: data.url,
         icon: data.icon,
         title: data.title,
-        displayOrder: data.displayOrder,
-        // HACK: Won't need this once displayOrder is working:
-        dateTime: new Date()
+        index: data.index,
+        isCurrentSession: true
       }
       db.insert(activity, (err, dbActivity) => {
         if (err) {
@@ -1015,7 +1050,7 @@ const actions = {
         url: data.url,
         icon: data.icon,
         title: data.title,
-        displayOrder: data.displayOrder
+        index: data.index
       }
       db.update({ _id: activityId }, { $set: activity }, {}, (err, numReplaced) => {
         if (err) {
@@ -1036,6 +1071,26 @@ const actions = {
         } else {
           resolve()
         }
+      })
+    })
+  },
+  saveSession ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const db = data.db
+      db.find({ isCurrentSession: true }).sort({ index: 1 }).exec((err, dbActivity) => {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+        dbActivity.forEach((item) => {
+          const activity = Object.assign({ name: data.name }, item)
+          activity.isCurrentSession = undefined
+          db.insert(activity, (err, dbActivity) => {
+            if (err) {
+              reject(err)
+            }
+          })
+        })
       })
     })
   }

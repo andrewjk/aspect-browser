@@ -41,6 +41,7 @@
       this.loadPersonas(this.$pdb)
       this.loadSettings(this.$usdb)
       this.loadSystemSettings(this.$ssdb)
+      this.loadActivity(this.$adb)
     },
     mounted () {
       window.addEventListener('keydown', (e) => {
@@ -71,6 +72,7 @@
         'loadSettings',
         'loadHistory',
         'loadSystemSettings',
+        'loadActivity',
         'removeFromActivity'
       ]),
       keyDown (e) {
