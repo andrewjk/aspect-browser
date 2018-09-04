@@ -9,8 +9,9 @@ import store from './store'
 import pdb from './data/personas'
 import usdb from './data/user-settings'
 import hdb from './data/history'
-import ldb from './data/logins'
 import adb from './data/activity'
+import ddb from './data/downloads'
+import ldb from './data/logins'
 import ssdb from './data/system-settings'
 
 // FontAwesome icons
@@ -45,6 +46,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faClock,
+  faFile,
   faWindowMinimize,
   faWindowMaximize,
   faWindowRestore,
@@ -63,8 +65,9 @@ require('../../node_modules/normalize.css/normalize.css')
 Vue.prototype.$pdb = pdb
 Vue.prototype.$usdb = usdb
 Vue.prototype.$hdb = hdb
-Vue.prototype.$ldb = ldb
 Vue.prototype.$adb = adb
+Vue.prototype.$ddb = ddb
+Vue.prototype.$ldb = ldb
 Vue.prototype.$ssdb = ssdb
 
 // Add the FontAwesome icons that we will use
@@ -89,13 +92,14 @@ library.add(faChevronUp)
 library.add(faChevronDown)
 library.add(faBars)
 library.add(faEllipsisV)
-library.add(faClock)
 library.add(faFolder)
 library.add(faGlobe)
 library.add(faTable)
 library.add(faKey)
 library.add(faInfoCircle)
 
+library.add(faClock)
+library.add(faFile)
 library.add(faWindowMinimize)
 library.add(faWindowMaximize)
 library.add(faWindowRestore)

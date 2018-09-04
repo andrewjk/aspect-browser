@@ -509,6 +509,10 @@ const mutations = {
             t.url = 'aspect://history'
             t.title = 'History'
             t.webview = null
+          } else if (url === 'aspect://downloads') {
+            t.url = 'aspect://downloads'
+            t.title = 'Downloads'
+            t.webview = null
           } else if (url === 'aspect://logins') {
             t.url = 'aspect://logins'
             t.title = 'Logins'
@@ -545,6 +549,10 @@ const mutations = {
           } else if (url === 'aspect://history') {
             t.url = 'aspect://history'
             t.title = 'History'
+            t.webview = null
+          } else if (url === 'aspect://downloads') {
+            t.url = 'aspect://downloads'
+            t.title = 'Downloads'
             t.webview = null
           } else if (url === 'aspect://logins') {
             t.url = 'aspect://logins'
@@ -969,59 +977,27 @@ const actions = {
     })
   },
   clearHistory ({ commit }, data) {
-    const dialog = create(ConfirmDialog)
-    dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
-      .then((result) => {
-        if (result) {
-          const db = data.db
-          const adb = data.adb
-          const personaId = data.personaId
-          db.remove({ personaId }, { multi: true }, (err, numReplaced) => {
-            if (err) {
-              alert('ERROR: ' + err)
-              return
-            }
-            // Also delete history activity
-            adb.remove({ personaId, isPreviousSession: true }, { multi: true }, (err, numRemoved) => {
-              if (err) {
-                alert('ERROR: ' + err)
-              } else {
-                const dialog = create(AlertDialog)
-                dialog({ content: 'Browsing history cleared.' }).transition()
-                  .catch((err) => {
-                    alert('ERROR: ' + err)
-                  })
-              }
-            })
-          })
-        }
-      })
-      .catch((err) => {
+    const db = data.db
+    const personaId = data.personaId
+    db.remove({ personaId }, { multi: true }, (err, numReplaced) => {
+      if (err) {
         alert('ERROR: ' + err)
-      })
+      }
+    })
   },
   clearAllHistory ({ commit }, data) {
-    const dialog = create(ConfirmDialog)
-    dialog({ content: 'Are you sure you want to clear the browsing history for all personas?' }).transition()
-      .then((result) => {
-        if (result) {
-          const db = data.db
-          db.remove({}, { multi: true }, (err, numReplaced) => {
-            if (err) {
-              alert('ERROR: ' + err)
-              return
-            }
-            const dialog = create(AlertDialog)
-            dialog({ content: 'Browsing history cleared.' }).transition()
-              .catch((err) => {
-                alert('ERROR: ' + err)
-              })
-          })
-        }
-      })
-      .catch((err) => {
+    const db = data.db
+    db.remove({}, { multi: true }, (err, numReplaced) => {
+      if (err) {
         alert('ERROR: ' + err)
-      })
+        return
+      }
+      const dialog = create(AlertDialog)
+      dialog({ content: 'Browsing history cleared.' }).transition()
+        .catch((err) => {
+          alert('ERROR: ' + err)
+        })
+    })
   },
   // ========
   // ACTIVITY
@@ -1095,6 +1071,23 @@ const actions = {
           resolve()
         }
       })
+    })
+  },
+  clearActivity ({ commit }, data) {
+    const db = data.db
+    const personaId = data.personaId
+    db.remove({ personaId, isPreviousSession: true }, { multi: true }, (err, numReplaced) => {
+      if (err) {
+        alert('ERROR: ' + err)
+      }
+    })
+  },
+  clearAllActivity ({ commit }, data) {
+    const db = data.db
+    db.remove({ isPreviousSession: true }, { multi: true }, (err, numReplaced) => {
+      if (err) {
+        alert('ERROR: ' + err)
+      }
     })
   },
   restoreSession ({ commit }, data) {

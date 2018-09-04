@@ -13,13 +13,13 @@
         <span>View {{ this.persona.name }} history</span>
       </div>
     </button>
-    <button class="options-menu-item" @click="clearHistory({ db: $hdb, adb: $adb, personaId: persona._id })" title="Clear the browsing history for this persona">
+    <button class="options-menu-item" @click="clearHistoryAndRelated" title="Clear the browsing history for this persona">
       <div class="options-menu-item-grid">
         <fa icon="trash" class="options-menu-icon"/>
         <span>Clear {{ this.persona.name }} history</span>
       </div>
     </button>
-    <button class="options-menu-item" @click="clearAllHistory({ db: $hdb, personaId: persona._id })" title="Clear the browsing history for all personas">
+    <button class="options-menu-item" @click="clearAllHistoryAndRelated" title="Clear the browsing history for all personas">
       <div class="options-menu-item-grid">
         <fa icon="trash" class="options-menu-icon"/>
         <span>Clear all history</span>
@@ -68,6 +68,7 @@
   import AlertDialog from './AlertDialog'
   import PromptDialog from './PromptDialog'
   import AboutDialog from './AboutDialog'
+  import ConfirmDialog from './ConfirmDialog'
 
   import Encrypter from '../../data/Encrypter'
 
@@ -89,6 +90,10 @@
         'editSettings',
         'clearHistory',
         'clearAllHistory',
+        'clearActivity',
+        'clearAllActivity',
+        'clearDownloads',
+        'clearAllDownloads',
         'restoreSession',
         'saveSession',
         'loadSession'
@@ -140,6 +145,34 @@
       showAboutDialog () {
         const dialog = create(AboutDialog)
         dialog({}).transition()
+          .catch((err) => {
+            alert('ERROR: ' + err)
+          })
+      },
+      clearHistoryAndRelated () {
+        const dialog = create(ConfirmDialog)
+        dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
+          .then((result) => {
+            if (result) {
+              this.clearHistory({ db: this.$hdb, personaId: this.persona._id })
+              this.clearActivity({ db: this.$adb, personaId: this.persona._id })
+              this.clearDownloads({ db: this.$ddb, personaId: this.persona._id })
+            }
+          })
+          .catch((err) => {
+            alert('ERROR: ' + err)
+          })
+      },
+      clearAllHistoryAndRelated () {
+        const dialog = create(ConfirmDialog)
+        dialog({ content: 'Are you sure you want to clear the browsing history for all personas?' }).transition()
+          .then((result) => {
+            if (result) {
+              this.clearAllHistory({ db: this.$hdb })
+              this.clearAllActivity({ db: this.$adb })
+              this.clearAllDownloads({ db: this.$ddb })
+            }
+          })
           .catch((err) => {
             alert('ERROR: ' + err)
           })

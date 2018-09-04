@@ -65,7 +65,8 @@
         'openNewTab',
         'closeTab',
         'reopenTab',
-        'showHistory'
+        'showHistory',
+        'showDownloads'
       ]),
       ...mapActions([
         'loadPersonas',
@@ -159,7 +160,7 @@
           }
           case 'ctrl+w': {
             this.closeTab()
-            const tab = this.getActiveTab()
+            const tab = this.getActiveTab
             this.removeFromActivity({ db: this.$adb, activityId: tab.activityId })
             break
           }
@@ -173,6 +174,11 @@
           }
           case 'ctrl+h': {
             this.showHistory()
+            break
+          }
+          case 'ctrl+d': {
+            const activePersona = this.getActivePersona
+            this.showDownloads({ activePersona })
             break
           }
         }
