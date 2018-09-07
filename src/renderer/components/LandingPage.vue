@@ -177,8 +177,8 @@
             break
           }
           case 'ctrl+d': {
-            const activePersona = this.getActivePersona
-            this.showDownloads({ activePersona })
+            const persona = this.getActivePersona
+            this.showDownloads({ persona })
             break
           }
         }

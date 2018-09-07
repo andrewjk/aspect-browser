@@ -1,12 +1,9 @@
 // NOTE: Copied from https://github.com/sindresorhus/electron-dl/blob/master/index.js to support multiple file downloads with progress
 
-'use strict'
-
-const path = require('path')
-const electron = require('electron')
-const unusedFilename = require('unused-filename')
-const pupa = require('pupa')
-const extName = require('ext-name')
+import path from 'path'
+import electron from 'electron'
+import unusedFilename from 'unused-filename'
+import extName from 'ext-name'
 
 const { app, shell } = electron
 
@@ -79,7 +76,7 @@ function registerListener (session, options, cb = () => {}) {
       }
 
       if (typeof options.onProgress === 'function') {
-        options.onProgress(progressDownloadItems())
+        options.onProgress({ localFile: item.getSavePath(), progress: item.getReceivedBytes() })
       }
     })
 
@@ -107,7 +104,7 @@ function registerListener (session, options, cb = () => {}) {
           options.onCancel(item)
         }
       } else if (state === 'interrupted') {
-        const message = pupa(errorMessage, { filename: item.getFilename() })
+        const message = errorMessage.replace('{filename}', item.getFilename())
         electron.dialog.showErrorBox(errorTitle, message)
         cb(new Error(message))
       } else if (state === 'completed') {
@@ -120,6 +117,10 @@ function registerListener (session, options, cb = () => {}) {
         }
 
         cb(null, item)
+
+        if (typeof options.onCompleted === 'function') {
+          options.onCompleted({ localFile: item.getSavePath() })
+        }
       }
     })
   }
@@ -127,12 +128,13 @@ function registerListener (session, options, cb = () => {}) {
   session.on('will-download', listener)
 }
 
-module.exports = (options = {}) => {
+export default (options = {}) => {
   app.on('session-created', session => {
     registerListener(session, options)
   })
 }
 
+/*
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
   options = Object.assign({}, options, { unregisterWhenDone: true })
 
@@ -146,3 +148,4 @@ module.exports.download = (win, url, options) => new Promise((resolve, reject) =
 
   win.webContents.downloadURL(url)
 })
+*/

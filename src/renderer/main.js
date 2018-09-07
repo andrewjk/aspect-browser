@@ -42,6 +42,9 @@ import {
   faGlobe,
   faTable,
   faKey,
+  faPlay,
+  faPause,
+  faFolderOpen,
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -96,6 +99,9 @@ library.add(faFolder)
 library.add(faGlobe)
 library.add(faTable)
 library.add(faKey)
+library.add(faPlay)
+library.add(faPause)
+library.add(faFolderOpen)
 library.add(faInfoCircle)
 
 library.add(faClock)

@@ -45,6 +45,13 @@
       </div>
     </button>
     <div class="options-menu-separator"></div>
+    <button class="options-menu-item" @click="showDownloads({ persona })" title="Show downloaded files for this persona">
+      <div class="options-menu-item-grid">
+        <fa :icon="['far', 'file']" class="options-menu-icon"/>
+        <span>View {{ this.persona.name }} downloads</span>
+      </div>
+    </button>
+    <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="maybeShowLogins" title="Show login details for this persona">
       <div class="options-menu-item-grid">
         <fa icon="key" class="options-menu-icon"/>
@@ -84,6 +91,7 @@
     methods: {
       ...mapMutations([
         'showHistory',
+        'showDownloads',
         'showLogins'
       ]),
       ...mapActions([
@@ -190,7 +198,7 @@
     position: absolute;
     right: 3px;
     top: 65px;
-    width: 200px;
+    width: 230px;
     padding: 4px 0;
   }
 
@@ -207,11 +215,10 @@
 
   .options-menu-item-grid {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 24px 1fr;
   }
 
   .options-menu-icon {
-    margin-right: 10px;
   }
 
   .options-menu-separator {

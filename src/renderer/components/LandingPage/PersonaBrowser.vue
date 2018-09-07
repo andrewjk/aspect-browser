@@ -6,31 +6,47 @@
         <address-bar :persona="item" class="persona-address-bar"></address-bar>
         <tab-page-list :persona="item" :show-welcome="personas.length === 1" class="persona-tab-page-list"></tab-page-list>
         <find-in-page v-show="showFindInPage" :persona="item" class="persona-find-in-page"></find-in-page>
+        <downloads-bar v-show="showDownloadsBar" :persona="item" class="persona-downloads-bar"></downloads-bar>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import electron from 'electron'
   import { mapState, mapGetters, mapMutations } from 'vuex'
 
   import TabList from './TabList'
   import AddressBar from './AddressBar'
   import TabPageList from './TabPageList'
   import FindInPage from './FindInPage'
+  import DownloadsBar from './DownloadsBar'
 
   export default {
-    components: { TabList, AddressBar, TabPageList, FindInPage },
+    components: { TabList, AddressBar, TabPageList, FindInPage, DownloadsBar },
     computed: {
       ...mapState({
         personas: state => state.Store.personas,
         settings: state => state.Settings.settings,
         showFindInPage: state => state.Store.showFindInPage,
-        focusFindInPage: state => state.Store.focusFindInPage
+        focusFindInPage: state => state.Store.focusFindInPage,
+        showDownloadsBar: state => state.Downloads.showDownloadsBar
       }),
       ...mapGetters([
         'getActivePersona'
       ])
+    },
+    mounted () {
+      electron.ipcRenderer.on('download-started', (event, data) => {
+        this.addDownload(data)
+        this.openDownloadsBar()
+      })
+      electron.ipcRenderer.on('download-progress', (event, data) => {
+        this.setDownloadDetails(data)
+      })
+      electron.ipcRenderer.on('download-completed', (event, data) => {
+        this.setDownloadDetails({ localFile: data.localFile, isCompleted: true })
+      })
     },
     updated () {
       if (this.focusFindInPage) {
@@ -41,7 +57,10 @@
     methods: {
       ...mapMutations([
         'getZIndex',
-        'unfocusFindInPage'
+        'unfocusFindInPage',
+        'addDownload',
+        'setDownloadDetails',
+        'openDownloadsBar'
       ]),
       getZIndex (index) {
         return this.personas[index].isActive ? 99 : -99

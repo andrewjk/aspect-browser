@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
+import registerDownloads from './electron-dl'
 
 /**
  * Set `__static` path to static files in production
@@ -36,8 +37,6 @@ function createWindow () {
   })
 }
 
-console.log(app.getPath('userData'))
-
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
@@ -49,6 +48,47 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
+  }
+})
+
+// Setup downloads management via electron-dl, using IPC to communicate to Vue components
+registerDownloads({
+  onStarted: (item) => {
+    // Properties from https://electronjs.org/docs/api/download-item
+    const data = {
+      filename: item.getSavePath().split('\\').pop().split('/').pop(),
+      serverFile: item.getURL(),
+      localFile: item.getSavePath(),
+      size: item.getTotalBytes(),
+      canResume: item.canResume()
+    }
+    mainWindow.send('download-started', data)
+
+    // const item = data
+    // item.on('updated', (event, state) => {
+    //   if (state === 'interrupted') {
+    //     console.log('Download is interrupted but can be resumed')
+    //   } else if (state === 'progressing') {
+    //     if (item.isPaused()) {
+    //       console.log('Download is paused')
+    //     } else {
+    //       console.log(`Received bytes: ${item.getReceivedBytes()}`)
+    //     }
+    //   }
+    // })
+    // item.once('done', (event, state) => {
+    //   if (state === 'completed') {
+    //     console.log('Download successfully')
+    //   } else {
+    //     console.log(`Download failed: ${state}`)
+    //   }
+    // })
+  },
+  onProgress: (item) => {
+    mainWindow.send('download-progress', item)
+  },
+  onCompleted: (item) => {
+    mainWindow.send('download-completed', item)
   }
 })
 

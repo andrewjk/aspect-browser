@@ -72,7 +72,8 @@ const mutations = {
             forwardHistory: []
           }
         ],
-        closedTabs: []
+        closedTabs: [],
+        downloads: []
       }
     })
   },
@@ -120,6 +121,7 @@ const mutations = {
       }
     ]
     persona.closedTabs = []
+    persona.downloads = []
   },
   nextPersona (state) {
     let index
@@ -646,6 +648,41 @@ const mutations = {
   },
   unfocusFindInPage (state, data) {
     state.focusFindInPage = false
+  },
+  // =========
+  // DOWNLOADS
+  // =========
+  addDownload (state, data) {
+    const activePersona = state.personas.find((p) => {
+      return p.isActive
+    })
+    if (activePersona) {
+      const downloads = activePersona.downloads
+      downloads.push({
+        _id: uuid(),
+        filename: data.filename,
+        serverFile: data.serverFile,
+        localFile: data.localFile,
+        progress: 0,
+        size: data.size,
+        isCompleted: false
+      })
+    }
+  },
+  setDownloadDetails (state, data) {
+    const localFile = data.localFile
+    let download
+    state.personas.forEach((p) => {
+      p.downloads.forEach((d) => {
+        if (d.localFile === localFile) {
+          download = d
+        }
+      })
+    })
+    if (download) {
+      if (data.progress !== undefined) download.progress = data.progress
+      if (data.isCompleted !== undefined) download.isCompleted = data.isCompleted
+    }
   }
 }
 

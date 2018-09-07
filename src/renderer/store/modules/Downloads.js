@@ -5,11 +5,15 @@ import { create } from 'vue-modal-dialogs'
 import AlertDialog from '../../components/LandingPage/AlertDialog'
 import ConfirmDialog from '../../components/LandingPage/ConfirmDialog'
 
+const state = {
+  showDownloadsBar: false
+}
+
 const mutations = {
   showDownloads (state, data) {
-    const activePersona = data.activePersona
-    if (activePersona) {
-      const tabs = activePersona.tabs
+    const persona = data.persona
+    if (persona) {
+      const tabs = persona.tabs
       tabs.push({
         _id: uuid(),
         url: 'aspect://downloads',
@@ -27,6 +31,12 @@ const mutations = {
         t.isActive = (i === newIndex)
       })
     }
+  },
+  openDownloadsBar (state, data) {
+    state.showDownloadsBar = true
+  },
+  closeDownloadsBar (state, data) {
+    state.showDownloadsBar = false
   }
 }
 
@@ -134,6 +144,7 @@ const actions = {
 }
 
 export default {
+  state,
   mutations,
   actions
 }
