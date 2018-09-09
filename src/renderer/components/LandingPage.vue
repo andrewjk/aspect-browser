@@ -66,7 +66,8 @@
         'closeTab',
         'reopenTab',
         'showHistory',
-        'showDownloads'
+        'showDownloads',
+        'openFindInPage'
       ]),
       ...mapActions([
         'loadPersonas',
