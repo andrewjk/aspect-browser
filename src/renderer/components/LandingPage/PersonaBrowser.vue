@@ -14,7 +14,7 @@
 
 <script>
   import electron from 'electron'
-  import { mapState, mapGetters, mapMutations } from 'vuex'
+  import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
   import TabList from './TabList'
   import AddressBar from './AddressBar'
@@ -38,14 +38,27 @@
     },
     mounted () {
       electron.ipcRenderer.on('download-started', (event, data) => {
-        this.addDownload(data)
-        this.openDownloadsBar()
+        const activePersona = this.getActivePersona
+        if (activePersona) {
+          this.saveToDownloads(Object.assign({ db: this.$ddb, personaId: activePersona._id }, data))
+          this.addDownload(data)
+          this.openDownloadsBar()
+        }
       })
       electron.ipcRenderer.on('download-progress', (event, data) => {
         this.setDownloadDetails(data)
       })
       electron.ipcRenderer.on('download-completed', (event, data) => {
         this.setDownloadDetails({ localFile: data.localFile, isCompleted: true })
+      })
+      electron.ipcRenderer.on('download-paused', (event, data) => {
+        this.setDownloadDetails({ localFile: data.localFile, isPaused: true })
+      })
+      electron.ipcRenderer.on('download-resumed', (event, data) => {
+        this.setDownloadDetails({ localFile: data.localFile, isPaused: false })
+      })
+      electron.ipcRenderer.on('download-cancelled', (event, data) => {
+        this.setDownloadDetails({ localFile: data.localFile, isPaused: false, isCompleted: true, isCancelled: true })
       })
     },
     updated () {
@@ -61,6 +74,9 @@
         'addDownload',
         'setDownloadDetails',
         'openDownloadsBar'
+      ]),
+      ...mapActions([
+        'saveToDownloads'
       ]),
       getZIndex (index) {
         return this.personas[index].isActive ? 99 : -99

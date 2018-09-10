@@ -665,7 +665,9 @@ const mutations = {
         localFile: data.localFile,
         progress: 0,
         size: data.size,
-        isCompleted: false
+        isCompleted: false,
+        isPaused: false,
+        isCancelled: false
       })
     }
   },
@@ -682,6 +684,8 @@ const mutations = {
     if (download) {
       if (data.progress !== undefined) download.progress = data.progress
       if (data.isCompleted !== undefined) download.isCompleted = data.isCompleted
+      if (data.isPaused !== undefined) download.isPaused = data.isPaused
+      if (data.isCancelled !== undefined) download.isCancelled = data.isCancelled
     }
   }
 }

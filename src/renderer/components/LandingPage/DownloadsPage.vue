@@ -16,8 +16,8 @@
       <label class="downloads-select-all">
         <input type="checkbox" :checked="selectAll" @change="toggleAll"> {{ showSelectAll ? 'Select all' : 'Select none' }}
       </label>
-      <button v-if="showDeleteButton" class="downloads-delete-button delete-link" @click.stop="deleteSelectedItems" :title="'Delete the selected downloads items'">
-        {{ `Delete the ${selectedCount} selected downloads ${selectedCount === 1 ? 'item' : 'items'}` }}
+      <button v-if="showDeleteButton" class="downloads-delete-button delete-link" @click.stop="deleteSelectedItems" :title="'Delete the selected downloaded'">
+        {{ `Delete the ${selectedCount} selected ${selectedCount === 1 ? 'download' : 'downloads'}` }}
       </button>
     </div>
     <div class="downloads-list">
@@ -30,9 +30,12 @@
           </label>
           <button class="downloads-button" @click="openDownloads(item, $event)">
             <div class="downloads-button-grid">
-              <img class="downloads-icon" :src="item.icon">
-              <div class="downloads-title" :title="item.title">{{ item.title }}</div>
-              <div class="downloads-url" :title="item.url">{{ item.url }}</div>
+              <div class="downloads-filename" :title="item.filename">{{ item.filename }}</div>
+              <div class="downloads-size">{{ formatSize(item) }}</div>
+              <div class="downloads-host" :title="item.serverFile">{{ formatHost(item) }}</div>
+              <button class="open-folder-button" @click="openFolder(item)" title="Show file in folder">
+                <fa icon="folder-open"/>
+              </button>
             </div>
           </button>
         </div>
@@ -43,8 +46,11 @@
 
 <script>
   import { mapMutations, mapActions } from 'vuex'
+  import { shell } from 'electron'
 
+  import url from 'url'
   import dateformat from 'dateformat'
+  import filesize from 'filesize'
 
   export default {
     props: {
@@ -88,7 +94,7 @@
     },
     updated () {
       if (this.focusSearchText) {
-        // Focus the search box when the downloads items have been loaded
+        // Focus the search box when the downloaded items have been loaded
         this.focusSearchText = false
         const box = document.getElementById('downloads-search-text-' + this.persona._id)
         if (box) box.focus()
@@ -99,7 +105,7 @@
         'setTabDetails',
         'openInTab',
         'editDownloads',
-        'addToDownloads'
+        'addToHistory'
       ]),
       ...mapActions([
         'loadDownloads',
@@ -132,7 +138,7 @@
         })
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: downloads.url })
-        this.addToDownloads({ tab: activeTab, url: 'aspect://downloads', title: 'Downloads' })
+        this.addToHistory({ tab: activeTab, url: 'aspect://downloads', title: 'Downloads' })
       },
       areDatesEqual (d1, d2) {
         if (!d1.getFullYear) console.log(d1)
@@ -153,6 +159,12 @@
       },
       formatTime (time) {
         return dateformat(time, 'shortTime')
+      },
+      formatSize (item) {
+        return filesize(item.size)
+      },
+      formatHost (item) {
+        return url.parse(item.serverFile).hostname
       },
       toggleAll () {
         this.checkAll(!this.selectAll)
@@ -181,6 +193,12 @@
         }).catch((err) => {
           alert('ERROR: ' + err)
         })
+      },
+      openDownload (item) {
+        shell.openItem(item.localFile)
+      },
+      openFolder (item) {
+        shell.showItemInFolder(item.localFile)
       }
     }
   }
@@ -267,7 +285,7 @@
 
   .downloads-button-grid {
     display: grid;
-    grid-template-columns: auto 1fr 250px;
+    grid-template-columns: 1fr auto 1fr auto;
     grid-column-gap: 20px;
     align-items: center;
   }
@@ -278,17 +296,21 @@
     border-radius: 2px;
   }
 
-  .downloads-title {
+  .downloads-filename,
+  .downloads-host {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .downloads-url {
-    color: #888;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .open-folder-button {
+    border-radius: 2px;
+    padding: 4px;
+  }
+
+  .open-folder-button:hover,
+  .open-folder-button:focus {
+    background-color: #ccc;
   }
 
 </style>

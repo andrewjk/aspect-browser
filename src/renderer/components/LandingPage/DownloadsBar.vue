@@ -1,7 +1,7 @@
 <template>
   <div class="downloads-bar-wrapper">
     <div class="downloads-bar">
-      <div v-for="(item) in downloads" :key="item.filename" class="download" :title="downloadTitle(item)">
+      <button v-for="(item) in downloads" :key="item.filename" class="download" :title="downloadTitle(item)" @click="downloadClicked(item)">
         <template v-if="item.isDownloading">
           <fa icon="spinner" class="download-icon" spin/>
         </template>
@@ -9,22 +9,19 @@
           <img class="download-icon" :src="item.icon">
         </template>
         <span class="download-title">{{ item.filename }}</span>
-        <button v-if="!item.isCompleted" class="download-button" @click="pauseDownload(item)" title="Pause download">
-          <fa icon="pause"/>
-        </button>
         <button v-if="!item.isCompleted" class="download-button" @click="cancelDownload(item)" title="Cancel download">
           <fa icon="times"/>
         </button>
-        <button v-if="item.isCompleted" class="download-button" @click="openDownload(item)" title="Open file">
-          <fa icon="play"/>
-        </button>
-        <button v-if="item.isCompleted" class="download-button" @click="openFolder(item)" title="Show file in folder">
+        <button v-if="item.isCompleted && !item.isCancelled" class="download-button" @click="openFolder(item)" title="Show file in folder">
           <fa icon="folder-open"/>
         </button>
-        <div class="download-progress-wrapper">
+        <div v-if="item.isCompleted && item.isCancelled" class="download-button" title="Cancelled">
+          <fa icon="times"/>
+        </div>
+        <div v-if="!item.isCompleted" class="download-progress-wrapper">
           <div class="download-progress-bar" :style="progressStyle(item)" :title="item.progress"></div>
         </div>
-      </div>
+      </button>
       <div class="downloads-bar-spacer">
       </div>
       <button class="downloads-bar-button" title="Show all downloads in the downloads page" @click="showDownloads({ persona })">
@@ -39,7 +36,7 @@
 
 <script>
   import { mapMutations } from 'vuex'
-  import { shell } from 'electron'
+  import { shell, ipcRenderer } from 'electron'
   import filesize from 'filesize'
 
   export default {
@@ -60,13 +57,35 @@
         return { width: (item.progress / item.size * 100) + '%' }
       },
       downloadTitle (item) {
-        return item.isCompleted ? `Completed: ${item.filename} (${filesize(item.size)})` : `Downloading: ${+(item.progress / item.size * 100).toFixed(2)}% of ${filesize(item.size)}`
+        if (item.isCompleted) {
+          return `Completed: ${item.filename} (${filesize(item.size)}). Click to open the file`
+        } else {
+          if (item.isPaused) {
+            return `Paused: ${+(item.progress / item.size * 100).toFixed(2)}% of ${filesize(item.size)}. Click to resume the download`
+          } else {
+            return `Downloading: ${+(item.progress / item.size * 100).toFixed(2)}% of ${filesize(item.size)}. Click to pause the download`
+          }
+        }
+      },
+      downloadClicked (item) {
+        if (item.isCompleted) {
+          this.openDownload(item)
+        } else {
+          if (item.isPaused) {
+            this.resumeDownload(item)
+          } else {
+            this.pauseDownload(item)
+          }
+        }
       },
       pauseDownload (item) {
-
+        ipcRenderer.send('pause-download', { localFile: item.localFile })
+      },
+      resumeDownload (item) {
+        ipcRenderer.send('resume-download', { localFile: item.localFile })
       },
       cancelDownload (item) {
-
+        ipcRenderer.send('cancel-download', { localFile: item.localFile })
       },
       openDownload (item) {
         shell.openItem(item.localFile)
@@ -81,7 +100,7 @@
 <style scoped>
 
   .downloads-bar-wrapper {
-    background-color: #ccc;
+    background-color: #eee;
     border-top: 1px solid #ddd;
     font-size: 14px;
     padding: 5px;
@@ -95,7 +114,7 @@
   }
 
   .download {
-    background-color: #eee;
+    background-color: #ccc;
     border-radius: 2px;
     display: inline-flex;
     flex-wrap: wrap;
@@ -106,6 +125,12 @@
     line-height: 18px;
     vertical-align: top;
     text-align: left;
+    cursor: pointer;
+  }
+
+  .download:hover,
+  .download:focus {
+    background-color: #ddd;
   }
 
   .download-icon {
@@ -159,7 +184,7 @@
 
   .downloads-bar-button:hover,
   .downloads-bar-button:focus {
-    background-color: #eee;
+    background-color: #ddd;
   }
 
 </style>

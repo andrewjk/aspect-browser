@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import registerDownloads from './electron-dl'
 
 /**
@@ -52,6 +52,7 @@ app.on('activate', () => {
 })
 
 // Setup downloads management via electron-dl, using IPC to communicate to Vue components
+const downloads = []
 registerDownloads({
   onStarted: (item) => {
     // Properties from https://electronjs.org/docs/api/download-item
@@ -63,26 +64,7 @@ registerDownloads({
       canResume: item.canResume()
     }
     mainWindow.send('download-started', data)
-
-    // const item = data
-    // item.on('updated', (event, state) => {
-    //   if (state === 'interrupted') {
-    //     console.log('Download is interrupted but can be resumed')
-    //   } else if (state === 'progressing') {
-    //     if (item.isPaused()) {
-    //       console.log('Download is paused')
-    //     } else {
-    //       console.log(`Received bytes: ${item.getReceivedBytes()}`)
-    //     }
-    //   }
-    // })
-    // item.once('done', (event, state) => {
-    //   if (state === 'completed') {
-    //     console.log('Download successfully')
-    //   } else {
-    //     console.log(`Download failed: ${state}`)
-    //   }
-    // })
+    downloads.push({ localFile: item.getSavePath(), item })
   },
   onProgress: (item) => {
     mainWindow.send('download-progress', item)
@@ -90,6 +72,28 @@ registerDownloads({
   onCompleted: (item) => {
     mainWindow.send('download-completed', item)
   }
+})
+
+ipcMain.on('pause-download', (event, data) => {
+  const download = downloads.find((item) => {
+    return item.localFile === data.localFile
+  })
+  download.item.pause()
+  mainWindow.send('download-paused', data)
+})
+ipcMain.on('resume-download', (event, data) => {
+  const download = downloads.find((item) => {
+    return item.localFile === data.localFile
+  })
+  download.item.resume()
+  mainWindow.send('download-resumed', data)
+})
+ipcMain.on('cancel-download', (event, data) => {
+  const download = downloads.find((item) => {
+    return item.localFile === data.localFile
+  })
+  download.item.cancel()
+  mainWindow.send('download-cancelled', data)
 })
 
 /**
