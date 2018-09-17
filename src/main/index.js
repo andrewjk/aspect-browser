@@ -2,6 +2,7 @@
 
 import { app, BrowserWindow, ipcMain } from 'electron'
 import registerDownloads from './electron-dl'
+import registerContextMenu from 'electron-context-menu'
 
 /**
  * Set `__static` path to static files in production
@@ -95,6 +96,9 @@ ipcMain.on('cancel-download', (event, data) => {
   download.item.cancel()
   mainWindow.send('download-cancelled', data)
 })
+
+// Set up the default context menu using electron-context-menu
+registerContextMenu({})
 
 /**
  * Auto Updater

@@ -11,6 +11,8 @@
   import electron from 'electron'
   import path from 'path'
   import errors from 'chrome-network-errors'
+  import registerContextMenu from 'electron-context-menu'
+  import { download } from 'electron-dl'
 
   export default {
     props: {
@@ -41,8 +43,6 @@
       webview.focus()
 
       this.setupWebviewListeners(webview)
-
-      // TODO: Add a context menu to the webview
     },
     updated () {
       // Focus the webview when the URL has changed e.g. when the user has clicked a link or typed something
@@ -208,6 +208,29 @@
           const javascript = `document.__personaId = "${personaId}"`
           webview.executeJavaScript(javascript, false, () => {
             event.sender.send('persona-id-available')
+          })
+        })
+
+        // Add a context menu to the webview (after it's ready so that the context-menu event gets intercepted correctly)
+        webview.addEventListener('dom-ready', () => {
+          registerContextMenu({
+            window: webview,
+            append: (params, browserWindow) => [{
+              id: 'saveAs',
+              label: 'Save Link As',
+              click (item, win) {
+                // TODO: Get the actual file name and mime type, rather than the link location (e.g. it might actually be index.html)
+                const defaultFolder = electron.remote.app.getPath('downloads')
+                const defaultFile = path.basename(params.linkURL)
+                const defaultPath = path.join(defaultFolder, defaultFile)
+                electron.remote.dialog.showSaveDialog(null, { defaultPath }, (file) => {
+                  const directory = path.dirname(file)
+                  const filename = path.basename(file)
+                  download(win, params.linkURL, { directory, filename })
+                })
+              },
+              visible: params.linkURL && params.mediaType === 'none'
+            }]
           })
         })
       }
