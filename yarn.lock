@@ -1839,6 +1839,10 @@ chownr@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.0.1.tgz#e2a75042a9551908bebd25b8523d5f9769d79181"
 
+chrome-network-errors@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/chrome-network-errors/-/chrome-network-errors-1.0.0.tgz#c04c7c6a259cd8c503c63ce87025adb08b39104a"
+
 chromium-pickle-js@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/chromium-pickle-js/-/chromium-pickle-js-0.2.0.tgz#04a106672c18b085ab774d983dfa3ea138f22205"

@@ -62,6 +62,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.1",
     "@octokit/rest": "^15.10.0",
     "axios": "^0.18.0",
+    "chrome-network-errors": "^1.0.0",
     "dateformat": "^3.0.3",
     "ext-name": "^5.0.0",
     "filesize": "^3.6.1",

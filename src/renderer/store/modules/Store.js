@@ -465,6 +465,8 @@ const mutations = {
             if (data.title !== undefined) t.title = data.title
             if (data.icon !== undefined) t.icon = data.icon
             if (data.isLoading !== undefined) t.isLoading = data.isLoading
+            if (data.errorCode !== undefined) t.errorCode = data.errorCode
+            if (data.errorDescription !== undefined) t.errorDescription = data.errorDescription
           }
         })
         p.hasOpenTab = p.tabs.some((tab) => {
@@ -519,6 +521,10 @@ const mutations = {
             t.url = 'aspect://logins'
             t.title = 'Logins'
             t.webview = null
+          } else if (url === 'aspect://error') {
+            t.url = 'aspect://error'
+            t.title = 'Error'
+            t.webview = null
           } else if (t.webview) {
             t.webview.loadURL(url)
           } else {
@@ -559,6 +565,10 @@ const mutations = {
           } else if (url === 'aspect://logins') {
             t.url = 'aspect://logins'
             t.title = 'Logins'
+            t.webview = null
+          } else if (url === 'aspect://error') {
+            t.url = 'aspect://error'
+            t.title = 'Error'
             t.webview = null
           } else if (t.webview) {
             t.webview.loadURL(url)

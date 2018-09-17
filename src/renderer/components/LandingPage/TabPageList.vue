@@ -13,6 +13,9 @@
         <template v-else-if="item.url === 'aspect://logins'">
           <logins-page :persona="persona" :tabs="tabs"></logins-page>
         </template>
+        <template v-else-if="item.url === 'aspect://error'">
+          <error-page :persona="persona" :tabs="tabs"></error-page>
+        </template>
         <template v-else>
           <tab-page :persona="persona" :tab="item"></tab-page>
         </template>
@@ -31,13 +34,14 @@
   import HistoryPage from './HistoryPage'
   import DownloadsPage from './DownloadsPage'
   import LoginsPage from './LoginsPage'
+  import ErrorPage from './ErrorPage'
   import TabPage from './TabPage'
 
   import electron from 'electron'
   import Encrypter from '../../data/Encrypter'
 
   export default {
-    components: { HomePage, HistoryPage, DownloadsPage, LoginsPage, TabPage },
+    components: { HomePage, HistoryPage, DownloadsPage, LoginsPage, ErrorPage, TabPage },
     props: {
       persona: null,
       showWelcome: false
@@ -68,9 +72,7 @@
       setupLoginManager () {
         // Set up login management for forms with password fields
         const personaId = this.persona._id
-        // console.log('setting up the listeners for ' + personaId)
         electron.remote.ipcMain.on('form-found-with-password-' + personaId, (event, data) => {
-          // console.log('form found with password for ' + personaId)
           // Is the login manager enabled?
           if (this.settings.enableLoginManager) {
             // Load the existing username/password

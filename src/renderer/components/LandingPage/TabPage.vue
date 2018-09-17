@@ -10,6 +10,7 @@
 
   import electron from 'electron'
   import path from 'path'
+  import errors from 'chrome-network-errors'
 
   export default {
     props: {
@@ -111,10 +112,17 @@
         }
         this.historyUrl = this.tab.url
       },
-      loadFailed () {
-        // console.log('load failed: ' + this.tab.webview.getURL())
-        // TODO: What should I actually be doing here?
-        this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: false })
+      loadFailed (e) {
+        this.setTabDetails({
+          persona: this.persona,
+          tab: this.tab,
+          isLoading: false,
+          url: 'aspect://error',
+          title: 'Error',
+          errorCode: e.errorCode,
+          errorDescription: errors[e.errorCode],
+          webview: null
+        })
       },
       pageTitleUpdated (e) {
         this.setTabDetails({ persona: this.persona, tab: this.tab, title: e.title })
