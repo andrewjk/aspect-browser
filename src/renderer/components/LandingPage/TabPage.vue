@@ -43,6 +43,8 @@
       webview.focus()
 
       this.setupWebviewListeners(webview)
+
+      this.checkSuspensionTimers()
     },
     updated () {
       // Focus the webview when the URL has changed e.g. when the user has clicked a link or typed something
@@ -52,14 +54,16 @@
         webview.focus()
         this.previousUrl = this.tab.url
       }
+
+      this.checkSuspensionTimers()
     },
     methods: {
       ...mapMutations([
         'setTabDetails',
-        'openInTab',
         'addToHistory'
       ]),
       ...mapActions([
+        'openInTab',
         'saveToHistory',
         'saveToActivity',
         'updateActivity'
@@ -171,6 +175,28 @@
       didNavigateInPage () {
         // TODO:
         // console.log('did navigate in page')
+      },
+      checkSuspensionTimers () {
+        // // TODO: This should be in the store...
+        // // Check whether the tab's inactivity timer should be reset
+        // // Is it cool to have a bunch of timers being restarted constantly?
+        // console.log('checking the timers')
+        // if (this.tab.isActive) {
+        //   if (this.tab.isSuspended) {
+        //     console.log('unsuspending the tab: ' + this.tab.url)
+        //     this.setTabDetails({ persona: this.persona, tab: this.tab, isSuspended: false })
+        //   }
+        //   if (this.tab.timeout) {
+        //     console.log('resetting the timeout')
+        //     clearTimeout(this.tab.timeout)
+        //   }
+        //   this.tab.timeout = setTimeout(() => {
+        //     if (!this.tab.isActive) {
+        //       console.log('suspending the tab: ' + this.tab.url)
+        //       this.setTabDetails({ persona: this.persona, tab: this.tab, isSuspended: true })
+        //     }
+        //   }, 1000)
+        // }
       },
       newWindow (e) {
         this.openInTab({ url: e.url, background: e.disposition === 'background-tab' })

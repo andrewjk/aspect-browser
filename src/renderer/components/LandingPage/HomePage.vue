@@ -77,10 +77,10 @@
     methods: {
       ...mapMutations([
         'setTabDetails',
-        'openInTab',
         'addToHistory'
       ]),
       ...mapActions([
+        'openInTab',
         'moveBookmarkUpAndSave',
         'moveBookmarkDownAndSave',
         'editBookmark',

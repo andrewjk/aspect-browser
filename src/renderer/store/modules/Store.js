@@ -68,6 +68,7 @@ const mutations = {
             icon: null,
             isActive: true,
             isLoading: false,
+            isSuspended: false,
             backHistory: [],
             forwardHistory: []
           }
@@ -85,23 +86,13 @@ const mutations = {
       p.isActive = (i === index)
     })
   },
-  setActiveTabIndex (state, index) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      const tabs = activePersona.tabs
-      if (index < 0 || index >= tabs.length) {
-        return
-      }
-      tabs.forEach((t, i) => {
-        t.isActive = (i === index)
-      })
-      state.showFindInPage = false
-    }
-  },
   sortPersonas (state) {
     state.personas = state.personas.sort(sorter)
+  },
+  setHasOpenTab (state, persona) {
+    persona.hasOpenTab = persona.tabs.some((tab) => {
+      return tab.url
+    })
   },
   addHomeTab (state, persona) {
     persona.isActive = false
@@ -116,6 +107,7 @@ const mutations = {
         icon: null,
         isActive: true,
         isLoading: false,
+        isSuspended: false,
         backHistory: [],
         forwardHistory: []
       }
@@ -147,160 +139,6 @@ const mutations = {
       p.isActive = (i === newIndex)
     })
   },
-  nextTab (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      const tabs = activePersona.tabs
-      let index
-      for (let i = 0; i < tabs.length; i++) {
-        if (tabs[i].isActive) {
-          index = i
-          break
-        }
-      }
-      const newIndex = index < tabs.length - 1 ? index + 1 : 0
-      tabs.forEach((t, i) => {
-        t.isActive = (i === newIndex)
-      })
-    }
-  },
-  previousTab (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      const tabs = activePersona.tabs
-      let index
-      for (let i = 0; i < tabs.length; i++) {
-        if (tabs[i].isActive) {
-          index = i
-          break
-        }
-      }
-      const newIndex = index > 0 ? index - 1 : tabs.length - 1
-      tabs.forEach((t, i) => {
-        t.isActive = (i === newIndex)
-      })
-    }
-  },
-  closeTab (state, index) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      if (index === undefined) {
-        for (let i = 0; i < activePersona.tabs.length; i++) {
-          if (activePersona.tabs[i].isActive) {
-            index = i
-            break
-          }
-        }
-      }
-      const closingTab = activePersona.tabs[index]
-      closingTab.index = index
-      activePersona.closedTabs.push(closingTab)
-      while (activePersona.closedTabs.length > 20) {
-        activePersona.closedTabs.splice(0, 1)
-      }
-      if (activePersona.tabs.length > 1) {
-        activePersona.tabs.splice(index, 1)
-        const newIndex = Math.min(index, activePersona.tabs.length - 1)
-        activePersona.tabs.forEach((tab, i) => {
-          tab.isActive = (i === newIndex)
-        })
-      } else {
-        // HACK: Don't feel great about duplicating this:
-        closingTab.url = 'aspect://home'
-        closingTab.addressText = null
-        closingTab.title = 'Home'
-        closingTab.icon = null
-        closingTab.isActive = true
-        closingTab.isLoading = false
-        closingTab.backHistory = []
-        closingTab.forwardHistory = []
-        closingTab.webview = null
-        state.showFindInPage = false
-      }
-      activePersona.hasOpenTab = activePersona.tabs.some((tab) => {
-        return tab.url
-      })
-      // TODO: Update the tab indexes
-    }
-  },
-  reopenTab (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      if (activePersona.closedTabs && activePersona.closedTabs.length) {
-        const closedTab = activePersona.closedTabs.pop()
-        const newIndex = Math.min(closedTab.index, activePersona.tabs.length)
-        activePersona.tabs.splice(newIndex, 0, closedTab)
-        // TODO: Need to reorganise the other tab indexes
-        closedTab.index = newIndex
-        activePersona.tabs.forEach((t, i) => {
-          t.isActive = (i === newIndex)
-        })
-      }
-    }
-  },
-  openNewTab (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      const tabs = activePersona.tabs
-      tabs.push({
-        _id: uuid(),
-        url: 'aspect://home',
-        addressText: null,
-        title: 'Home',
-        index: tabs.length,
-        icon: null,
-        isActive: true,
-        isLoading: false,
-        backHistory: [],
-        forwardHistory: []
-      })
-      const newIndex = tabs.length - 1
-      tabs.forEach((t, i) => {
-        t.isActive = (i === newIndex)
-      })
-    }
-  },
-  openInTab (state, data) {
-    const url = data.url
-    const background = data.background
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      const tabs = activePersona.tabs
-      tabs.push({
-        _id: uuid(),
-        url: url,
-        addressText: url,
-        title: url.replace(/http[s]*:\/\/[www.]*/, ''),
-        index: tabs.length,
-        icon: null,
-        isActive: false,
-        isLoading: false,
-        backHistory: [],
-        forwardHistory: []
-      })
-      if (!background) {
-        const newIndex = tabs.length - 1
-        tabs.forEach((t, i) => {
-          t.isActive = (i === newIndex)
-        })
-      }
-      activePersona.hasOpenTab = tabs.some((tab) => {
-        return tab.url
-      })
-    }
-  },
   openInPersona (state, data) {
     const url = data.url
     const personaId = data.personaId
@@ -318,6 +156,7 @@ const mutations = {
         icon: null,
         isActive: false,
         isLoading: false,
+        isSuspended: false,
         backHistory: [],
         forwardHistory: []
       })
@@ -464,7 +303,11 @@ const mutations = {
             if (data.addressText !== undefined) t.addressText = data.addressText
             if (data.title !== undefined) t.title = data.title
             if (data.icon !== undefined) t.icon = data.icon
+            if (data.index !== undefined) t.index = data.index
+            if (data.isActive !== undefined) t.isActive = data.isActive
             if (data.isLoading !== undefined) t.isLoading = data.isLoading
+            if (data.isSuspended !== undefined) t.isSuspended = data.isSuspended
+            if (data.suspensionTimer !== undefined) t.suspensionTimer = data.suspensionTimer
             if (data.errorCode !== undefined) t.errorCode = data.errorCode
             if (data.errorDescription !== undefined) t.errorDescription = data.errorDescription
           }
@@ -474,6 +317,41 @@ const mutations = {
         })
       }
     })
+  },
+  addTab (state, data) {
+    const persona = data.persona
+    persona.tabs.push({
+      _id: uuid(),
+      url: data.url !== undefined ? data.url : 'aspect://home',
+      addressText: data.addressText !== undefined ? data.addressText : null,
+      title: data.title !== undefined ? data.title : 'Home',
+      icon: data.icon !== undefined ? data.icon : null,
+      index: data.index !== undefined ? data.index : persona.tabs.length,
+      isActive: data.isActive !== undefined ? data.isActive : false,
+      isLoading: data.isLoading !== undefined ? data.isLoading : false,
+      isSuspended: data.isSuspended !== undefined ? data.isSuspended : false,
+      suspensionTimer: data.suspensionTimer !== undefined ? data.suspensionTimer : null,
+      backHistory: data.backHistory !== undefined ? data.backHistory : [],
+      forwardHistory: data.forwardHistory !== undefined ? data.forwardHistory : []
+    })
+  },
+  removeTab (state, data) {
+    const persona = data.persona
+    const tab = data.tab
+    const index = data.index
+    persona.closedTabs.push(tab)
+    while (persona.closedTabs.length > 20) {
+      persona.closedTabs.splice(0, 1)
+    }
+    persona.tabs.splice(index, 1)
+  },
+  reopenClosedTab (state, data) {
+    const persona = data.persona
+    const index = data.index
+    const tab = persona.closedTabs.pop()
+    persona.tabs.splice(index, 0, tab)
+    // TODO: Need to reorganise the other tab indexes
+    tab.index = index
   },
   // ========
   // HISTORY
@@ -621,30 +499,6 @@ const mutations = {
     tab.addressText = null
     tab.title = 'Home'
     tab.webview = null
-  },
-  showHistory (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      const tabs = activePersona.tabs
-      tabs.push({
-        _id: uuid(),
-        url: 'aspect://history',
-        addressText: null,
-        title: 'History',
-        index: tabs.length,
-        icon: null,
-        isActive: true,
-        isLoading: false,
-        backHistory: [],
-        forwardHistory: []
-      })
-      const newIndex = tabs.length - 1
-      tabs.forEach((t, i) => {
-        t.isActive = (i === newIndex)
-      })
-    }
   },
   // ====
   // FIND
@@ -889,6 +743,142 @@ const actions = {
       })
     })
   },
+  // ====
+  // TABS
+  // ====
+  setActiveTabIndexInPersona ({ commit }, data) {
+    const persona = data.persona
+    const index = data.index
+    const tabs = persona.tabs
+    if (index < 0 || index >= tabs.length) {
+      return
+    }
+    // 15 seconds in development, 15 minutes in production
+    const timeUntilSuspension = process.env.NODE_ENV === 'development' ? 15 * 1000 : 15 * 60 * 1000
+    tabs.forEach((tab, i) => {
+      if (tab.isActive && i !== index) {
+        // The tab becoming inactive needs a timer to set it to inactive
+        console.log('adding timer to inactive tab: ' + tab.url)
+        if (tab.suspensionTimer) {
+          clearTimeout(tab.suspensionTimer)
+        }
+        const suspensionTimer = setTimeout(() => {
+          console.log('suspending tab: ' + tab.url)
+          commit('setTabDetails', { persona, tab, isSuspended: true, webview: null })
+        }, timeUntilSuspension)
+        commit('setTabDetails', { persona, tab, suspensionTimer })
+      } else if (!tab.isActive && i === index) {
+        // The tab becoming active needs its timer reset and its URL set back to what it was, if necessary
+        console.log('resuming tab: ' + tab.url)
+        if (tab.suspensionTimer) {
+          clearTimeout(tab.suspensionTimer)
+        }
+        commit('setTabDetails', { persona, tab, isSuspended: false, suspensionTimer: null })
+      } else if (!tab.isActive && !tab.suspensionTimer) {
+        // Background tabs need timers straight away
+        const suspensionTimer = setTimeout(() => {
+          console.log('suspending tab: ' + tab.url)
+          commit('setTabDetails', { persona, tab, isSuspended: true, webview: null })
+        }, timeUntilSuspension)
+        commit('setTabDetails', { persona, tab, suspensionTimer })
+      }
+      commit('setTabDetails', { persona, tab, isActive: (i === index) })
+    })
+    commit('closeFindInPage')
+  },
+  setActiveTabIndex ({ getters, dispatch }, index) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+    }
+  },
+  nextTab ({ getters, dispatch }) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      const tabs = persona.tabs
+      let index
+      for (let i = 0; i < tabs.length; i++) {
+        if (tabs[i].isActive) {
+          index = i
+          break
+        }
+      }
+      index = index < tabs.length - 1 ? index + 1 : 0
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+    }
+  },
+  previousTab ({ getters, dispatch }) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      const tabs = persona.tabs
+      let index
+      for (let i = 0; i < tabs.length; i++) {
+        if (tabs[i].isActive) {
+          index = i
+          break
+        }
+      }
+      index = index > 0 ? index - 1 : tabs.length - 1
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+    }
+  },
+  closeTab ({ getters, commit, dispatch }, index) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      if (index === undefined) {
+        for (let i = 0; i < persona.tabs.length; i++) {
+          if (persona.tabs[i].isActive) {
+            index = i
+            break
+          }
+        }
+      }
+      const tab = persona.tabs[index]
+      commit('setTabDetails', { persona, tab, index })
+      commit('removeTab', { persona, tab, index })
+      // If there are no more tabs, add the Home tab
+      if (persona.tabs.length === 0) {
+        commit('addTab', { persona })
+      }
+      index = Math.min(index, persona.tabs.length - 1)
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+      commit('setHasOpenTab', persona)
+      // TODO: Update the tab indexes
+    }
+  },
+  reopenTab ({ getters, commit, dispatch }) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      if (persona.closedTabs && persona.closedTabs.length) {
+        const tab = persona.closedTabs[persona.closedTabs.length - 1]
+        const index = Math.min(tab.index, persona.tabs.length)
+        commit('reopenClosedTab', { persona, tab, index })
+        dispatch('setActiveTabIndexInPersona', { persona, index })
+      }
+    }
+  },
+  openNewTab ({ getters, commit, dispatch }) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      commit('addTab', { persona })
+      const index = persona.tabs.length - 1
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+    }
+  },
+  openInTab ({ getters, commit, dispatch }, data) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      const url = data.url
+      const title = url.replace(/http[s]*:\/\/[www.]*/, '')
+      const background = data.background
+      commit('addTab', { persona, url, title })
+      if (!background) {
+        const index = persona.tabs.length - 1
+        dispatch('setActiveTabIndexInPersona', { persona, index })
+      }
+      commit('setHasOpenTab', persona)
+    }
+  },
   // =========
   // BOOKMARKS
   // =========
@@ -1026,6 +1016,27 @@ const actions = {
         }
       })
     })
+  },
+  showHistory ({ getters, dispatch }) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      const tabs = persona.tabs
+      tabs.push({
+        _id: uuid(),
+        url: 'aspect://history',
+        addressText: null,
+        title: 'History',
+        index: tabs.length,
+        icon: null,
+        isActive: true,
+        isLoading: false,
+        isSuspended: false,
+        backHistory: [],
+        forwardHistory: []
+      })
+      const index = tabs.length - 1
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+    }
   },
   clearHistory ({ commit }, data) {
     const db = data.db

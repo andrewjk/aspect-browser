@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import { mapState, mapGetters, mapMutations } from 'vuex'
+  import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
   export default {
     data () {
@@ -54,10 +54,11 @@
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
-        'setActiveTabIndex',
         'setTabDetails',
-        'openInTab',
         'addToHistory'
+      ]),
+      ...mapActions([
+        'openInTab'
       ]),
       doNothing () {
         // HACK: This just prevents clicks on the dialog-content bubbling to the dialog-mask. There's probably a better way to do this...

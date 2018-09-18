@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import { mapMutations } from 'vuex'
+  import { mapActions } from 'vuex'
   import path from 'path'
   import { remote } from 'electron'
 
@@ -42,7 +42,7 @@
       }
     },
     methods: {
-      ...mapMutations([
+      ...mapActions([
         'openInTab'
       ]),
       doNothing () {

@@ -52,7 +52,7 @@
 </template>
 
 <script>
-  import { mapMutations, mapActions } from 'vuex'
+  import { mapActions } from 'vuex'
 
   import WindowButtons from './WindowButtons'
 
@@ -96,12 +96,10 @@
       }
     },
     methods: {
-      ...mapMutations([
-        'setActiveTabIndex',
-        'closeTab',
-        'openNewTab'
-      ]),
       ...mapActions([
+        'setActiveTabIndex',
+        'openNewTab',
+        'closeTab',
         'removeFromActivity'
       ]),
       getActiveTab () {

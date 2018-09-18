@@ -16,6 +16,9 @@
         <template v-else-if="item.url === 'aspect://error'">
           <error-page :persona="persona" :tabs="tabs"></error-page>
         </template>
+        <template v-else-if="item.isSuspended">
+          <suspended-page></suspended-page>
+        </template>
         <template v-else>
           <tab-page :persona="persona" :tab="item"></tab-page>
         </template>
@@ -35,13 +38,14 @@
   import DownloadsPage from './DownloadsPage'
   import LoginsPage from './LoginsPage'
   import ErrorPage from './ErrorPage'
+  import SuspendedPage from './SuspendedPage'
   import TabPage from './TabPage'
 
   import electron from 'electron'
   import Encrypter from '../../data/Encrypter'
 
   export default {
-    components: { HomePage, HistoryPage, DownloadsPage, LoginsPage, ErrorPage, TabPage },
+    components: { HomePage, HistoryPage, DownloadsPage, LoginsPage, ErrorPage, SuspendedPage, TabPage },
     props: {
       persona: null,
       showWelcome: false

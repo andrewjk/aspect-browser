@@ -57,19 +57,19 @@
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
-        'setActiveTabIndex',
         'previousPersona',
         'nextPersona',
-        'previousTab',
-        'nextTab',
-        'openNewTab',
-        'closeTab',
-        'reopenTab',
         'showHistory',
         'showDownloads',
         'openFindInPage'
       ]),
       ...mapActions([
+        'setActiveTabIndex',
+        'openNewTab',
+        'previousTab',
+        'nextTab',
+        'closeTab',
+        'reopenTab',
         'loadPersonas',
         'loadSettings',
         'loadHistory',

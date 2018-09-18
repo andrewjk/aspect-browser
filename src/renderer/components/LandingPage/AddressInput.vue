@@ -75,10 +75,10 @@
         'setTabDetails',
         'addToHistory',
         'goToUrl',
-        'goHome',
-        'setActiveTabIndex'
+        'goHome'
       ]),
       ...mapActions([
+        'setActiveTabIndex',
         'loadHistory'
       ]),
       keyPressed (e) {

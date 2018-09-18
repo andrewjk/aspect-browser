@@ -97,11 +97,11 @@
     methods: {
       ...mapMutations([
         'setTabDetails',
-        'openInTab',
         'editHistory',
         'addToHistory'
       ]),
       ...mapActions([
+        'openInTab',
         'loadHistory',
         'deleteHistory'
       ]),

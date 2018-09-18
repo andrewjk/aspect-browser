@@ -103,11 +103,11 @@
     methods: {
       ...mapMutations([
         'setTabDetails',
-        'openInTab',
         'editDownloads',
         'addToHistory'
       ]),
       ...mapActions([
+        'openInTab',
         'loadDownloads',
         'deleteDownloads'
       ]),

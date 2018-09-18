@@ -63,13 +63,13 @@
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
-        'openNewTab',
         'addHomeTab',
         'insertPersona',
         'sortPersonas',
         'setPersonaDetails'
       ]),
       ...mapActions([
+        'openNewTab',
         'movePersonaUpAndSave',
         'movePersonaDownAndSave',
         'addPersona',
