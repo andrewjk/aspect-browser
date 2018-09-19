@@ -117,6 +117,13 @@
         this.historyUrl = this.tab.url
       },
       loadFailed (e) {
+        // HACK: The aborted error gets thrown when you click on a link before the page has
+        // finished loading, but we don't want that to interrupt things so we ignore it
+        if (e.errorCode === -3) {
+          return
+        }
+
+        // Show the error page
         this.setTabDetails({
           persona: this.persona,
           tab: this.tab,
