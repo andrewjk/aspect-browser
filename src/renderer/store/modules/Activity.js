@@ -101,6 +101,16 @@ const actions = {
         dbActivity.forEach((item) => {
           commit('openInPersona', { url: item.url, personaId: item.personaId, title: item.title, icon: item.icon, isSuspended: true })
         })
+        // Set the activity to have isCurrentSession = true so they are current again and can be
+        // reloaded the next time the browser is opened, even if they haven't been restored from
+        // suspension
+        db.update({ isPreviousSession: true }, { $set: { isCurrentSession: true, isPreviousSession: false } }, { multi: true }, (err, numReplaced) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve()
+          }
+        })
       })
     })
   },
