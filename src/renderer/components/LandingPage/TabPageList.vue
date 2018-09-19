@@ -1,7 +1,10 @@
 <template>
   <div class="tab-page-list-wrapper">
       <div v-for="(item, index) in tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
-        <template v-if="item.url === 'aspect://home'">
+        <template v-if="item.isSuspended">
+          <suspended-page></suspended-page>
+        </template>
+        <template v-else-if="item.url === 'aspect://home'">
           <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome"></home-page>
         </template>
         <template v-else-if="item.url === 'aspect://history'">
@@ -15,9 +18,6 @@
         </template>
         <template v-else-if="item.url === 'aspect://error'">
           <error-page :persona="persona" :tabs="tabs"></error-page>
-        </template>
-        <template v-else-if="item.isSuspended">
-          <suspended-page></suspended-page>
         </template>
         <template v-else>
           <tab-page :persona="persona" :tab="item"></tab-page>
