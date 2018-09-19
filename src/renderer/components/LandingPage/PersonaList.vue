@@ -48,7 +48,7 @@
 
   export default {
     computed: mapState({
-      personas: state => state.Store.personas,
+      personas: state => state.Personas.personas,
       settings: state => state.Settings.settings,
       ...mapGetters([
         'getActiveTab'

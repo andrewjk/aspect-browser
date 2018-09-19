@@ -1,4 +1,7 @@
 
+// NOTE: V4 uses random numbers
+import uuid from 'uuid/v4'
+
 const state = {
   showDownloadsBar: false
 }
@@ -9,6 +12,42 @@ const mutations = {
   },
   closeDownloadsBar (state, data) {
     state.showDownloadsBar = false
+  },
+  addDownload (state, data) {
+    const activePersona = state.personas.find((p) => {
+      return p.isActive
+    })
+    if (activePersona) {
+      const downloads = activePersona.downloads
+      downloads.push({
+        _id: uuid(),
+        filename: data.filename,
+        serverFile: data.serverFile,
+        localFile: data.localFile,
+        progress: 0,
+        size: data.size,
+        isCompleted: false,
+        isPaused: false,
+        isCancelled: false
+      })
+    }
+  },
+  setDownloadDetails (state, data) {
+    const localFile = data.localFile
+    let download
+    state.personas.forEach((p) => {
+      p.downloads.forEach((d) => {
+        if (d.localFile === localFile) {
+          download = d
+        }
+      })
+    })
+    if (download) {
+      if (data.progress !== undefined) download.progress = data.progress
+      if (data.isCompleted !== undefined) download.isCompleted = data.isCompleted
+      if (data.isPaused !== undefined) download.isPaused = data.isPaused
+      if (data.isCancelled !== undefined) download.isCancelled = data.isCancelled
+    }
   }
 }
 

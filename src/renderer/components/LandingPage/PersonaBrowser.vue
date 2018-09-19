@@ -26,10 +26,10 @@
     components: { TabList, AddressBar, TabPageList, FindInPage, DownloadsBar },
     computed: {
       ...mapState({
-        personas: state => state.Store.personas,
+        personas: state => state.Personas.personas,
         settings: state => state.Settings.settings,
-        showFindInPage: state => state.Store.showFindInPage,
-        focusFindInPage: state => state.Store.focusFindInPage,
+        showFindInPage: state => state.FindInPage.showFindInPage,
+        focusFindInPage: state => state.FindInPage.focusFindInPage,
         showDownloadsBar: state => state.Downloads.showDownloadsBar
       }),
       ...mapGetters([

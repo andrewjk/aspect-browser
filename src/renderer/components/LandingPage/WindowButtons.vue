@@ -40,7 +40,7 @@
     },
     computed: {
       ...mapState({
-        personas: state => state.Store.personas,
+        personas: state => state.Personas.personas,
         systemSettings: state => state.SystemSettings.settings
       })
     },

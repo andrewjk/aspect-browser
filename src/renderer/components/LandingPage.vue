@@ -29,7 +29,7 @@
     },
     computed: {
       ...mapState({
-        personas: state => state.Store.personas,
+        personas: state => state.Personas.personas,
         settings: state => state.Settings.settings
       }),
       ...mapGetters([
@@ -44,6 +44,7 @@
       this.loadActivity(this.$adb)
     },
     mounted () {
+      console.log(this.personas)
       window.addEventListener('keydown', (e) => {
         this.keyDown(e)
       }, true)

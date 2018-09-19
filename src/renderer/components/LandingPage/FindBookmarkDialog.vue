@@ -36,7 +36,7 @@
     },
     computed: {
       ...mapState({
-        personas: state => state.Store.personas
+        personas: state => state.Personas.personas
       }),
       ...mapGetters([
         'getActivePersona'
