@@ -756,7 +756,7 @@ const actions = {
     // 15 seconds in development, 15 minutes in production
     const timeUntilSuspension = process.env.NODE_ENV === 'development' ? 15 * 1000 : 15 * 60 * 1000
     tabs.forEach((tab, i) => {
-      if (tab.isActive && i !== index) {
+      if (tab.isActive && index !== null && i !== index) {
         // The tab becoming inactive needs a timer to set it to inactive
         console.log('adding timer to inactive tab: ' + tab.url)
         if (tab.suspensionTimer) {
@@ -767,24 +767,31 @@ const actions = {
           commit('setTabDetails', { persona, tab, isSuspended: true, webview: null })
         }, timeUntilSuspension)
         commit('setTabDetails', { persona, tab, suspensionTimer })
-      } else if (!tab.isActive && i === index) {
+      } else if (!tab.isActive && index !== null && i === index) {
         // The tab becoming active needs its timer reset and its URL set back to what it was, if necessary
-        console.log('resuming tab: ' + tab.url)
+        if (tab.isSuspended) {
+          console.log('reloading tab: ' + tab.url)
+        }
         if (tab.suspensionTimer) {
           clearTimeout(tab.suspensionTimer)
         }
         commit('setTabDetails', { persona, tab, isSuspended: false, suspensionTimer: null })
       } else if (!tab.isActive && !tab.suspensionTimer) {
         // Background tabs need timers straight away
+        console.log('adding timer to background tab: ' + tab.url)
         const suspensionTimer = setTimeout(() => {
           console.log('suspending tab: ' + tab.url)
           commit('setTabDetails', { persona, tab, isSuspended: true, webview: null })
         }, timeUntilSuspension)
         commit('setTabDetails', { persona, tab, suspensionTimer })
       }
-      commit('setTabDetails', { persona, tab, isActive: (i === index) })
+      if (index !== null) {
+        commit('setTabDetails', { persona, tab, isActive: (i === index) })
+      }
     })
-    commit('closeFindInPage')
+    if (index !== null) {
+      commit('closeFindInPage')
+    }
   },
   setActiveTabIndex ({ getters, dispatch }, index) {
     const persona = getters.getActivePersona
@@ -872,10 +879,9 @@ const actions = {
       const title = url.replace(/http[s]*:\/\/[www.]*/, '')
       const background = data.background
       commit('addTab', { persona, url, title })
-      if (!background) {
-        const index = persona.tabs.length - 1
-        dispatch('setActiveTabIndexInPersona', { persona, index })
-      }
+      // If it's a background tab, pass index = null to setActiveTabIndexInPersona to indicate that we shouldn't actually change to that tab
+      const index = background ? null : persona.tabs.length - 1
+      dispatch('setActiveTabIndexInPersona', { persona, index })
       commit('setHasOpenTab', persona)
     }
   },
