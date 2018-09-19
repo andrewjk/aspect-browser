@@ -77,8 +77,8 @@ const actions = {
     if (index < 0 || index >= tabs.length) {
       return
     }
-    // 15 seconds in development, 15 minutes in production
-    const timeUntilSuspension = process.env.NODE_ENV === 'development' ? 15 * 1000 : 15 * 60 * 1000
+    // 5 minutes in development, 15 minutes in production
+    const timeUntilSuspension = process.env.NODE_ENV === 'development' ? 5 * 60 * 1000 : 15 * 60 * 1000
     tabs.forEach((tab, i) => {
       if (tab.isActive && index !== null && i !== index) {
         // The tab becoming inactive needs a timer to set it to inactive
