@@ -134,12 +134,12 @@ const mutations = {
         _id: uuid(),
         url: url,
         addressText: url,
-        title: url.replace(/http[s]*:\/\/[www.]*/, ''),
+        title: data.title ? data.title : url.replace(/http[s]*:\/\/[www.]*/, ''),
         index: tabs.length,
-        icon: null,
+        icon: data.icon,
         isActive: false,
         isLoading: false,
-        isSuspended: false,
+        isSuspended: !!data.isSuspended,
         backHistory: [],
         forwardHistory: []
       })

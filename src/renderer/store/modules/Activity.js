@@ -99,8 +99,7 @@ const actions = {
           return
         }
         dbActivity.forEach((item) => {
-          // TODO: Set icon and title and don't load until clicked
-          commit('openInPersona', { url: item.url, personaId: item.personaId })
+          commit('openInPersona', { url: item.url, personaId: item.personaId, title: item.title, icon: item.icon, isSuspended: true })
         })
       })
     })
@@ -141,8 +140,7 @@ const actions = {
           return
         }
         dbActivity.forEach((item) => {
-          // TODO: Set icon and title and don't load until clicked
-          commit('openInPersona', { url: item.url, personaId: item.personaId })
+          commit('openInPersona', { url: item.url, personaId: item.personaId, title: item.title, icon: item.icon, isSuspended: true })
         })
       })
     })
