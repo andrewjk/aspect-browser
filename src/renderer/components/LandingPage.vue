@@ -59,8 +59,6 @@
         'setActivePersonaIndex',
         'previousPersona',
         'nextPersona',
-        'showHistory',
-        'showDownloads',
         'openFindInPage'
       ]),
       ...mapActions([
@@ -75,7 +73,9 @@
         'loadHistory',
         'loadSystemSettings',
         'loadActivity',
-        'removeFromActivity'
+        'removeFromActivity',
+        'showHistory',
+        'showDownloads'
       ]),
       keyDown (e) {
         let keys = ''

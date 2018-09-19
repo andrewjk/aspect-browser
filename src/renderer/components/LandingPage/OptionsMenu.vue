@@ -69,7 +69,7 @@
 </template>
 
 <script>
-  import { mapState, mapMutations, mapActions } from 'vuex'
+  import { mapState, mapActions } from 'vuex'
   import { create } from 'vue-modal-dialogs'
 
   import AlertDialog from './AlertDialog'
@@ -89,11 +89,6 @@
       })
     },
     methods: {
-      ...mapMutations([
-        'showHistory',
-        'showDownloads',
-        'showLogins'
-      ]),
       ...mapActions([
         'editSettings',
         'clearHistory',
@@ -104,7 +99,10 @@
         'clearAllDownloads',
         'restoreSession',
         'saveSession',
-        'loadSession'
+        'loadSession',
+        'showHistory',
+        'showDownloads',
+        'showLogins'
       ]),
       saveSessionWithName () {
         const prompt = create(PromptDialog)

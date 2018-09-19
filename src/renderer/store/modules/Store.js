@@ -1023,24 +1023,11 @@ const actions = {
       })
     })
   },
-  showHistory ({ getters, dispatch }) {
+  showHistory ({ getters, commit, dispatch }) {
     const persona = getters.getActivePersona
     if (persona) {
-      const tabs = persona.tabs
-      tabs.push({
-        _id: uuid(),
-        url: 'aspect://history',
-        addressText: null,
-        title: 'History',
-        index: tabs.length,
-        icon: null,
-        isActive: true,
-        isLoading: false,
-        isSuspended: false,
-        backHistory: [],
-        forwardHistory: []
-      })
-      const index = tabs.length - 1
+      commit('addTab', { persona, url: 'aspect://history', title: 'History' })
+      const index = persona.tabs.length - 1
       dispatch('setActiveTabIndexInPersona', { persona, index })
     }
   },

@@ -1,5 +1,3 @@
-// NOTE: V4 uses random numbers
-import uuid from 'uuid/v4'
 
 const state = {
   showLoginMenu: false,
@@ -16,25 +14,6 @@ const mutations = {
   },
   closeLoginMenu (state, data) {
     state.showLoginMenu = false
-  },
-  showLogins (state, data) {
-    const persona = data.persona
-    const tabs = persona.tabs
-    tabs.push({
-      _id: uuid(),
-      url: 'aspect://logins',
-      addressText: null,
-      title: 'Logins',
-      icon: null,
-      isActive: true,
-      isLoading: false,
-      backHistory: [],
-      forwardHistory: []
-    })
-    const newIndex = tabs.length - 1
-    tabs.forEach((t, i) => {
-      t.isActive = (i === newIndex)
-    })
   }
 }
 
@@ -196,6 +175,14 @@ const actions = {
         }
       })
     })
+  },
+  showLogins ({ commit, dispatch }, data) {
+    const persona = data.persona
+    if (persona) {
+      commit('addTab', { persona, url: 'aspect://logins', title: 'Logins' })
+      const index = persona.tabs.length - 1
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+    }
   }
 }
 

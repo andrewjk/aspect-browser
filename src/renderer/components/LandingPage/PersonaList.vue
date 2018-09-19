@@ -63,7 +63,6 @@
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
-        'addHomeTab',
         'insertPersona',
         'sortPersonas',
         'setPersonaDetails'

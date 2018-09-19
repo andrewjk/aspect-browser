@@ -1,33 +1,9 @@
-// NOTE: V4 uses random numbers
-import uuid from 'uuid/v4'
 
 const state = {
   showDownloadsBar: false
 }
 
 const mutations = {
-  showDownloads (state, data) {
-    const persona = data.persona
-    if (persona) {
-      const tabs = persona.tabs
-      tabs.push({
-        _id: uuid(),
-        url: 'aspect://downloads',
-        addressText: null,
-        title: 'Downloads',
-        index: tabs.length,
-        icon: null,
-        isActive: true,
-        isLoading: false,
-        backHistory: [],
-        forwardHistory: []
-      })
-      const newIndex = tabs.length - 1
-      tabs.forEach((t, i) => {
-        t.isActive = (i === newIndex)
-      })
-    }
-  },
   openDownloadsBar (state, data) {
     state.showDownloadsBar = true
   },
@@ -82,6 +58,14 @@ const actions = {
         }
       })
     })
+  },
+  showDownloads ({ commit, dispatch }, data) {
+    const persona = data.persona
+    if (persona) {
+      commit('addTab', { persona, url: 'aspect://downloads', title: 'Downloads' })
+      const index = persona.tabs.length - 1
+      dispatch('setActiveTabIndexInPersona', { persona, index })
+    }
   },
   clearDownloads ({ commit }, data) {
     const db = data.db
