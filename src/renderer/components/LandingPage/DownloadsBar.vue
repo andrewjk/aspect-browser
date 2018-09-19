@@ -12,7 +12,7 @@
         <button v-if="!item.isCompleted" class="download-button" @click="cancelDownload(item)" title="Cancel download">
           <fa icon="times"/>
         </button>
-        <button v-if="item.isCompleted && !item.isCancelled" class="download-button" @click="openFolder(item)" title="Show file in folder">
+        <button v-if="item.isCompleted && !item.isCancelled" class="download-button" @click.stop="openFolder(item)" title="Show file in folder">
           <fa icon="folder-open"/>
         </button>
         <div v-if="item.isCompleted && item.isCancelled" class="download-button" title="Cancelled">

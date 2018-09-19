@@ -14,39 +14,33 @@ const mutations = {
     state.showDownloadsBar = false
   },
   addDownload (state, data) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
+    const persona = data.persona
+    persona.downloads.push({
+      _id: uuid(),
+      filename: data.filename,
+      serverFile: data.serverFile,
+      localFile: data.localFile,
+      progress: 0,
+      size: data.size,
+      isCompleted: false,
+      isPaused: false,
+      isCancelled: false
     })
-    if (activePersona) {
-      const downloads = activePersona.downloads
-      downloads.push({
-        _id: uuid(),
-        filename: data.filename,
-        serverFile: data.serverFile,
-        localFile: data.localFile,
-        progress: 0,
-        size: data.size,
-        isCompleted: false,
-        isPaused: false,
-        isCancelled: false
-      })
-    }
   },
   setDownloadDetails (state, data) {
-    const localFile = data.localFile
-    let download
-    state.personas.forEach((p) => {
-      p.downloads.forEach((d) => {
-        if (d.localFile === localFile) {
-          download = d
-        }
-      })
-    })
-    if (download) {
-      if (data.progress !== undefined) download.progress = data.progress
-      if (data.isCompleted !== undefined) download.isCompleted = data.isCompleted
-      if (data.isPaused !== undefined) download.isPaused = data.isPaused
-      if (data.isCancelled !== undefined) download.isCancelled = data.isCancelled
+    const download = data.download
+    if (data.progress !== undefined) download.progress = data.progress
+    if (data.isCompleted !== undefined) download.isCompleted = data.isCompleted
+    if (data.isPaused !== undefined) download.isPaused = data.isPaused
+    if (data.isCancelled !== undefined) download.isCancelled = data.isCancelled
+  },
+  removeDownload (state, data) {
+    const persona = data.persona
+    const download = data.download
+    const index = persona.downloads.indexOf(download)
+    persona.downloads.splice(index, 1)
+    if (!persona.downloads.length) {
+      state.showDownloadsBar = false
     }
   }
 }
@@ -122,6 +116,38 @@ const actions = {
         alert('ERROR: ' + err)
       }
     })
+  },
+  startDownload ({ getters, commit }, data) {
+    const persona = getters.getActivePersona
+    if (persona) {
+      const changedData = Object.assign({ persona }, data)
+      commit('addDownload', changedData)
+    }
+  },
+  findAndSetDownloadDetails ({ commit, rootState }, data) {
+    const localFile = data.localFile
+    let persona
+    let download
+    rootState.Personas.personas.forEach((p) => {
+      p.downloads.forEach((d) => {
+        if (d.localFile === localFile) {
+          persona = p
+          download = d
+        }
+      })
+    })
+    if (download) {
+      const changedData = Object.assign({ download }, data)
+      commit('setDownloadDetails', changedData)
+      if (changedData.isCompleted) {
+        // 5 minutes in development, 30 minutes in production
+        const timeUntilRemoval = process.env.NODE_ENV === 'development' ? 5 * 60 * 1000 : 30 * 60 * 1000
+        setTimeout(() => {
+          console.log('removing download: ' + download.localFile)
+          commit('removeDownload', { persona, download })
+        }, timeUntilRemoval)
+      }
+    }
   }
 }
 

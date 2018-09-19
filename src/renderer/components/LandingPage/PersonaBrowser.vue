@@ -41,24 +41,24 @@
         const activePersona = this.getActivePersona
         if (activePersona) {
           this.saveToDownloads(Object.assign({ db: this.$ddb, personaId: activePersona._id }, data))
-          this.addDownload(data)
+          this.startDownload(data)
           this.openDownloadsBar()
         }
       })
       electron.ipcRenderer.on('download-progress', (event, data) => {
-        this.setDownloadDetails(data)
+        this.findAndSetDownloadDetails(data)
       })
       electron.ipcRenderer.on('download-completed', (event, data) => {
-        this.setDownloadDetails({ localFile: data.localFile, isCompleted: true })
+        this.findAndSetDownloadDetails({ localFile: data.localFile, isCompleted: true })
       })
       electron.ipcRenderer.on('download-paused', (event, data) => {
-        this.setDownloadDetails({ localFile: data.localFile, isPaused: true })
+        this.findAndSetDownloadDetails({ localFile: data.localFile, isPaused: true })
       })
       electron.ipcRenderer.on('download-resumed', (event, data) => {
-        this.setDownloadDetails({ localFile: data.localFile, isPaused: false })
+        this.findAndSetDownloadDetails({ localFile: data.localFile, isPaused: false })
       })
       electron.ipcRenderer.on('download-cancelled', (event, data) => {
-        this.setDownloadDetails({ localFile: data.localFile, isPaused: false, isCompleted: true, isCancelled: true })
+        this.findAndSetDownloadDetails({ localFile: data.localFile, isPaused: false, isCompleted: true, isCancelled: true })
       })
     },
     updated () {
@@ -71,12 +71,12 @@
       ...mapMutations([
         'getZIndex',
         'unfocusFindInPage',
-        'addDownload',
-        'setDownloadDetails',
         'openDownloadsBar'
       ]),
       ...mapActions([
-        'saveToDownloads'
+        'saveToDownloads',
+        'startDownload',
+        'findAndSetDownloadDetails'
       ]),
       getZIndex (index) {
         return this.personas[index].isActive ? 99 : -99
