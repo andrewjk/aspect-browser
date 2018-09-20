@@ -1,7 +1,7 @@
 {
   "name": "aspect-browser",
-  "version": "0.0.6",
-  "author": "Andrew K <andrewjk@gmail.com>",
+  "version": "0.0.8",
+  "author": "Andrew JK <andrewjk@gmail.com>",
   "description": "A multi-persona web browser",
   "license": "MIT",
   "main": "./dist/electron/main.js",

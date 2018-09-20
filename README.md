@@ -37,13 +37,13 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 
 ## Download
 
-![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.6/aspect-browser-setup-0.0.6.exe)
+![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.8/aspect-browser-setup-0.0.8.exe)
 
-![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.6/Aspect-0.0.6.dmg)
+![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.8/Aspect-0.0.8.dmg)
 
-![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.6/aspect-browser-0.0.6-x86_64.AppImage)
+![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.8/aspect-browser-0.0.8-x86_64.AppImage)
 
-![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.6)
+![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.8)
 
 ## Keyboard Shortcuts
 
@@ -62,6 +62,7 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 | Ctrl/Command + L | Focus the Address Box |
 | Ctrl/Command + F | Find in Page |
 | Ctrl/Command + H | Show History |
+| Ctrl/Command + D | Show Downloads |
 | Ctrl/Command + Plus/Minus | Zoom In/Zoom Out |
 | Ctrl/Command + 0 | Reset Zoom |
 
