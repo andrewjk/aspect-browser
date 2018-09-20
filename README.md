@@ -27,11 +27,13 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 * Use keyboard shortcuts to switch between personas and tabs
 * Use Quick Find to search for personas and bookmarks
 * Manage history for each persona
-* Restore, save and load sessions
+* Manage downloads for each persona
 * Manage login details for each persona
   * Can be turned on in Settings => Login Manager
   * Requires a master password to be set
   * Has not been audited - use at your own risk!
+* Restore, save and load sessions
+* Automatically suspends background tabs after 30 minutes to lower memory usage
 
 ## Download
 
@@ -74,8 +76,8 @@ The following is a very provisional roadmap of planned major features.
 | 20 Aug | 0.0.4 | Login management | ✓ |
 | 27 Aug | 0.0.5 | Ad blocking | ✗ |
 | 3 Sep | 0.0.6 | Session management | ✓ |
-| 10 Sep | 0.0.7 | Download management | |
-| 17 Sep | 0.0.8 | Memory management | |
+| 10 Sep | 0.0.7 | Download management | ✓ |
+| 17 Sep | 0.0.8 | Memory management | ✓ |
 | 24 Sep | 0.0.9 | Notifications | |
 | 1 Oct | 0.0.10 | Bookmark management | |
 | 8 Oct | 0.0.11 | Home page widgets | |
