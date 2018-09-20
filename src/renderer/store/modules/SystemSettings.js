@@ -9,14 +9,12 @@ const mutations = {
   setSystemSettings (state, settings) {
     state.settings = settings
   },
-  setUpdateChecked (state, updateChecked) {
-    state.settings.updateChecked = updateChecked
+  setUpdateChecked (state, data) {
+    state.settings.updateChecked = data.updateChecked
+    state.settings.updateCheckedVersion = data.updateCheckedVersion
   },
   setUpdateExists (state, data) {
-    const updateExists = data.updateExists
-    const oldVersion = data.oldVersion
-    state.settings.updateExists = updateExists
-    state.settings.oldVersion = oldVersion
+    state.settings.updateExists = data.updateExists
   }
 }
 
@@ -39,8 +37,8 @@ const actions = {
     const defaultSettings = {
       _id: uuid(),
       updateChecked: new Date(1900, 1, 1),
-      updateExists: false,
-      oldVersion: ''
+      updateCheckedVersion: '',
+      updateExists: false
     }
     db.insert(defaultSettings, (err, dbSettings) => {
       if (err) {

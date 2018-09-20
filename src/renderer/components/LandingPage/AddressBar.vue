@@ -126,12 +126,18 @@
       toggleOptionsMenu () {
         this.showOptionsMenu = !this.showOptionsMenu
       },
-      checkUpdate () {
+      checkUpdate (force) {
         const updateChecked = this.systemSettings.updateChecked
         const now = new Date()
         const timeToCheck = 60 * 60 * 1000 // Check once an hour
-        if (!updateChecked || now.getTime() - updateChecked.getTime() > timeToCheck) {
-          this.setUpdateChecked(new Date())
+        const needsCheckDueToTime = !updateChecked || !updateChecked.getTime || now.getTime() - updateChecked.getTime() > timeToCheck
+
+        const updateCheckedVersion = this.systemSettings.updateCheckedVersion
+        const localVersion = remote.app.getVersion()
+        const needsCheckDueToVersion = !updateCheckedVersion || updateCheckedVersion !== localVersion
+
+        if (needsCheckDueToTime || needsCheckDueToVersion) {
+          this.setUpdateChecked({ updateChecked: now, updateCheckedVersion: localVersion })
           this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
 
           // Sample code from https://github.com/octokit/rest.js/blob/master/examples/getReleaseAsset.js
@@ -146,7 +152,6 @@
 
             const release = result.data[0]
             const version = release.tag_name.replace('v', '')
-            const localVersion = remote.app.getVersion()
             if (semver.gt(version, localVersion)) {
               console.log('checked for updates ' + version + ' vs ' + localVersion + ' - update exists')
               this.updateExists = true
@@ -155,7 +160,7 @@
               console.log('checked for updates ' + version + ' vs ' + localVersion + ' - no update found')
               this.updateExists = false
             }
-            this.setUpdateExists({ updateExists: this.updateExists, oldVersion: localVersion })
+            this.setUpdateExists({ updateExists: this.updateExists })
             this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
           })
         }
