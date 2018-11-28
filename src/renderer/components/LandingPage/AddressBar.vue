@@ -140,8 +140,7 @@
           this.setUpdateChecked({ updateChecked: now, updateCheckedVersion: localVersion })
           this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
 
-          // Sample code from https://github.com/octokit/rest.js/blob/master/examples/getReleaseAsset.js
-          octokit.repos.getReleases({
+          octokit.repos.listReleases({
             owner: 'andrewjk',
             repo: 'aspect-browser'
           }).then(result => {
