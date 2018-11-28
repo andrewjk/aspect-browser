@@ -114,10 +114,10 @@ function startMain () {
 }
 
 function startElectron () {
-  var args = [
-    '--inspect=5858',
-    path.join(__dirname, '../dist/electron/main.js')
-  ]
+  // NOTE: Passing ../dist/electron/main.js to the electron process bypasses package.json, so you
+  // get the version and paths from the electon binary. Instead you have to pass . as the script
+  // See https://github.com/electron/electron/issues/7085 for some discussion
+  var args = ['--inspect=5858', '.']
 
   // detect yarn or npm and process commandline args accordingly
   if (process.env.npm_execpath.endsWith('yarn.js')) {
