@@ -83,7 +83,7 @@
       },
       loginsDatabaseExists () {
         // Check whether there's already a database file
-        const filename = path.join(remote.app.getPath('userData'), '/logins.db')
+        const filename = path.join(remote.app.getPath('appData'), '/Aspect Browser/logins.db')
         return fs.existsSync(filename)
       },
       maybeSetEnableLoginManager (value) {
@@ -215,7 +215,7 @@
                   }
 
                   // Delete the old database file
-                  const filename = path.join(remote.app.getPath('userData'), '/logins.db')
+                  const filename = path.join(remote.app.getPath('appData'), '/Aspect Browser/logins.db')
                   fs.unlinkSync(filename)
 
                   // Encrypt every record with the new encrypter
