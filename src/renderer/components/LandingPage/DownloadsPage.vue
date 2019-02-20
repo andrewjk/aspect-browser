@@ -164,7 +164,7 @@
         return filesize(item.size)
       },
       formatHost (item) {
-        return url.parse(item.serverFile).hostname
+        return url.URL(item.serverFile).hostname
       },
       toggleAll () {
         this.checkAll(!this.selectAll)
