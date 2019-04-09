@@ -48,7 +48,7 @@
   import { mapMutations, mapActions } from 'vuex'
   import { shell } from 'electron'
 
-  import url from 'url'
+  import { URL } from 'url'
   import dateformat from 'dateformat'
   import filesize from 'filesize'
 
@@ -164,7 +164,7 @@
         return filesize(item.size)
       },
       formatHost (item) {
-        return url.URL(item.serverFile).hostname
+        return new URL(item.serverFile).hostname
       },
       toggleAll () {
         this.checkAll(!this.selectAll)
@@ -285,7 +285,7 @@
 
   .downloads-button-grid {
     display: grid;
-    grid-template-columns: 1fr auto 1fr auto;
+    grid-template-columns: 1fr 80px 200px auto;
     grid-column-gap: 20px;
     align-items: center;
   }
