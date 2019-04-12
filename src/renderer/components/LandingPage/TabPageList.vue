@@ -30,8 +30,8 @@
   import { mapState, mapMutations, mapActions } from 'vuex'
   import { create } from 'vue-modal-dialogs'
 
-  import AlertDialog from './AlertDialog'
-  import PromptDialog from './PromptDialog'
+  import AlertDialog from '../Dialogs/AlertDialog'
+  import PromptDialog from '../Dialogs/PromptDialog'
 
   import HomePage from './HomePage'
   import HistoryPage from './HistoryPage'

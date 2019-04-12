@@ -15,7 +15,7 @@
 
   import PersonaList from './LandingPage/PersonaList'
   import PersonaBrowser from './LandingPage/PersonaBrowser'
-  import FindBookmarkDialog from './LandingPage/FindBookmarkDialog.vue'
+  import FindBookmarkDialog from './Dialogs/FindBookmarkDialog.vue'
 
   export default {
     name: 'landing-page',

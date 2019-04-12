@@ -24,7 +24,7 @@
   import electron from 'electron'
   import { create } from 'vue-modal-dialogs'
 
-  import ConfirmDialog from './ConfirmDialog'
+  import ConfirmDialog from '../Dialogs/ConfirmDialog'
 
   const window = electron.remote.getCurrentWindow()
 

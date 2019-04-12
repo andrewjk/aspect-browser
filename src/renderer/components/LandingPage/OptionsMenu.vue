@@ -72,10 +72,10 @@
   import { mapState, mapActions } from 'vuex'
   import { create } from 'vue-modal-dialogs'
 
-  import AlertDialog from './AlertDialog'
-  import PromptDialog from './PromptDialog'
-  import AboutDialog from './AboutDialog'
-  import ConfirmDialog from './ConfirmDialog'
+  import AlertDialog from '../Dialogs/AlertDialog'
+  import PromptDialog from '../Dialogs/PromptDialog'
+  import AboutDialog from '../Dialogs/AboutDialog'
+  import ConfirmDialog from '../Dialogs/ConfirmDialog'
 
   import Encrypter from '../../data/Encrypter'
 

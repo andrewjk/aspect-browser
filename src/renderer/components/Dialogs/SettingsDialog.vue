@@ -53,9 +53,9 @@
   import { mapState, mapMutations, mapActions } from 'vuex'
   import { create } from 'vue-modal-dialogs'
 
-  import AlertDialog from './AlertDialog'
-  import CreatePasswordDialog from './CreatePasswordDialog'
-  import ChangePasswordDialog from './ChangePasswordDialog'
+  import AlertDialog from '../Dialogs/AlertDialog'
+  import CreatePasswordDialog from '../Dialogs/CreatePasswordDialog'
+  import ChangePasswordDialog from '../Dialogs/ChangePasswordDialog'
 
   import { remote } from 'electron'
   import fs from 'fs'
