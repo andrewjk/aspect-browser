@@ -3,8 +3,8 @@
 import uuid from 'uuid/v4'
 
 import { create } from 'vue-modal-dialogs'
-import ConfirmDialog from '../../components/LandingPage/ConfirmDialog'
-import PersonaDialog from '../../components/LandingPage/PersonaDialog'
+import ConfirmDialog from '../../components/Dialogs/ConfirmDialog'
+import PersonaDialog from '../../components/Dialogs/PersonaDialog'
 
 const state = {
   personas: []

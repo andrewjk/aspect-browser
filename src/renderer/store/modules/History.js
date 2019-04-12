@@ -1,6 +1,6 @@
 
 import { create } from 'vue-modal-dialogs'
-import AlertDialog from '../../components/LandingPage/AlertDialog'
+import AlertDialog from '../../components/Dialogs/AlertDialog'
 
 const mutations = {
   addToHistory (state, data) {

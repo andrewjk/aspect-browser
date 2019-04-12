@@ -3,8 +3,8 @@
 import uuid from 'uuid/v4'
 
 import { create } from 'vue-modal-dialogs'
-import ConfirmDialog from '../../components/LandingPage/ConfirmDialog'
-import BookmarkDialog from '../../components/LandingPage/BookmarkDialog'
+import ConfirmDialog from '../../components/Dialogs/ConfirmDialog'
+import BookmarkDialog from '../../components/Dialogs/BookmarkDialog'
 
 function sorter (a, b) {
   if (a.order < b.order) {

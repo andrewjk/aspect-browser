@@ -2,7 +2,7 @@
 import uuid from 'uuid/v4'
 import { create } from 'vue-modal-dialogs'
 
-import SettingsDialog from '../../components/LandingPage/SettingsDialog'
+import SettingsDialog from '../../components/Dialogs/SettingsDialog'
 
 const state = {
   settings: {}
