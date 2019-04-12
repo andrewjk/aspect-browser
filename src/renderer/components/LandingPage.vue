@@ -223,12 +223,9 @@
           activeTab.webview.setZoomLevel(this.zoomLevel)
         }
       },
-      showFindBookmarkDialog () {
+      async showFindBookmarkDialog () {
         const dialog = create(FindBookmarkDialog)
-        dialog({}).transition()
-          .catch((err) => {
-            alert('ERROR: ' + err)
-          })
+        await dialog({}).transition()
         this.focusFindBookmark = true
       }
     }

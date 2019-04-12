@@ -60,11 +60,9 @@
       doNothing () {
         // HACK: This just prevents clicks on the dialog-content bubbling to the dialog-mask. There's probably a better way to do this...
       },
-      deletePersonaAndClose () {
-        this.deletePersona({ db: this.$pdb, persona: this.persona })
-          .then(() => {
-            this.$close(false)
-          })
+      async deletePersonaAndClose () {
+        await this.deletePersona({ db: this.$pdb, persona: this.persona })
+        this.$close(false)
       }
     }
   }

@@ -325,36 +325,23 @@ const actions = {
         }
       })
   },
-  deletePersona ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      const persona = data.persona
-      const dialog = create(ConfirmDialog)
-      dialog({ content: 'Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.' }).transition()
-        .then((result) => {
-          if (result) {
-            dialog({ content: 'Are you really sure you want to delete this persona?' }).transition()
-              .then((result) => {
-                if (result) {
-                  db.remove({ _id: persona._id }, {}, (err, numReplaced) => {
-                    if (err) {
-                      alert('ERROR: ' + err)
-                      return
-                    }
-                    commit('removePersona', persona)
-                    resolve()
-                  })
-                }
-              })
-              .catch((err) => {
-                alert('ERROR: ' + err)
-              })
+  async deletePersona ({ commit }, data) {
+    const db = data.db
+    const persona = data.persona
+    const dialog = create(ConfirmDialog)
+    const okResult = await dialog({ content: 'Are you sure you want to delete this persona? This will delete all bookmarks and saved data associated with it.' }).transition()
+    if (okResult) {
+      const okResult2 = await dialog({ content: 'Are you really sure you want to delete this persona?' }).transition()
+      if (okResult2) {
+        db.remove({ _id: persona._id }, {}, (err, numReplaced) => {
+          if (err) {
+            alert('ERROR: ' + err)
+            return
           }
+          commit('removePersona', persona)
         })
-        .catch((err) => {
-          alert('ERROR: ' + err)
-        })
-    })
+      }
+    }
   },
   savePersona ({ commit }, data) {
     return new Promise((resolve, reject) => {

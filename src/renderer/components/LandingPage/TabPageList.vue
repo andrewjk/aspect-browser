@@ -73,10 +73,10 @@
       getZIndex (index) {
         return this.tabs[index].isActive ? 99 : -99
       },
-      setupLoginManager () {
+      async setupLoginManager () {
         // Set up login management for forms with password fields
         const personaId = this.persona._id
-        electron.remote.ipcMain.on('form-found-with-password-' + personaId, (event, data) => {
+        electron.remote.ipcMain.on('form-found-with-password-' + personaId, async (event, data) => {
           // Is the login manager enabled?
           if (this.settings.enableLoginManager) {
             // Load the existing username/password
@@ -87,32 +87,27 @@
             // Maybe load the logins database
             if (!db.persistence.isLoaded) {
               const prompt = create(PromptDialog)
-              prompt({ content: 'Enter your master password:', type: 'password' }).transition()
-                .then((result) => {
-                  if (result) {
-                    const crypt = new Encrypter(result)
-                    db.persistence.afterSerialization = crypt.encrypt
-                    db.persistence.beforeDeserialization = crypt.decrypt
-                    db.loadDatabase((err) => {
-                      if (err) {
-                        const dialog = create(AlertDialog)
-                        dialog({ content: 'Failed to unlock database.' }).transition()
-                          .catch((err) => {
-                            alert('ERROR: ' + err)
-                          })
-                        return
-                      }
-                      db.persistence.isLoaded = true
-                      this.loadFormLoginDetails(db, host, form, event)
-                    })
+              const result = await prompt({ content: 'Enter your master password:', type: 'password' }).transition()
+              if (result) {
+                const crypt = new Encrypter(result)
+                db.persistence.afterSerialization = crypt.encrypt
+                db.persistence.beforeDeserialization = crypt.decrypt
+                db.loadDatabase(async (err) => {
+                  if (err) {
+                    const dialog = create(AlertDialog)
+                    await dialog({ content: 'Failed to unlock database.' }).transition()
+                    return
                   }
+                  db.persistence.isLoaded = true
+                  this.loadFormLoginDetails(db, host, form, event)
                 })
+              }
             } else {
               this.loadFormLoginDetails(db, host, form, event)
             }
           }
         })
-        electron.remote.ipcMain.on('form-submitted-with-password-' + personaId, (event, data) => {
+        electron.remote.ipcMain.on('form-submitted-with-password-' + personaId, async (event, data) => {
           // Is the login manager enabled?
           if (this.settings.enableLoginManager) {
             // Has the user entered the master password?
@@ -122,16 +117,13 @@
               const host = data.host
               const fields = data.fields
               // If login details have already been saved for this host, update them
-              db.find({ personaId, host }).exec((err, dbDetails) => {
+              db.find({ personaId, host }).exec(async (err, dbDetails) => {
                 if (err) {
                   alert('ERROR: ' + err)
                 }
                 if (dbDetails.length) {
                   if (!dbDetails[0].ignore) {
-                    this.saveLoginDetails({ db, personaId, host, fields })
-                      .catch((err) => {
-                        alert('ERROR', err)
-                      })
+                    await this.saveLoginDetails({ db, personaId, host, fields })
                   }
                 } else {
                   // Otherwise, ask the user whether to save the login details
@@ -145,19 +137,14 @@
           }
         })
       },
-      loadFormLoginDetails (db, host, form, event) {
+      async loadFormLoginDetails (db, host, form, event) {
         // TODO: to function
         const personaId = this.persona._id
-        this.loadLoginDetails({ db, personaId, host })
-          .then((result) => {
-            if (result && result.ignore) console.log('ignoring that one')
-            if (result && result.fields && !result.ignore) {
-              event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
-            }
-          })
-          .catch((err) => {
-            alert('ERROR', err)
-          })
+        const result = await this.loadLoginDetails({ db, personaId, host })
+        if (result && result.ignore) console.log('ignoring that one')
+        if (result && result.fields && !result.ignore) {
+          event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
+        }
       }
     }
   }

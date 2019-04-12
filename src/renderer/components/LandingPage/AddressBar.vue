@@ -126,7 +126,7 @@
       toggleOptionsMenu () {
         this.showOptionsMenu = !this.showOptionsMenu
       },
-      checkUpdate (force) {
+      async checkUpdate (force) {
         const updateChecked = this.systemSettings.updateChecked
         const now = new Date()
         const timeToCheck = 60 * 60 * 1000 // Check once an hour
@@ -140,28 +140,27 @@
           this.setUpdateChecked({ updateChecked: now, updateCheckedVersion: localVersion })
           this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
 
-          octokit.repos.listReleases({
+          const result = await octokit.repos.listReleases({
             owner: 'andrewjk',
             repo: 'aspect-browser'
-          }).then(result => {
-            if (result.data.length === 0) {
-              console.log('repository has no releases')
-              return
-            }
-
-            const release = result.data[0]
-            const version = release.tag_name.replace('v', '')
-            if (semver.gt(version, localVersion)) {
-              console.log('checked for updates ' + version + ' vs ' + localVersion + ' - update exists')
-              this.updateExists = true
-              this.updateUrl = release.html_url
-            } else {
-              console.log('checked for updates ' + version + ' vs ' + localVersion + ' - no update found')
-              this.updateExists = false
-            }
-            this.setUpdateExists({ updateExists: this.updateExists })
-            this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
           })
+          if (result.data.length === 0) {
+            console.log('repository has no releases')
+            return
+          }
+
+          const release = result.data[0]
+          const version = release.tag_name.replace('v', '')
+          if (semver.gt(version, localVersion)) {
+            console.log('checked for updates ' + version + ' vs ' + localVersion + ' - update exists')
+            this.updateExists = true
+            this.updateUrl = release.html_url
+          } else {
+            console.log('checked for updates ' + version + ' vs ' + localVersion + ' - no update found')
+            this.updateExists = false
+          }
+          this.setUpdateExists({ updateExists: this.updateExists })
+          this.saveSystemSettings({ db: this.$ssdb, systemSettings: this.systemSettings })
         }
       },
       getUpdate () {

@@ -78,13 +78,10 @@
         }
       }
     },
-    created () {
-      this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 }).then((response) => {
-        this.history = response
-        this.focusSearchText = true
-      }).catch((err) => {
-        alert('ERROR: ' + err)
-      })
+    async created () {
+      const response = await this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 })
+      this.history = response
+      this.focusSearchText = true
     },
     updated () {
       if (this.focusSearchText) {
@@ -111,13 +108,10 @@
         if (this.searchInterval) {
           clearTimeout(this.searchInterval)
         }
-        this.searchInterval = setTimeout(() => {
-          this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then((response) => {
-            this.history = response
-            this.searchCompleted = true
-          }).catch((err) => {
-            alert('ERROR: ' + err)
-          })
+        this.searchInterval = setTimeout(async () => {
+          const response = await this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText, limit: 100 })
+          this.history = response
+          this.searchCompleted = true
         }, 500)
       },
       openHistory (history, e) {
@@ -170,17 +164,13 @@
         this.showDeleteButton = this.history.some((item) => item.isSelected)
         this.selectedCount = this.history.filter((item) => item.isSelected).length
       },
-      deleteSelectedItems () {
+      async deleteSelectedItems () {
         const ids = this.history.filter((item) => item.isSelected).map((item) => item._id)
-        this.deleteHistory({ db: this.$hdb, ids }).then((response) => {
-          this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then(response => {
-            this.history = response
-            this.showSelectAll = true
-            this.showDeleteButton = false
-          })
-        }).catch((err) => {
-          alert('ERROR: ' + err)
-        })
+        await this.deleteHistory({ db: this.$hdb, ids })
+        const response = await this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.searchText, limit: 100 })
+        this.history = response
+        this.showSelectAll = true
+        this.showDeleteButton = false
       }
     }
   }

@@ -214,16 +214,13 @@ const actions = {
   },
   clearAllHistory ({ commit }, data) {
     const db = data.db
-    db.remove({}, { multi: true }, (err, numReplaced) => {
+    db.remove({}, { multi: true }, async (err, numReplaced) => {
       if (err) {
         alert('ERROR: ' + err)
         return
       }
       const dialog = create(AlertDialog)
-      dialog({ content: 'Browsing history cleared.' }).transition()
-        .catch((err) => {
-          alert('ERROR: ' + err)
-        })
+      await dialog({ content: 'Browsing history cleared.' }).transition()
     })
   }
 }

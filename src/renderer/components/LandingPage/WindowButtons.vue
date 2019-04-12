@@ -66,7 +66,7 @@
       restore () {
         window.unmaximize()
       },
-      close () {
+      async close () {
         let personaCount = 0
         let tabCount = 0
         this.personas.forEach(persona => {
@@ -78,12 +78,10 @@
         if (tabCount > 0) {
           const prompt = create(ConfirmDialog)
           const content = `You are about to close ${tabCount} tab${tabCount === 1 ? '' : 's'} in ${personaCount} persona${personaCount === 1 ? '' : 's'}. Are you sure you want to continue?`
-          prompt({ content, confirmText: 'Close tabs' }).transition()
-            .then((result) => {
-              if (result) {
-                window.close()
-              }
-            })
+          const result = await prompt({ content, confirmText: 'Close tabs' }).transition()
+          if (result) {
+            window.close()
+          }
         } else {
           window.close()
         }

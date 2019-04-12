@@ -81,7 +81,7 @@
         const title = this.tab.webview.getTitle()
         this.setTabDetails({ persona: this.persona, tab: this.tab, url, addressText: url, title })
       },
-      loadFinished () {
+      async loadFinished () {
         // console.log('load finished: ' + this.tab.webview.getURL())
         this.setTabDetails({ persona: this.persona, tab: this.tab, isLoading: false })
         if (this.tab.url !== this.historyUrl) {
@@ -102,16 +102,15 @@
               title: this.tab.title
             })
           } else {
-            this.saveToActivity({
+            const _id = await this.saveToActivity({
               db: this.$adb,
               personaId: this.persona._id,
               url: this.tab.url,
               icon: this.tab.icon,
               title: this.tab.title,
               index: this.tab.index
-            }).then((_id) => {
-              this.tab.activityId = _id
             })
+            this.tab.activityId = _id
           }
         }
         this.historyUrl = this.tab.url

@@ -92,7 +92,7 @@
         //   }
         // }
       },
-      startFind (e) {
+      async startFind (e) {
         // Only want to find if the user pressed backspace, delete or a key that changes the text
         if ((e.ctrlKey || e.metaKey) ||
             (e.keyCode !== 8 && e.keyCode !== 46 && !this.shouldStartFind(e.key))) {
@@ -184,22 +184,21 @@
 
           // 4. History
           if (results.length < maxItems) {
-            this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.addressText, limit: maxItems }).then((response) => {
-              response.forEach((history) => {
-                if (results.length < maxItems && !results.find((item) => item.url === history.url)) {
-                  results.push({
-                    type: 'history',
-                    id: history._id,
-                    icon: history.icon,
-                    text: history.title,
-                    url: history.url,
-                    hintIcon: ['far', 'clock'],
-                    hint: 'Open this page',
-                    title: 'Open ' + history.url,
-                    isActive: false
-                  })
-                }
-              })
+            const response = await this.loadHistory({ db: this.$hdb, personaId: this.persona._id, search: this.addressText, limit: maxItems })
+            response.forEach((history) => {
+              if (results.length < maxItems && !results.find((item) => item.url === history.url)) {
+                results.push({
+                  type: 'history',
+                  id: history._id,
+                  icon: history.icon,
+                  text: history.title,
+                  url: history.url,
+                  hintIcon: ['far', 'clock'],
+                  hint: 'Open this page',
+                  title: 'Open ' + history.url,
+                  isActive: false
+                })
+              }
 
               if (results.length) {
                 results[0].isActive = true

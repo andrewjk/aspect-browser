@@ -84,13 +84,10 @@
         }
       }
     },
-    created () {
-      this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, limit: 100 }).then((response) => {
-        this.downloads = response
-        this.focusSearchText = true
-      }).catch((err) => {
-        alert('ERROR: ' + err)
-      })
+    async created () {
+      const response = await this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, limit: 100 })
+      this.downloads = response
+      this.focusSearchText = true
     },
     updated () {
       if (this.focusSearchText) {
@@ -117,13 +114,10 @@
         if (this.searchInterval) {
           clearTimeout(this.searchInterval)
         }
-        this.searchInterval = setTimeout(() => {
-          this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then((response) => {
-            this.downloads = response
-            this.searchCompleted = true
-          }).catch((err) => {
-            alert('ERROR: ' + err)
-          })
+        this.searchInterval = setTimeout(async () => {
+          const response = await this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, search: this.searchText, limit: 100 })
+          this.downloads = response
+          this.searchCompleted = true
         }, 500)
       },
       openDownloads (downloads, e) {
@@ -182,17 +176,13 @@
         this.showDeleteButton = this.downloads.some((item) => item.isSelected)
         this.selectedCount = this.downloads.filter((item) => item.isSelected).length
       },
-      deleteSelectedItems () {
+      async deleteSelectedItems () {
         const ids = this.downloads.filter((item) => item.isSelected).map((item) => item._id)
-        this.deleteDownloads({ db: this.$ddb, ids }).then((response) => {
-          this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then(response => {
-            this.downloads = response
-            this.showSelectAll = true
-            this.showDeleteButton = false
-          })
-        }).catch((err) => {
-          alert('ERROR: ' + err)
-        })
+        await this.deleteDownloads({ db: this.$ddb, ids })
+        const response = await this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, search: this.searchText, limit: 100 })
+        this.downloads = response
+        this.showSelectAll = true
+        this.showDeleteButton = false
       },
       openDownload (item) {
         shell.openItem(item.localFile)

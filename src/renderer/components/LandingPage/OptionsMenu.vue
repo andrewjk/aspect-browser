@@ -104,84 +104,62 @@
         'showDownloads',
         'showLogins'
       ]),
-      saveSessionWithName () {
+      async saveSessionWithName () {
         const prompt = create(PromptDialog)
-        prompt({ content: 'Enter a name for this session:' }).transition()
-          .then((result) => {
-            if (result) {
-              this.saveSession({ db: this.$adb, name: result })
-            }
-          })
+        const result = await prompt({ content: 'Enter a name for this session:' }).transition()
+        if (result) {
+          this.saveSession({ db: this.$adb, name: result })
+        }
       },
-      loadSessionWithName () {
+      async loadSessionWithName () {
         const prompt = create(PromptDialog)
-        prompt({ content: 'Enter the name of the session to load:' }).transition()
-          .then((result) => {
-            if (result) {
-              this.loadSession({ db: this.$adb, name: result })
-            }
-          })
+        const result = await prompt({ content: 'Enter the name of the session to load:' }).transition()
+        if (result) {
+          this.loadSession({ db: this.$adb, name: result })
+        }
       },
-      maybeShowLogins () {
+      async maybeShowLogins () {
         // Always get the password before showing the saved logins
         // TODO: Loop this until we get the right password
         const db = this.$ldb
         const prompt = create(PromptDialog)
-        prompt({ content: 'Enter your master password:', type: 'password' }).transition()
-          .then((result) => {
-            if (result) {
-              const crypt = new Encrypter(result)
-              db.persistence.afterSerialization = crypt.encrypt
-              db.persistence.beforeDeserialization = crypt.decrypt
-              db.loadDatabase((err) => {
-                if (err) {
-                  const dialog = create(AlertDialog)
-                  dialog({ content: 'Failed to unlock database.' }).transition()
-                    .catch((err) => {
-                      alert('ERROR: ' + err)
-                    })
-                  return
-                }
-                db.persistence.isLoaded = true
-                this.showLogins({ persona: this.persona })
-              })
+        const result = await prompt({ content: 'Enter your master password:', type: 'password' }).transition()
+        if (result) {
+          const crypt = new Encrypter(result)
+          db.persistence.afterSerialization = crypt.encrypt
+          db.persistence.beforeDeserialization = crypt.decrypt
+          db.loadDatabase(async (err) => {
+            if (err) {
+              const dialog = create(AlertDialog)
+              await dialog({ content: 'Failed to unlock database.' }).transition()
+              return
             }
+            db.persistence.isLoaded = true
+            this.showLogins({ persona: this.persona })
           })
+        }
       },
-      showAboutDialog () {
+      async showAboutDialog () {
         const dialog = create(AboutDialog)
-        dialog({}).transition()
-          .catch((err) => {
-            alert('ERROR: ' + err)
-          })
+        await dialog({}).transition()
       },
       clearHistoryAndRelated () {
         const dialog = create(ConfirmDialog)
-        dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
-          .then((result) => {
-            if (result) {
-              this.clearHistory({ db: this.$hdb, personaId: this.persona._id })
-              this.clearActivity({ db: this.$adb, personaId: this.persona._id })
-              this.clearDownloads({ db: this.$ddb, personaId: this.persona._id })
-            }
-          })
-          .catch((err) => {
-            alert('ERROR: ' + err)
-          })
+        const result = dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
+        if (result) {
+          this.clearHistory({ db: this.$hdb, personaId: this.persona._id })
+          this.clearActivity({ db: this.$adb, personaId: this.persona._id })
+          this.clearDownloads({ db: this.$ddb, personaId: this.persona._id })
+        }
       },
       clearAllHistoryAndRelated () {
         const dialog = create(ConfirmDialog)
-        dialog({ content: 'Are you sure you want to clear the browsing history for all personas?' }).transition()
-          .then((result) => {
-            if (result) {
-              this.clearAllHistory({ db: this.$hdb })
-              this.clearAllActivity({ db: this.$adb })
-              this.clearAllDownloads({ db: this.$ddb })
-            }
-          })
-          .catch((err) => {
-            alert('ERROR: ' + err)
-          })
+        const result = dialog({ content: 'Are you sure you want to clear the browsing history for all personas?' }).transition()
+        if (result) {
+          this.clearAllHistory({ db: this.$hdb })
+          this.clearAllActivity({ db: this.$adb })
+          this.clearAllDownloads({ db: this.$ddb })
+        }
       }
     }
   }

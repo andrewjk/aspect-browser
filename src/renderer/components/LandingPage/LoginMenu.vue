@@ -42,33 +42,23 @@
         'saveLoginDetails',
         'ignoreLoginDetails'
       ]),
-      saveLogin () {
+      async saveLogin () {
         const db = this.$ldb
         const personaId = this.persona._id
         const host = this.loginSettings.host
         const fields = this.loginSettings.fields
-        this.saveLoginDetails({ db, personaId, host, fields })
-          .then(() => {
-            this.closeLoginMenu()
-          })
-          .catch((err) => {
-            alert('ERROR', err)
-          })
+        await this.saveLoginDetails({ db, personaId, host, fields })
+        this.closeLoginMenu()
       },
       dontSaveLogin () {
         this.closeLoginMenu()
       },
-      neverSaveLogin () {
+      async neverSaveLogin () {
         const db = this.$ldb
         const personaId = this.persona._id
         const host = this.loginSettings.host
-        this.ignoreLoginDetails({ db, personaId, host })
-          .then(() => {
-            this.closeLoginMenu()
-          })
-          .catch((err) => {
-            alert('ERROR', err)
-          })
+        await this.ignoreLoginDetails({ db, personaId, host })
+        this.closeLoginMenu()
       }
     }
   }

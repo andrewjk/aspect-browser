@@ -52,13 +52,10 @@
         selectedCount: 0
       }
     },
-    created () {
-      this.loadLogins({ db: this.$ldb, personaId: this.persona._id, limit: 100 }).then((response) => {
-        this.logins = response
-        this.focusSearchText = true
-      }).catch((err) => {
-        alert('ERROR: ' + err)
-      })
+    async created () {
+      const response = await this.loadLogins({ db: this.$ldb, personaId: this.persona._id, limit: 100 })
+      this.logins = response
+      this.focusSearchText = true
     },
     updated () {
       if (this.focusSearchText) {
@@ -80,19 +77,16 @@
           return 'Ignored'
         }
       },
-      searchLogins () {
+      async searchLogins () {
         this.checkAll(false)
         this.searchCompleted = false
         if (this.searchInterval) {
           clearTimeout(this.searchInterval)
         }
-        this.searchInterval = setTimeout(() => {
-          this.loadLogins({ db: this.$ldb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then((response) => {
-            this.logins = response
-            this.searchCompleted = true
-          }).catch((err) => {
-            alert('ERROR: ' + err)
-          })
+        this.searchInterval = setTimeout(async () => {
+          const response = await this.loadLogins({ db: this.$ldb, personaId: this.persona._id, search: this.searchText, limit: 100 })
+          this.logins = response
+          this.searchCompleted = true
         }, 500)
       },
       toggleAll () {
@@ -111,17 +105,13 @@
         this.showDeleteButton = this.logins.some((item) => item.isSelected)
         this.selectedCount = this.logins.filter((item) => item.isSelected).length
       },
-      deleteSelectedItems () {
+      async deleteSelectedItems () {
         const ids = this.logins.filter((item) => item.isSelected).map((item) => item._id)
-        this.deleteLogins({ db: this.$ldb, ids }).then((response) => {
-          this.loadLogins({ db: this.$ldb, personaId: this.persona._id, search: this.searchText, limit: 100 }).then(response => {
-            this.logins = response
-            this.showSelectAll = true
-            this.showDeleteButton = false
-          })
-        }).catch((err) => {
-          alert('ERROR: ' + err)
-        })
+        await this.deleteLogins({ db: this.$ldb, ids })
+        const response = await this.loadLogins({ db: this.$ldb, personaId: this.persona._id, search: this.searchText, limit: 100 })
+        this.logins = response
+        this.showSelectAll = true
+        this.showDeleteButton = false
       }
     }
   }
