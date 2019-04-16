@@ -74,7 +74,7 @@ const mutations = {
   },
   setHasOpenTab (state, persona) {
     persona.hasOpenTab = persona.tabs.some((tab) => {
-      return tab.url
+      return tab.url && tab.url.indexOf('aspect://') === -1
     })
   },
   addHomeTab (state, persona) {
