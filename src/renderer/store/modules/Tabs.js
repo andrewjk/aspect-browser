@@ -31,6 +31,7 @@ const mutations = {
     if (data.suspensionTimer !== undefined) tab.suspensionTimer = data.suspensionTimer
     if (data.errorCode !== undefined) tab.errorCode = data.errorCode
     if (data.errorDescription !== undefined) tab.errorDescription = data.errorDescription
+    if (data.newTabOffset !== undefined) tab.newTabOffset = data.newTabOffset
   },
   addTab (state, data) {
     const persona = data.persona
@@ -48,6 +49,30 @@ const mutations = {
       backHistory: data.backHistory !== undefined ? data.backHistory : [],
       forwardHistory: data.forwardHistory !== undefined ? data.forwardHistory : []
     })
+    persona.tabs.forEach((tab, idx) => {
+      tab.index = idx
+    })
+  },
+  insertTab (state, data) {
+    const persona = data.persona
+    const index = data.index
+    persona.tabs.splice(index, 0, {
+      _id: uuid(),
+      url: data.url !== undefined ? data.url : 'aspect://home',
+      addressText: data.addressText !== undefined ? data.addressText : null,
+      title: data.title !== undefined ? data.title : 'Home',
+      icon: data.icon !== undefined ? data.icon : null,
+      index: data.index !== undefined ? data.index : persona.tabs.length,
+      isActive: data.isActive !== undefined ? data.isActive : false,
+      isLoading: data.isLoading !== undefined ? data.isLoading : false,
+      isSuspended: data.isSuspended !== undefined ? data.isSuspended : false,
+      suspensionTimer: data.suspensionTimer !== undefined ? data.suspensionTimer : null,
+      backHistory: data.backHistory !== undefined ? data.backHistory : [],
+      forwardHistory: data.forwardHistory !== undefined ? data.forwardHistory : []
+    })
+    persona.tabs.forEach((tab, idx) => {
+      tab.index = idx
+    })
   },
   removeTab (state, data) {
     const persona = data.persona
@@ -58,14 +83,19 @@ const mutations = {
       persona.closedTabs.splice(0, 1)
     }
     persona.tabs.splice(index, 1)
+    persona.tabs.forEach((item, idx) => {
+      item.index = idx
+    })
   },
   reopenClosedTab (state, data) {
     const persona = data.persona
     const index = data.index
     const tab = persona.closedTabs.pop()
-    persona.tabs.splice(index, 0, tab)
-    // TODO: Need to reorganise the other tab indexes
     tab.index = index
+    persona.tabs.splice(index, 0, tab)
+    persona.tabs.forEach((tab, idx) => {
+      tab.index = idx
+    })
   }
 }
 
@@ -110,7 +140,7 @@ const actions = {
         commit('setTabDetails', { persona, tab, suspensionTimer })
       }
       if (index !== null) {
-        commit('setTabDetails', { persona, tab, isActive: (i === index) })
+        commit('setTabDetails', { persona, tab, isActive: (i === index), newTabOffset: 0 })
       }
     })
     if (index !== null) {
@@ -174,7 +204,6 @@ const actions = {
       index = Math.min(index, persona.tabs.length - 1)
       dispatch('setActiveTabIndexInPersona', { persona, index })
       commit('setHasOpenTab', persona)
-      // TODO: Update the tab indexes
     }
   },
   reopenTab ({ getters, commit, dispatch }) {
@@ -202,10 +231,30 @@ const actions = {
       const url = data.url
       const title = url.replace(/http[s]*:\/\/[www.]*/, '')
       const background = data.background
-      commit('addTab', { persona, url, title })
+      if (background) {
+        // Add the tab after the current active tab
+        // But also after any background tabs that have been opened already
+        const persona = getters.getActivePersona
+        if (persona) {
+          const tabs = persona.tabs
+          let index
+          for (let i = 0; i < tabs.length; i++) {
+            if (tabs[i].isActive) {
+              const offset = tabs[i].newTabOffset || 0
+              index = i + 1 + offset
+              commit('setTabDetails', { persona, tab: tabs[i], newTabOffset: offset + 1 })
+              break
+            }
+          }
+          commit('insertTab', { persona, url, title, index })
+        }
+      } else {
+        // Add the tab at the end
+        commit('addTab', { persona, url, title })
+      }
       // If it's a background tab, pass index = null to setActiveTabIndexInPersona to indicate that we shouldn't actually change to that tab
-      const index = background ? null : persona.tabs.length - 1
-      dispatch('setActiveTabIndexInPersona', { persona, index })
+      const newIndex = background ? null : persona.tabs.length - 1
+      dispatch('setActiveTabIndexInPersona', { persona, index: newIndex })
       commit('setHasOpenTab', persona)
     }
   }
