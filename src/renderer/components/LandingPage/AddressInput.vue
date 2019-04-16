@@ -1,6 +1,6 @@
 <template>
   <div class="address-input">
-    <input type="text" :id="'address-text-' + persona._id" v-model="addressText" onfocus="this.select();" @keypress="keyPressed" @keyup="startFind" @keyup.enter="openResult" @keyup.esc="closeFind" @keyup.up="previousResult" @keyup.down="nextResult" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
+    <input type="text" :id="'address-text-' + persona._id" v-model="addressText" onfocus="this.select();" @keyup="startFind" @keyup.enter="openResult" @keyup.esc="closeFind" @keyup.up="previousResult" @keyup.down="nextResult" placeholder="Search or enter an address" title="The address bar, where you can type something to search for or enter a Web address">
     <div v-show="showDropDown" class="address-text-dropdown" :id="'address-text-dropdown-' + persona._id">
       <ul class="address-text-list">
         <li v-for="(item, index) in results" :key="item.tid" :class="['address-text-item', item.isActive ? 'active' : '']" @click="openResultAtIndex(index)">
@@ -81,17 +81,6 @@
         'setActiveTabIndex',
         'loadHistory'
       ]),
-      keyPressed (e) {
-        // if (e.keyCode === 13) {
-        //   let tab = this.getActiveTab
-        //   let url = tab.addressText.trim()
-        //   if (url) {
-        //     this.goToUrl({ tab, url })
-        //   } else {
-        //     this.goHome(tab)
-        //   }
-        // }
-      },
       async startFind (e) {
         // Only want to find if the user pressed backspace, delete or a key that changes the text
         if ((e.ctrlKey || e.metaKey) ||
@@ -275,8 +264,8 @@
         const result = this.results.find((r, i) => {
           return r.isActive
         })
+        const activeTab = this.getActiveTab
         if (result) {
-          const activeTab = this.getActiveTab
           if (result.type === 'tab') {
             // Set this tab's text back to its URL, and switch to the selected tab
             this.setTabDetails({ persona: this.persona, tab: activeTab, addressText: activeTab.url })
@@ -295,6 +284,13 @@
             if (activeTab.webview) {
               activeTab.webview.focus()
             }
+          }
+        } else {
+          const url = activeTab.addressText.trim()
+          if (url) {
+            this.goToUrl({ tab: activeTab, url })
+          } else {
+            this.goHome(activeTab)
           }
         }
       }
