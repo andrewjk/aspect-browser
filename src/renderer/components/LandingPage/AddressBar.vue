@@ -84,7 +84,6 @@
     },
     methods: {
       ...mapMutations([
-        'setTabDetails',
         'goBack',
         'goForward',
         'goHome',
