@@ -55,7 +55,8 @@
       ...mapMutations([
         'setActivePersonaIndex',
         'setTabDetails',
-        'addToHistory'
+        'addToHistory',
+        'setHasOpenTab'
       ]),
       ...mapActions([
         'openInTab'
@@ -140,8 +141,10 @@
                 const activeTab = tabs[0]
                 this.setTabDetails({ persona: activePersona, tab: activeTab, isLoading: true, url: result.url })
                 this.addToHistory({ tab: activeTab, url: 'aspect://home', title: 'Home' })
+                this.setHasOpenTab(activePersona)
               } else {
                 this.openInTab({ url: result.url, background: false })
+                this.setHasOpenTab(activePersona)
               }
             }
           }

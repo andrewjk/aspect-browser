@@ -77,7 +77,8 @@
     methods: {
       ...mapMutations([
         'setTabDetails',
-        'addToHistory'
+        'addToHistory',
+        'setHasOpenTab'
       ]),
       ...mapActions([
         'openInTab',
@@ -103,6 +104,7 @@
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: bookmark.url })
         this.addToHistory({ tab: activeTab, url: 'aspect://home', title: 'Home' })
+        this.setHasOpenTab(this.persona)
       },
       editBookmarks () {
         this.showEditBookmarkLinks = !this.showEditBookmarkLinks

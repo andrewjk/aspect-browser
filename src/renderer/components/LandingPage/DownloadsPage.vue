@@ -101,7 +101,8 @@
       ...mapMutations([
         'setTabDetails',
         'editDownloads',
-        'addToHistory'
+        'addToHistory',
+        'setHasOpenTab'
       ]),
       ...mapActions([
         'openInTab',
@@ -133,6 +134,7 @@
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: downloads.url })
         this.addToHistory({ tab: activeTab, url: 'aspect://downloads', title: 'Downloads' })
+        this.setHasOpenTab(this.persona)
       },
       areDatesEqual (d1, d2) {
         if (!d1.getFullYear) console.log(d1)

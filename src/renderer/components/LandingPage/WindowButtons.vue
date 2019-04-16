@@ -77,7 +77,11 @@
         })
         if (tabCount > 0) {
           const prompt = create(ConfirmDialog)
-          const content = `You are about to close ${tabCount} tab${tabCount === 1 ? '' : 's'} in ${personaCount} persona${personaCount === 1 ? '' : 's'}. Are you sure you want to continue?`
+          let content = `You are about to close ${tabCount} ${tabCount === 1 ? 'tab' : 'tabs'}`
+          if (personaCount > 1) {
+            content = content + ` in ${personaCount} personas`
+          }
+          content = content + `. Are you sure you want to continue?`
           const result = await prompt({ content, confirmText: 'Close tabs' }).transition()
           if (result) {
             window.close()
