@@ -148,6 +148,7 @@
     display: flex;
     background-color: #ccc;
     font-size: 13px;
+    user-select: none;
   }
 
   .tab-list {

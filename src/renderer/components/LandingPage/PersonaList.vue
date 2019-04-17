@@ -1,44 +1,42 @@
 <template>
-  <div class="persona-list-wrapper">
-    <div :class="['persona-list', showEditPersonaLinks ? 'editing' : '']">
-      <div class="drag-indicator">
-        <fa v-if="platform !== 'darwin'" icon="bars"/>
-      </div>
-      <div class="list">
-        <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersona(index)">
-          <div v-show="item.hasOpenTab" class="open-tab-indicator"></div>
-          <div class="persona-info">
-            <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(item) }">
-              {{ item.shortName }}
-            </div>
-            <div class="persona-name">{{ item.name }}</div>
+  <div :class="['persona-list', showEditPersonaLinks ? 'editing' : '']">
+    <div class="drag-indicator">
+      <fa v-if="platform !== 'darwin'" icon="bars"/>
+    </div>
+    <div class="list">
+      <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersona(index)">
+        <div v-show="item.hasOpenTab" class="open-tab-indicator"></div>
+        <div class="persona-info">
+          <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(item) }">
+            {{ item.shortName }}
           </div>
-          <div v-if="showEditPersonaLinks" class="persona-edit-buttons">
-            <button class="edit-persona-button" @click.stop="movePersonaUpAndSave({ db: $pdb, personas, index })" title="Move this persona up">
-              <fa icon="chevron-up"/>
-            </button>
-            <button class="edit-persona-button" @click.stop="editPersona({ db: $pdb, persona: item })" title="Edit this persona">
-              <fa icon="user-edit"/>
-            </button>
-            <button class="edit-persona-button" @click.stop="movePersonaDownAndSave({ db: $pdb, personas, index })" title="Move this persona down">
-              <fa icon="chevron-down"/>
-            </button>
-          </div>
-        </button>
-      </div>
-      <button v-if="!showEditPersonaLinks" class="persona-button" @click="findBookmark" title="Search for a bookmark">
-        <fa icon="search"/>
-      </button>
-      <button v-if="showEditPersonaLinks" class="persona-button" @click="addPersona({ db: $pdb, personas })" title="Add a persona">
-        <fa icon="plus"/>
-      </button>
-      <button v-if="showEditPersonaLinks" class="persona-button" @click="editPersonas" title="Done editing">
-        <fa icon="check"/>
-      </button>
-      <button v-else class="persona-button" @click="editPersonas" title="Edit personas">
-        <fa icon="user-edit"/>
+          <div class="persona-name">{{ item.name }}</div>
+        </div>
+        <div v-if="showEditPersonaLinks" class="persona-edit-buttons">
+          <button class="edit-persona-button" @click.stop="movePersonaUpAndSave({ db: $pdb, personas, index })" title="Move this persona up">
+            <fa icon="chevron-up"/>
+          </button>
+          <button class="edit-persona-button" @click.stop="editPersona({ db: $pdb, persona: item })" title="Edit this persona">
+            <fa icon="user-edit"/>
+          </button>
+          <button class="edit-persona-button" @click.stop="movePersonaDownAndSave({ db: $pdb, personas, index })" title="Move this persona down">
+            <fa icon="chevron-down"/>
+          </button>
+        </div>
       </button>
     </div>
+    <button v-if="!showEditPersonaLinks" class="persona-button" @click="findBookmark" title="Search for a bookmark">
+      <fa icon="search"/>
+    </button>
+    <button v-if="showEditPersonaLinks" class="persona-button" @click="addPersona({ db: $pdb, personas })" title="Add a persona">
+      <fa icon="plus"/>
+    </button>
+    <button v-if="showEditPersonaLinks" class="persona-button" @click="editPersonas" title="Done editing">
+      <fa icon="check"/>
+    </button>
+    <button v-else class="persona-button" @click="editPersonas" title="Edit personas">
+      <fa icon="user-edit"/>
+    </button>
   </div>
 </template>
 
@@ -117,6 +115,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    user-select: none;
   }
 
   .persona-list.editing {
