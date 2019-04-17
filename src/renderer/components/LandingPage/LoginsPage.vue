@@ -1,7 +1,7 @@
 <template>
   <div class="logins-page-wrapper">
     <div class="title">{{ persona.name }} Logins</div>
-    <div v-if="(!logins || !logins.length) && !searchText" class="welcome">
+    <div v-if="!loading && (!logins || !logins.length) && !searchText" class="welcome">
       <p>
         No login details have been stored for this persona.
       </p>
@@ -41,6 +41,7 @@
     },
     data () {
       return {
+        loading: true,
         logins: [],
         searchText: null,
         focusSearchText: false,
@@ -54,6 +55,7 @@
     },
     async created () {
       const response = await this.loadLogins({ db: this.$ldb, personaId: this.persona._id, limit: 100 })
+      this.loading = false
       this.logins = response
       this.focusSearchText = true
     },

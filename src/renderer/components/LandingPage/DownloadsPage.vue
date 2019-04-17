@@ -1,7 +1,7 @@
 <template>
   <div class="downloads-page-wrapper">
     <div class="title">{{ persona.name }} Downloads</div>
-    <div v-if="(!downloads || !downloads.length) && !searchText" class="welcome">
+    <div v-if="!loading && (!downloads || !downloads.length) && !searchText" class="welcome">
       <p>
         No files have been downloaded for this persona.
       </p>
@@ -59,6 +59,7 @@
     },
     data () {
       return {
+        loading: true,
         downloads: [],
         searchText: null,
         focusSearchText: false,
@@ -86,6 +87,7 @@
     },
     async created () {
       const response = await this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, limit: 100 })
+      this.loading = false
       this.downloads = response
       this.focusSearchText = true
     },

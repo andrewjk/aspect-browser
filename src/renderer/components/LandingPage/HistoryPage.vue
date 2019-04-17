@@ -1,7 +1,7 @@
 <template>
   <div class="history-page-wrapper">
     <div class="title">{{ persona.name }} History</div>
-    <div v-if="(!history || !history.length) && !searchText" class="welcome">
+    <div v-if="!loading && (!history || !history.length) && !searchText" class="welcome">
       <p>
         This persona's browsing history is empty.
       </p>
@@ -53,6 +53,7 @@
     },
     data () {
       return {
+        loading: true,
         history: [],
         searchText: null,
         focusSearchText: false,
@@ -80,6 +81,7 @@
     },
     async created () {
       const response = await this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 })
+      this.loading = false
       this.history = response
       this.focusSearchText = true
     },
