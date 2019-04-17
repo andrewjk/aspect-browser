@@ -195,8 +195,6 @@
               }
               this.results = results
               this.showDropDown = results.length
-            }).catch((err) => {
-              alert('ERROR: ' + err)
             })
           }
         }

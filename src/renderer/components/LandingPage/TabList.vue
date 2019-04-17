@@ -6,33 +6,35 @@
       </button>
     </button>
     <div :id="'tab-list-' + persona._id" class="tab-list" :style="{ maxWidth: maxTabListWidth }">
-      <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveTabIndex(index)" @click.middle="closeTabAndRemoveActivity(index)" :title="item.title">
-        <template v-if="item.url === 'aspect://home'">
-          <fa icon="home" class="tab-icon"/>
-        </template>
-        <template v-else-if="item.url === 'aspect://history'">
-          <fa :icon="['far', 'clock']" class="tab-icon"/>
-        </template>
-        <template v-else-if="item.url === 'aspect://downloads'">
-          <fa :icon="['far', 'file']" class="tab-icon"/>
-        </template>
-        <template v-else-if="item.url === 'aspect://logins'">
-          <fa icon="key" class="tab-icon"/>
-        </template>
-        <template v-else-if="item.url === 'aspect://error'">
-          <fa icon="exclamation-triangle" class="tab-icon"/>
-        </template>
-        <template v-else-if="item.isLoading">
-          <fa icon="spinner" class="tab-icon" spin/>
-        </template>
-        <template v-else-if="item.icon">
-          <img class="tab-icon" :src="item.icon">
-        </template>
-        <span class="tab-title">{{ item.title }}</span>
-        <button class="tab-close" @click.stop="closeTabAndRemoveActivity(index)">
-          <fa icon="times"/>
+      <draggable v-list="tabs" @end="tabsSorted">
+        <button v-for="(item, index) in tabs" :key="item._id" :class="['tab', item.isActive ? 'active' : 'inactive']" :style="{ width: tabWidth + 'px' }" @click.left="setActiveTabIndex(index)" @click.middle="closeTabAndRemoveActivity(index)" :title="item.title">
+          <template v-if="item.url === 'aspect://home'">
+            <fa icon="home" class="tab-icon"/>
+          </template>
+          <template v-else-if="item.url === 'aspect://history'">
+            <fa :icon="['far', 'clock']" class="tab-icon"/>
+          </template>
+          <template v-else-if="item.url === 'aspect://downloads'">
+            <fa :icon="['far', 'file']" class="tab-icon"/>
+          </template>
+          <template v-else-if="item.url === 'aspect://logins'">
+            <fa icon="key" class="tab-icon"/>
+          </template>
+          <template v-else-if="item.url === 'aspect://error'">
+            <fa icon="exclamation-triangle" class="tab-icon"/>
+          </template>
+          <template v-else-if="item.isLoading">
+            <fa icon="spinner" class="tab-icon" spin/>
+          </template>
+          <template v-else-if="item.icon">
+            <img class="tab-icon" :src="item.icon">
+          </template>
+          <span class="tab-title">{{ item.title }}</span>
+          <button class="tab-close" @click.stop="closeTabAndRemoveActivity(index)">
+            <fa icon="times"/>
+          </button>
         </button>
-      </button>
+      </draggable>
       <button class="tab-nav" @click="openNewTab()">
         <button class="tab-nav-button">
           <fa icon="plus"/>
@@ -52,12 +54,13 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex'
+  import { mapMutations, mapActions } from 'vuex'
 
   import WindowButtons from './WindowButtons'
+  import draggable from 'vuedraggable'
 
   export default {
-    components: { WindowButtons },
+    components: { WindowButtons, draggable },
     props: {
       persona: null
     },
@@ -96,6 +99,9 @@
       }
     },
     methods: {
+      ...mapMutations([
+        'sortTabs'
+      ]),
       ...mapActions([
         'setActiveTabIndex',
         'openNewTab',
@@ -128,6 +134,9 @@
         const tab = this.tabs[index]
         this.closeTab(index)
         this.removeFromActivity({ db: this.$adb, activityId: tab.activityId })
+      },
+      tabsSorted () {
+        this.sortTabs({ persona: this.persona })
       }
     }
   }

@@ -17,6 +17,12 @@ const getters = {
 }
 
 const mutations = {
+  sortTabs (state, data) {
+    const persona = data.persona
+    persona.tabs.forEach((tab, idx) => {
+      tab.index = idx
+    })
+  },
   setTabDetails (state, data) {
     const tab = data.tab
     if (data.webview !== undefined) tab.webview = data.webview
