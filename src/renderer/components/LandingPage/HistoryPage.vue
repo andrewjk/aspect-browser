@@ -16,8 +16,11 @@
       <label class="history-select-all">
         <input type="checkbox" :checked="selectAll" @change="toggleAll"> {{ showSelectAll ? 'Select all' : 'Select none' }}
       </label>
-      <button v-if="showDeleteButton" class="history-delete-button delete-link" @click.stop="deleteSelectedItems" :title="'Delete the selected history items'">
+      <button v-if="showDeleteButton" class="history-delete-button delete-link" @click.stop="deleteSelectedItems" title="Delete the selected history item(s)">
         {{ `Delete the ${selectedCount} selected history ${selectedCount === 1 ? 'item' : 'items'}` }}
+      </button>
+      <button v-else class="history-delete-button delete-link" @click.stop="clearHistoryAndRelated" title="Clear this persona's history">
+        Clear {{ this.persona.name }} history
       </button>
     </div>
     <div class="history-list">
@@ -43,8 +46,10 @@
 
 <script>
   import { mapMutations, mapActions } from 'vuex'
-
+  import { create } from 'vue-modal-dialogs'
   import dateformat from 'dateformat'
+
+  import ConfirmDialog from '../Dialogs/ConfirmDialog'
 
   export default {
     props: {
@@ -103,7 +108,10 @@
       ...mapActions([
         'openInTab',
         'loadHistory',
-        'deleteHistory'
+        'deleteHistory',
+        'clearHistory',
+        'clearActivity',
+        'clearDownloads'
       ]),
       searchHistory () {
         this.checkAll(false)
@@ -175,6 +183,18 @@
         this.history = response
         this.showSelectAll = true
         this.showDeleteButton = false
+      },
+      async clearHistoryAndRelated () {
+        const dialog = create(ConfirmDialog)
+        const result = await dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
+        if (result) {
+          this.clearHistory({ db: this.$hdb, personaId: this.persona._id })
+          this.clearActivity({ db: this.$adb, personaId: this.persona._id })
+          this.clearDownloads({ db: this.$ddb, personaId: this.persona._id })
+
+          const response = await this.loadHistory({ db: this.$hdb, personaId: this.persona._id, limit: 100 })
+          this.history = response
+        }
       }
     }
   }
