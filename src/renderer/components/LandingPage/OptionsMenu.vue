@@ -143,18 +143,18 @@
         const dialog = create(AboutDialog)
         await dialog({}).transition()
       },
-      clearHistoryAndRelated () {
+      async clearHistoryAndRelated () {
         const dialog = create(ConfirmDialog)
-        const result = dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
+        const result = await dialog({ content: 'Are you sure you want to clear the browsing history for this persona?' }).transition()
         if (result) {
           this.clearHistory({ db: this.$hdb, personaId: this.persona._id })
           this.clearActivity({ db: this.$adb, personaId: this.persona._id })
           this.clearDownloads({ db: this.$ddb, personaId: this.persona._id })
         }
       },
-      clearAllHistoryAndRelated () {
+      async clearAllHistoryAndRelated () {
         const dialog = create(ConfirmDialog)
-        const result = dialog({ content: 'Are you sure you want to clear the browsing history for all personas?' }).transition()
+        const result = await dialog({ content: 'Are you sure you want to clear the browsing history for all personas?' }).transition()
         if (result) {
           this.clearAllHistory({ db: this.$hdb })
           this.clearAllActivity({ db: this.$adb })
