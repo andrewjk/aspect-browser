@@ -26,18 +26,25 @@
           <input type="checkbox" v-model="item.isSelected" @change="selectOne">
           {{ item.host }}
         </label>
-        <div class="logins-type" :title="item.host">{{ getLoginType(item) }}</div>
+        <button class="login-button" @click="openLogin(item, $event)">
+          <div class="login-button-grid">
+            <img class="login-icon" :src="item.icon">
+            <div class="login-title" :title="item.title">{{ item.title }}</div>
+            <div class="logins-type">{{ getLoginType(item) }}</div>
+          </div>
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { mapActions } from 'vuex'
+  import { mapMutations, mapActions } from 'vuex'
 
   export default {
     props: {
-      persona: null
+      persona: null,
+      tabs: Array
     },
     data () {
       return {
@@ -68,13 +75,20 @@
       }
     },
     methods: {
+      ...mapMutations([
+        'setTabDetails',
+        'addToHistory',
+        'setHasOpenTab'
+      ]),
       ...mapActions([
         'loadLogins',
-        'deleteLogins'
+        'deleteLogins',
+        'saveLoginDetails',
+        'openInTab'
       ]),
       getLoginType (item) {
         if (item.fields) {
-          return 'Details'
+          return 'Saved'
         } else if (item.ignore) {
           return 'Ignored'
         }
@@ -90,6 +104,21 @@
           this.logins = response
           this.searchCompleted = true
         }, 500)
+      },
+      openLogin (login, e) {
+        // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
+        if (e.ctrlKey || e.which === 2 || e.which === 4) {
+          this.openInTab({ url: login.url, background: true })
+          return
+        }
+
+        const activeTab = this.tabs.find((item) => {
+          return item.isActive
+        })
+
+        this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: login.url })
+        this.addToHistory({ tab: activeTab, url: 'aspect://logins', title: 'Logins' })
+        this.setHasOpenTab(this.persona)
       },
       toggleAll () {
         this.checkAll(!this.selectAll)
@@ -171,10 +200,9 @@
   .login-details {
     font-size: 13px;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 200px 1fr;
     grid-column-gap: 20px;
     align-items: center;
-    padding: 8px 0;
   }
 
   .login-host {
@@ -183,4 +211,42 @@
     text-overflow: ellipsis;
   }
 
+  .login-button {
+    border-radius: 2px;
+    cursor: default;
+    padding: 5px;
+    text-align: left;
+    padding: 10px;
+  }
+
+  .login-button:hover,
+  .login-button:focus {
+    background-color: #eee;
+  }
+
+  .login-button-grid {
+    display: grid;
+    grid-template-columns: auto 1fr 50px;
+    grid-column-gap: 20px;
+    align-items: center;
+  }
+
+  .login-icon {
+    height: 16px;
+    width: 16px;
+    border-radius: 2px;
+  }
+
+  .login-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .login-url {
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>

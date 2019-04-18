@@ -114,8 +114,20 @@
             // TODO: If not, prompt them to enter it...
             const db = this.$ldb
             if (db.persistence.isLoaded) {
+              // Get host, url and fields that were passed from the script
               const host = data.host
+              const url = data.url
               const fields = data.fields
+              // Get the title and icon from the active tab
+              let title
+              let icon
+              const activeTab = this.tabs.find((tab) => {
+                return tab.isActive
+              })
+              if (activeTab) {
+                title = activeTab.title
+                icon = activeTab.icon
+              }
               // If login details have already been saved for this host, update them
               db.find({ personaId, host }).exec(async (err, dbDetails) => {
                 if (err) {
@@ -123,11 +135,11 @@
                 }
                 if (dbDetails.length) {
                   if (!dbDetails[0].ignore) {
-                    await this.saveLoginDetails({ db, personaId, host, fields })
+                    await this.saveLoginDetails({ db, personaId, host, url, title, icon, fields })
                   }
                 } else {
                   // Otherwise, ask the user whether to save the login details
-                  this.openLoginMenu({ host, fields })
+                  this.openLoginMenu({ host, url, title, icon, fields })
                   setInterval(() => {
                     this.closeLoginMenu()
                   }, 10 * 1000)

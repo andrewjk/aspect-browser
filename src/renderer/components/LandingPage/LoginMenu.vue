@@ -46,8 +46,11 @@
         const db = this.$ldb
         const personaId = this.persona._id
         const host = this.loginSettings.host
+        const url = this.loginSettings.url
+        const title = this.loginSettings.title
+        const icon = this.loginSettings.icon
         const fields = this.loginSettings.fields
-        await this.saveLoginDetails({ db, personaId, host, fields })
+        await this.saveLoginDetails({ db, personaId, host, url, title, icon, fields })
         this.closeLoginMenu()
       },
       dontSaveLogin () {

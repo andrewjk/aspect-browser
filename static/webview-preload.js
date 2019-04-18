@@ -28,6 +28,7 @@ ipcRenderer.on('persona-id-available', (event, data) => {
   if (formsToHook.length) {
     // Store passwords against the host - which means there should only be one password per host per persona
     const host = document.location.host
+    const url = document.location.href
 
     // Let the caller know that we've found each form and may need its details
     for (let form of formsToHook) {
@@ -38,7 +39,7 @@ ipcRenderer.on('persona-id-available', (event, data) => {
     for (let form of formsToHook) {
       form.addEventListener('submit', () => {
         const fields = serialize(form)
-        ipcRenderer.send('form-submitted-with-password-' + personaId, { form: form.action, host, fields })
+        ipcRenderer.send('form-submitted-with-password-' + personaId, { form: form.action, host, url, fields })
       })
     }
   }

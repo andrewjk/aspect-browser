@@ -69,6 +69,10 @@ const actions = {
         if (dbDetails.length) {
           // Update the existing details
           const id = dbDetails[0]._id
+          dbDetails[0].host = host
+          dbDetails[0].url = data.url
+          dbDetails[0].title = data.title
+          dbDetails[0].icon = data.icon
           Object.assign(dbDetails[0].fields, data.fields)
           db.update({ _id: id }, dbDetails[0], {}, (err, numReplaced) => {
             if (err) {
@@ -78,11 +82,13 @@ const actions = {
           })
         } else {
           // Add the new details
-          const fields = data.fields
           const login = {
             personaId,
             host,
-            fields
+            url: data.url,
+            title: data.title,
+            icon: data.icon,
+            fields: data.fields
           }
           db.insert(login, (err, dbDetails) => {
             if (err) {
