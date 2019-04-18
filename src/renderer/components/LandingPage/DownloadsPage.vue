@@ -16,8 +16,11 @@
       <label class="downloads-select-all">
         <input type="checkbox" :checked="selectAll" @change="toggleAll"> {{ showSelectAll ? 'Select all' : 'Select none' }}
       </label>
-      <button v-if="showDeleteButton" class="downloads-delete-button delete-link" @click.stop="deleteSelectedItems" :title="'Delete the selected downloaded'">
+      <button v-if="showDeleteButton" class="downloads-delete-button delete-link" @click.stop="deleteSelectedItems" title="Delete the selected download(s)">
         {{ `Delete the ${selectedCount} selected ${selectedCount === 1 ? 'download' : 'downloads'}` }}
+      </button>
+      <button v-else class="downloads-delete-button delete-link" @click.stop="clearDownloadedItems" title="Clear this persona's downloads">
+        Clear {{ this.persona.name }} downloads
       </button>
     </div>
     <div class="downloads-list">
@@ -47,10 +50,12 @@
 <script>
   import { mapMutations, mapActions } from 'vuex'
   import { shell } from 'electron'
-
   import { URL } from 'url'
+  import { create } from 'vue-modal-dialogs'
   import dateformat from 'dateformat'
   import filesize from 'filesize'
+
+  import ConfirmDialog from '../Dialogs/ConfirmDialog'
 
   export default {
     props: {
@@ -109,7 +114,8 @@
       ...mapActions([
         'openInTab',
         'loadDownloads',
-        'deleteDownloads'
+        'deleteDownloads',
+        'clearDownloads'
       ]),
       searchDownloads () {
         this.checkAll(false)
@@ -187,6 +193,16 @@
         this.downloads = response
         this.showSelectAll = true
         this.showDeleteButton = false
+      },
+      async clearDownloadedItems () {
+        const dialog = create(ConfirmDialog)
+        const result = await dialog({ content: 'Are you sure you want to clear the downloads for this persona?' }).transition()
+        if (result) {
+          this.clearDownloads({ db: this.$ddb, personaId: this.persona._id })
+
+          const response = await this.loadDownloads({ db: this.$ddb, personaId: this.persona._id, limit: 100 })
+          this.downloads = response
+        }
       },
       openDownload (item) {
         shell.openItem(item.localFile)
