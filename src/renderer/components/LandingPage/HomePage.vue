@@ -183,7 +183,7 @@
     width: 30px;
     line-height: 30px;
     text-align: center;
-    color: #888;
+    color: #777;
   }
 
   .editing-icon {

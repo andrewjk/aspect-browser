@@ -66,6 +66,7 @@ const mutations = {
   setBookmarkDetails (state, data) {
     const bookmark = data.bookmark
     if (data.title !== undefined) bookmark.title = data.title
+    if (data.url !== undefined) bookmark.url = data.url
   },
   insertBookmark (state, data) {
     const persona = data.persona
@@ -135,13 +136,14 @@ const actions = {
     // Create a new bookmark object to be edited
     const bookmarkToEdit = {
       _id: bookmark._id,
-      title: bookmark.title
+      title: bookmark.title,
+      url: bookmark.url
     }
     const showForm = create(BookmarkDialog)
     showForm({ bookmark: bookmarkToEdit, persona }).transition()
       .then((result) => {
         if (result) {
-          commit('setBookmarkDetails', { bookmark, title: bookmarkToEdit.title })
+          commit('setBookmarkDetails', { bookmark, title: bookmarkToEdit.title, url: bookmarkToEdit.url })
           commit('sortBookmarks', persona)
           dispatch('savePersona', { db, persona })
         }

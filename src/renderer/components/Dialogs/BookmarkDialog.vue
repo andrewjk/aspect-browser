@@ -16,6 +16,14 @@
                   <input type="text" id="title" v-model="bookmark.title" placeholder="Title">
                 </td>
               </tr>
+              <tr>
+                <td>
+                  <label for="url">URL</label>
+                </td>
+                <td>
+                  <input type="text" id="url" v-model="bookmark.url" placeholder="URL">
+                </td>
+              </tr>
             </tbody>
           </table>
         </form>
