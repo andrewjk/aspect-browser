@@ -188,8 +188,8 @@
     background-color: inherit;
     border-radius: 2px;
     display: inline-block;
-    padding: 0 10px;
     height: 26px;
+    width: 36px;
   }
 
   .address-button:hover,
