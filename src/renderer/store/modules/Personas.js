@@ -37,6 +37,7 @@ const mutations = {
         name: persona.name,
         shortName: persona.shortName,
         color: persona.color,
+        image: persona.image,
         order: persona.order,
         bookmarks: persona.bookmarks,
         isActive: false,
@@ -180,6 +181,7 @@ const mutations = {
     if (data.name !== undefined) persona.name = data.name
     if (data.shortName !== undefined) persona.shortName = data.shortName
     if (data.color !== undefined) persona.color = data.color
+    if (data.image !== undefined) persona.image = data.image
   },
   insertPersona (state, persona) {
     state.personas.push(persona)
@@ -229,6 +231,7 @@ const actions = {
       name: 'Personal',
       shortName: 'P',
       color: '#25B76D',
+      image: null,
       order: 1,
       bookmarks: []
     }
@@ -279,6 +282,7 @@ const actions = {
       name: null,
       shortName: null,
       color: null,
+      image: null,
       bookmarks: []
     }
     const showForm = create(PersonaDialog)
@@ -307,6 +311,7 @@ const actions = {
       name: persona.name,
       shortName: persona.shortName,
       color: persona.color,
+      image: persona.image,
       bookmarks: persona.bookmarks
     }
     const showForm = create(PersonaDialog)
@@ -318,7 +323,8 @@ const actions = {
             persona,
             name: personaToEdit.name,
             shortName: personaToEdit.shortName,
-            color: personaToEdit.color
+            color: personaToEdit.color,
+            image: personaToEdit.image
           }
           commit('setPersonaDetails', personaDetails)
           dispatch('savePersona', { db, persona })
@@ -354,6 +360,7 @@ const actions = {
         name: persona.name,
         shortName: persona.shortName,
         color: persona.color,
+        image: persona.image,
         bookmarks: persona.bookmarks.map((bookmark) => {
           return {
             _id: bookmark._id,
@@ -373,6 +380,14 @@ const actions = {
         resolve()
       })
     })
+  },
+  setBackgroundImage ({ commit, dispatch }, { db, persona, image }) {
+    const personaDetails = {
+      persona,
+      image
+    }
+    commit('setPersonaDetails', personaDetails)
+    dispatch('savePersona', { db, persona })
   }
 }
 

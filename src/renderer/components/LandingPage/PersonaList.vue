@@ -62,8 +62,7 @@
       ...mapMutations([
         'setActivePersonaIndex',
         'insertPersona',
-        'sortPersonas',
-        'setPersonaDetails'
+        'sortPersonas'
       ]),
       ...mapActions([
         'openNewTab',

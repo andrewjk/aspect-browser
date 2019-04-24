@@ -68,6 +68,7 @@
     "electron-dl": "^1.14.0",
     "ext-name": "^5.0.0",
     "filesize": "^4.1.2",
+    "fs-extra": "^7.0.1",
     "nedb": "^1.8.0",
     "normalize.css": "^8.0.1",
     "semver": "^6.0.0",
