@@ -135,7 +135,7 @@ const mutations = {
         _id: uuid(),
         url: url,
         addressText: url,
-        title: data.title ? data.title : url.replace(/http[s]*:\/\/[www.]*/, ''),
+        title: data.title ? data.title : url.replace(/http[s]*:\/\/(www\.)*/, ''),
         index: tabs.length,
         icon: data.icon,
         isActive: false,

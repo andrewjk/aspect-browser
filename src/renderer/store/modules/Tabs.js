@@ -235,7 +235,7 @@ const actions = {
     const persona = getters.getActivePersona
     if (persona) {
       const url = data.url
-      const title = url.replace(/http[s]*:\/\/[www.]*/, '')
+      const title = url.replace(/http[s]*:\/\/(www\.)*/, '')
       const background = data.background
       if (background) {
         // Add the tab after the current active tab
