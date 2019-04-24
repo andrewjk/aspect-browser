@@ -5,5 +5,5 @@ import { remote } from 'electron'
 export default new Datastore({
   autoload: false,
   isLoaded: false,
-  filename: path.join(remote.app.getPath('appData'), '/Aspect Browser/Data/logins.db')
+  filename: path.join(remote.app.getPath('userData'), 'Data/logins.db')
 })

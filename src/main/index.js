@@ -12,6 +12,9 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
+// Set the userData folder manually to 'Aspect Browser'
+app.setPath('userData', app.getPath('userData').replace('aspect-browser', 'Aspect Browser'))
+
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
