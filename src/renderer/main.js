@@ -46,7 +46,8 @@ import {
   faPause,
   faFolderOpen,
   faInfoCircle,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faCamera
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faClock,
@@ -105,6 +106,7 @@ library.add(faPause)
 library.add(faFolderOpen)
 library.add(faInfoCircle)
 library.add(faExclamationTriangle)
+library.add(faCamera)
 
 library.add(faClock)
 library.add(faFile)

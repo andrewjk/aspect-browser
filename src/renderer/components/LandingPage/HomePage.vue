@@ -46,13 +46,19 @@
           </div>
         </button>
       </div>
-      <div class="home-links">
+    </div>
+    <div v-if="editing" class="edit-image-links">
+      <button class="persona-edit-button" @click="setBackground" title="Set background image">
+        <fa class="editing-icon" icon="camera"/>
+      </button>
+      <button v-if="persona.image" class="persona-edit-button" @click="clearBackground" title="Clear background image">
+        <fa class="editing-icon" icon="times"/>
+      </button>
+    </div>
+    <div class="edit-persona-links">
+      <button class="persona-edit-button" @click="toggleEditing" :title="editing ? 'Done editing' : 'Edit home page'">
         <fa class="editing-icon" :icon="editing ? 'check' : 'edit'"/>
-        <a href="#" @click="toggleEditing">
-          {{ editing ? 'Done editing' : 'Edit home page' }}
-        </a>
-        <a v-if="editing" href="#" @click="setBackground" style="float: right">Set background image</a>
-      </div>
+      </button>
     </div>
   </div>
 </template>
@@ -140,6 +146,17 @@
           await fs.copy(files[0], destFile)
           this.setBackgroundImage({ db: this.$pdb, persona: this.persona, image: destFile })
         }
+      },
+      async clearBackground () {
+        if (this.persona.image) {
+          try {
+            await fs.unlink(this.persona.image)
+          } catch (err) {
+            // Don't care if the file doesn't exist
+            console.log(err)
+          }
+        }
+        this.setBackgroundImage({ db: this.$pdb, persona: this.persona, image: null })
       }
     }
   }
@@ -190,6 +207,7 @@
   .bookmark-button:hover,
   .bookmark-button:focus {
     background-color: rgba(0, 0, 0, 0.15);
+    cursor: pointer;
   }
 
   .bookmark-button.editing:hover,
@@ -222,25 +240,45 @@
 
   .bookmark-edit-button {
     border-radius: 2px;
+    color: #777;
     height: 30px;
     width: 30px;
     line-height: 30px;
     text-align: center;
+  }
+
+  .edit-persona-links {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .persona-edit-button {
+    background-color: transparent;
+    border-radius: 2px;
     color: #777;
-  }
-
-  .home-links {
-    padding: 10px;
-  }
-
-  .editing-icon {
-    color: #0077cc;
-    margin-right: 5px;
+    height: 40px;
+    width: 40px;
+    line-height: 30px;
+    text-align: center;
   }
 
   .bookmark-edit-button:hover,
-  .bookmark-edit-button:focus {
-    background-color: #eee;
+  .bookmark-edit-button:focus,
+  .persona-edit-button:hover,
+  .persona-edit-button:focus {
+    background-color: rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+  }
+
+  .edit-image-links {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
   }
 
 </style>
