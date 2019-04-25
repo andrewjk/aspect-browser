@@ -31,7 +31,7 @@
             <input type="checkbox" v-model="item.isSelected" @change="selectOne">
             {{ formatTime(item.dateTime) }}
           </label>
-          <button class="downloads-button" @click="openDownloads(item, $event)">
+          <button class="downloads-button" @click="openDownload(item, $event)">
             <div class="downloads-button-grid">
               <div class="downloads-filename" :title="item.filename">{{ item.filename }}</div>
               <div class="downloads-size">{{ formatSize(item) }}</div>
@@ -128,21 +128,6 @@
           this.downloads = response
           this.searchCompleted = true
         }, 500)
-      },
-      openDownloads (downloads, e) {
-        // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
-        if (e.ctrlKey || e.which === 2 || e.which === 4) {
-          this.openInTab({ url: downloads.url, background: true })
-          return
-        }
-
-        const activeTab = this.tabs.find((item) => {
-          return item.isActive
-        })
-
-        this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: downloads.url })
-        this.addToHistory({ tab: activeTab, url: 'aspect://downloads', title: 'Downloads' })
-        this.setHasOpenTab(this.persona)
       },
       areDatesEqual (d1, d2) {
         if (!d1.getFullYear) console.log(d1)
