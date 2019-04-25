@@ -27,7 +27,7 @@
         </p>
       </div>
       <div class="home-bookmarks">
-        <button v-for="(item, index) in persona.bookmarks" :key="item._id" :class="['bookmark-button', editing ? 'editing' : '']" @click="openBookmark(item, $event)">
+        <button v-for="(item, index) in persona.bookmarks" :key="item._id" :class="['bookmark-button', editing ? 'editing' : '']" @click="openBookmark(item, $event)" @auxclick="openBookmark(item, $event)" @mousedown="checkMouseButton($event)">
           <img class="bookmark-icon" :src="item.icon">
           <div class="bookmark-title">{{ item.title }}</div>
           <div v-show="editing" class="edit-bookmark-links">
@@ -105,6 +105,12 @@
         'deleteBookmark',
         'setBackgroundImage'
       ]),
+      checkMouseButton (e) {
+        // If the middle button was clicked, prevent scrolling from starting so that we can handle opening the url
+        if (e.which === 2 || e.which === 4) {
+          e.preventDefault()
+        }
+      },
       openBookmark (bookmark, e) {
         if (this.editing) {
           return

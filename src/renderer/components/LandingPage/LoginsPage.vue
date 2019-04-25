@@ -26,7 +26,7 @@
           <input type="checkbox" v-model="item.isSelected" @change="selectOne">
           {{ item.host }}
         </label>
-        <button class="login-button" @click="openLogin(item, $event)">
+        <button class="login-button" @click="openLogin(item, $event)" @auxclick="openLogin(item, $event)" @mousedown="checkMouseButton($event)">
           <div class="login-button-grid">
             <img class="login-icon" :src="item.icon">
             <div class="login-title" :title="item.title">{{ item.title }}</div>
@@ -104,6 +104,12 @@
           this.logins = response
           this.searchCompleted = true
         }, 500)
+      },
+      checkMouseButton (e) {
+        // If the middle button was clicked, prevent scrolling from starting so that we can handle opening the url
+        if (e.which === 2 || e.which === 4) {
+          e.preventDefault()
+        }
       },
       openLogin (login, e) {
         // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background

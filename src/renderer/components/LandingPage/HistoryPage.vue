@@ -31,7 +31,7 @@
             <input type="checkbox" v-model="item.isSelected" @change="selectOne">
             {{ formatTime(item.dateTime) }}
           </label>
-          <button class="history-button" @click="openHistory(item, $event)">
+          <button class="history-button" @click="openHistory(item, $event)" @auxclick="openHistory(item, $event)" @mousedown="checkMouseButton($event)">
             <div class="history-button-grid">
               <img class="history-icon" :src="item.icon">
               <div class="history-title" :title="item.title">{{ item.title }}</div>
@@ -124,6 +124,12 @@
           this.history = response
           this.searchCompleted = true
         }, 500)
+      },
+      checkMouseButton (e) {
+        // If the middle button was clicked, prevent scrolling from starting so that we can handle opening the url
+        if (e.which === 2 || e.which === 4) {
+          e.preventDefault()
+        }
       },
       openHistory (history, e) {
         // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
