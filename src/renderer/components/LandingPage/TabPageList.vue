@@ -16,6 +16,9 @@
         <template v-else-if="item.url === 'aspect://logins'">
           <logins-page :persona="persona" :tabs="tabs"></logins-page>
         </template>
+        <template v-else-if="item.url === 'aspect://settings'">
+          <settings-page></settings-page>
+        </template>
         <template v-else-if="item.url === 'aspect://error'">
           <error-page :persona="persona" :tabs="tabs"></error-page>
         </template>
@@ -37,6 +40,7 @@
   import HistoryPage from './HistoryPage'
   import DownloadsPage from './DownloadsPage'
   import LoginsPage from './LoginsPage'
+  import SettingsPage from './SettingsPage'
   import ErrorPage from './ErrorPage'
   import SuspendedPage from './SuspendedPage'
   import TabPage from './TabPage'
@@ -45,7 +49,7 @@
   import Encrypter from '../../data/Encrypter'
 
   export default {
-    components: { HomePage, HistoryPage, DownloadsPage, LoginsPage, ErrorPage, SuspendedPage, TabPage },
+    components: { HomePage, HistoryPage, DownloadsPage, LoginsPage, SettingsPage, ErrorPage, SuspendedPage, TabPage },
     props: {
       persona: null,
       showWelcome: false

@@ -46,6 +46,10 @@ const mutations = {
             t.url = 'aspect://logins'
             t.title = 'Logins'
             t.webview = null
+          } else if (url === 'aspect://settings') {
+            t.url = 'aspect://settings'
+            t.title = 'Settings'
+            t.webview = null
           } else if (url === 'aspect://error') {
             t.url = 'aspect://error'
             t.title = 'Error'
@@ -90,6 +94,10 @@ const mutations = {
           } else if (url === 'aspect://logins') {
             t.url = 'aspect://logins'
             t.title = 'Logins'
+            t.webview = null
+          } else if (url === 'aspect://settings') {
+            t.url = 'aspect://settings'
+            t.title = 'Settings'
             t.webview = null
           } else if (url === 'aspect://error') {
             t.url = 'aspect://error'

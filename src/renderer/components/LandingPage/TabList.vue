@@ -20,6 +20,9 @@
           <template v-else-if="item.url === 'aspect://logins'">
             <fa icon="key" class="tab-icon"/>
           </template>
+          <template v-else-if="item.url === 'aspect://settings'">
+            <fa icon="cog" class="tab-icon"/>
+          </template>
           <template v-else-if="item.url === 'aspect://error'">
             <fa icon="exclamation-triangle" class="tab-icon"/>
           </template>

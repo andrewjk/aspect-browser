@@ -1,6 +1,6 @@
 <template>
   <div id="options-menu">
-    <button class="options-menu-item" @click="editSettings({ db: $usdb, settings })" title="Edit application settings">
+    <button class="options-menu-item" @click="editSettings" title="Edit application settings">
       <div class="options-menu-item-grid">
         <fa icon="cog" class="options-menu-icon"/>
         <span>Settings</span>
@@ -69,7 +69,7 @@
 </template>
 
 <script>
-  import { mapState, mapActions } from 'vuex'
+  import { mapActions } from 'vuex'
   import { create } from 'vue-modal-dialogs'
 
   import AlertDialog from '../Dialogs/AlertDialog'
@@ -82,11 +82,6 @@
   export default {
     props: {
       persona: null
-    },
-    computed: {
-      ...mapState({
-        settings: state => state.Settings.settings
-      })
     },
     methods: {
       ...mapActions([

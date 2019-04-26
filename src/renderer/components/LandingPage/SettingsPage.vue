@@ -1,51 +1,41 @@
 <template>
-  <div class="edit-dialog dialog-mask" @click="$close(false)">
-    <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
-      <header>
-        <h2>Edit Settings:</h2>
-      </header>
-      <div class="dialog-body">
-        <form>
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <label for="searchProvider">Search</label>
-                </td>
-                <td>
-                  <input type="text" id="searchProvider" v-model="settings.searchProvider" placeholder="Search provider">
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label for="enableLoginManager">Login manager</label>
-                </td>
-                <td>
-                  <label>
-                    <input type="checkbox" id="enableLoginManager" v-model="settings.enableLoginManager">
-                    {{ settings.enableLoginManager ? "Enabled" : "Disabled" }}
-                  </label>
-                </td>
-              </tr>
-              <tr v-show="this.settings.enableLoginManager && this.loginsDatabaseExists">
-                <td>
-                  &nbsp;
-                </td>
-                <td>
-                  <button class="settings-button" @click="changeLoginManagerPassword">
-                    Change Password
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </form>
-      </div>
-      <footer>
-        <button id="dialog-confirm" class="confirm" @click="$close(true)">Save</button>
-        <button id="dialog-cancel" class="cancel" @click="$close(false)">Cancel</button>
-      </footer>
-    </div>
+  <div class="settings-page-wrapper">
+    <div class="title">Settings</div>
+    <form>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <label for="searchProvider">Search</label>
+            </td>
+            <td>
+              <input type="text" id="searchProvider" v-model="settingsToEdit.searchProvider" placeholder="Search provider" @blur="saveSettings">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="enableLoginManager">Login manager</label>
+            </td>
+            <td>
+              <label>
+                <input type="checkbox" id="enableLoginManager" v-model="settingsToEdit.enableLoginManager" @change="maybeSetEnableLoginManager">
+                {{ settingsToEdit.enableLoginManager ? "Enabled" : "Disabled" }}
+              </label>
+            </td>
+          </tr>
+          <tr v-show="this.settingsToEdit.enableLoginManager && this.loginsDatabaseExists()">
+            <td>
+              &nbsp;
+            </td>
+            <td>
+              <button class="settings-button" @click="changeLoginManagerPassword">
+                Change Password
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
   </div>
 </template>
 
@@ -63,13 +53,21 @@
   import Encrypter from '../../data/Encrypter'
 
   export default {
-    props: {
-      settings: null
+    data () {
+      return {
+        settingsToEdit: {}
+      }
     },
     computed: {
       ...mapState({
-        settingsToEdit: state => state.Settings.settingsToEdit
+        settings: state => state.Settings.settings
       })
+    },
+    created: function () {
+      this.settingsToEdit = {
+        searchProvider: this.settings.searchProvider,
+        enableLoginManager: this.settings.enableLoginManager
+      }
     },
     methods: {
       ...mapMutations([
@@ -78,18 +76,15 @@
       ...mapActions([
         'saveMasterPasswordRecord'
       ]),
-      doNothing () {
-        // HACK: This just prevents clicks on the dialog-content bubbling to the dialog-mask. There's probably a better way to do this...
-      },
       loginsDatabaseExists () {
         // Check whether there's already a database file
-        const filename = path.join(remote.app.getPath('userData'), 'logins.db')
+        const filename = path.join(remote.app.getPath('userData'), 'Data/logins.db')
         return fs.existsSync(filename)
       },
-      async maybeSetEnableLoginManager (value) {
+      async maybeSetEnableLoginManager () {
         // TODO: This is some spaghetti that needs to be cleaned up...
         // If turning on and there's no existing database file, require setting the master password
-        if (value && !this.loginsDatabaseExists()) {
+        if (this.settingsToEdit.enableLoginManager && !this.loginsDatabaseExists()) {
           const prompt = create(CreatePasswordDialog)
           const result = await prompt({ content: 'Enter a master password below. This password will be used to encrypt your login details. You will be required to enter it the first time you encounter a password field after starting Aspect.' }).transition()
           if (result) {
@@ -97,16 +92,16 @@
               const dialog = create(AlertDialog)
               await dialog({ content: 'A password is required.' }).transition()
               // Turn it back off
-              document.getElementById('enableLoginManager').checked = false
-              this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: false })
+              this.settingsToEdit.enableLoginManager = false
+              this.saveSettings()
               return
             }
             if (result.password !== result.confirmPassword) {
               const dialog = create(AlertDialog)
               await dialog({ content: 'The password and confirmation don\'t match.' }).transition()
               // Turn it back off
-              document.getElementById('enableLoginManager').checked = false
-              this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: false })
+              this.settingsToEdit.enableLoginManager = false
+              this.saveSettings()
               return
             }
 
@@ -121,31 +116,25 @@
                   const dialog = create(AlertDialog)
                   await dialog({ content: 'Failed to unlock database.' }).transition()
                   // Turn it back off
-                  document.getElementById('enableLoginManager').checked = false
-                  this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: false })
+                  this.settingsToEdit.enableLoginManager = false
+                  this.saveSettings()
                   return
                 }
                 db.persistence.isLoaded = true
                 // Put a record in the database so that we know it works
                 await this.saveMasterPasswordRecord({ db })
-                // Turn it on
-                this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: value })
               })
             } else {
               // Put a record in the database so that we know it works
               await this.saveMasterPasswordRecord({ db })
-              // Turn it on
-              this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: value })
             }
           } else {
             // Turn it back off
-            document.getElementById('enableLoginManager').checked = false
-            this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: false })
+            this.settingsToEdit.enableLoginManager = false
+            this.saveSettings()
           }
-        } else {
-          // Just turn it on or off
-          this.setSettingsDetails({ settings: this.settingsToEdit, enableLoginManager: value })
         }
+        this.saveSettings()
       },
       async changeLoginManagerPassword () {
         // TODO: This is some spaghetti that needs to be cleaned up...
@@ -187,7 +176,7 @@
               }
 
               // Delete the old database file
-              const filename = path.join(remote.app.getPath('userData'), 'logins.db')
+              const filename = path.join(remote.app.getPath('userData'), 'Data/logins.db')
               fs.unlinkSync(filename)
 
               // Encrypt every record with the new encrypter
@@ -214,12 +203,40 @@
             })
           })
         }
+        this.saveSettings()
+      },
+      saveSettings () {
+        const settingsDetails = {
+          searchProvider: this.settingsToEdit.searchProvider,
+          enableLoginManager: this.settingsToEdit.enableLoginManager
+        }
+        this.setSettingsDetails(settingsDetails)
+        this.$usdb.update({ _id: this.settings._id }, settingsDetails, {}, (err, numReplaced) => {
+          if (err) {
+            alert('ERROR: ' + err)
+          }
+        })
       }
     }
   }
 </script>
 
 <style scoped>
+
+  .settings-page-wrapper {
+    padding: 40px 10px 10px;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  .title {
+    font-size: 42px;
+    margin-bottom: 10px;
+  }
+
+  .settings-search {
+    margin: 20px 0;
+  }
 
   .settings-button {
     border: 1px solid #aaa;

@@ -285,9 +285,9 @@
             }
           }
         } else {
-          const url = activeTab.addressText.trim()
+          const url = this.addressText.trim()
           if (url) {
-            this.goToUrl({ tab: activeTab, url })
+            this.goToUrl({ tab: activeTab, url, searchProvider: this.settings.searchProvider })
           } else {
             this.goHome(activeTab)
           }
