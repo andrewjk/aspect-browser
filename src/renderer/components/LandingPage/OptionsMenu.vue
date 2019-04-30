@@ -51,13 +51,19 @@
         <span>View {{ this.persona.name }} downloads</span>
       </div>
     </button>
-    <div class="options-menu-separator"></div>
-    <button class="options-menu-item" @click="maybeShowLogins" title="Show login details for this persona">
+    <div v-if="settings.enableLoginManager" class="options-menu-separator"></div>
+    <button v-if="settings.enableLoginManager" class="options-menu-item" @click="maybeShowLogins" title="Show login details for this persona">
       <div class="options-menu-item-grid">
         <fa icon="key" class="options-menu-icon"/>
         <span>View {{ this.persona.name }} logins</span>
       </div>
     </button>
+    <!--<button v-if="settings.enableLoginManager" class="options-menu-item" @click="fillLogin" title="Fill login details on this page">
+      <div class="options-menu-item-grid">
+        <fa icon="key" class="options-menu-icon"/>
+        <span>Fill login details</span>
+      </div>
+    </button>-->
     <div class="options-menu-separator"></div>
     <button class="options-menu-item" @click="showAboutDialog" title="Show information about Aspect">
       <div class="options-menu-item-grid">
@@ -69,7 +75,7 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex'
+  import { mapState, mapGetters, mapActions } from 'vuex'
   import { create } from 'vue-modal-dialogs'
 
   import AlertDialog from '../Dialogs/AlertDialog'
@@ -82,6 +88,14 @@
   export default {
     props: {
       persona: null
+    },
+    computed: {
+      ...mapState({
+        settings: state => state.Settings.settings
+      }),
+      ...mapGetters([
+        'getActiveTab'
+      ])
     },
     methods: {
       ...mapActions([
@@ -97,7 +111,8 @@
         'loadSession',
         'showHistory',
         'showDownloads',
-        'showLogins'
+        'showLogins',
+        'loadLoginDetails'
       ]),
       async saveSessionWithName () {
         const prompt = create(PromptDialog)
@@ -133,6 +148,10 @@
             this.showLogins({ persona: this.persona })
           })
         }
+      },
+      async fillLogin () {
+        const activeTab = this.getActiveTab
+        activeTab.webview.send('force-password-fill')
       },
       async showAboutDialog () {
         const dialog = create(AboutDialog)
