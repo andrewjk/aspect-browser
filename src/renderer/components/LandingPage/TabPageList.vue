@@ -87,7 +87,6 @@
             const db = this.$ldb
             const form = data.form
             const host = data.host
-
             // Maybe load the logins database
             if (!db.persistence.isLoaded) {
               const prompt = create(PromptDialog)
@@ -144,7 +143,7 @@
                 } else {
                   // Otherwise, ask the user whether to save the login details
                   this.openLoginMenu({ host, url, title, icon, fields })
-                  setInterval(() => {
+                  setTimeout(() => {
                     this.closeLoginMenu()
                   }, 10 * 1000)
                 }
@@ -157,9 +156,12 @@
         // TODO: to function
         const personaId = this.persona._id
         const result = await this.loadLoginDetails({ db, personaId, host })
-        if (result && result.ignore) console.log('ignoring that one')
-        if (result && result.fields && !result.ignore) {
-          event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
+        if (result) {
+          if (result.ignore) {
+            console.log('Ignoring login')
+          } else if (result.fields) {
+            event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
+          }
         }
       }
     }
