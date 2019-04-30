@@ -39,7 +39,8 @@ const mutations = {
         color: persona.color,
         image: persona.image,
         order: persona.order,
-        bookmarks: persona.bookmarks,
+        bookmarks: persona.bookmarks || [],
+        widgets: persona.widgets || [],
         isActive: false,
         hasOpenTab: false,
         tabs: [
@@ -233,7 +234,8 @@ const actions = {
       color: '#25B76D',
       image: null,
       order: 1,
-      bookmarks: []
+      bookmarks: [],
+      widgets: []
     }
     db.insert(defaultPersona, (err, dbPersona) => {
       if (err) {
@@ -283,7 +285,8 @@ const actions = {
       shortName: null,
       color: null,
       image: null,
-      bookmarks: []
+      bookmarks: [],
+      widgets: []
     }
     const showForm = create(PersonaDialog)
     showForm({ persona: personaToEdit, adding: true }).transition()
@@ -368,6 +371,15 @@ const actions = {
             title: bookmark.title,
             icon: bookmark.icon,
             order: bookmark.order
+          }
+        }),
+        widgets: persona.widgets.map((widget) => {
+          return {
+            _id: widget._id,
+            name: widget.name,
+            timezone: widget.timezone,
+            position: widget.position,
+            order: widget.order
           }
         })
       }

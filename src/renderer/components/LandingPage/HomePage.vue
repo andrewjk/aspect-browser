@@ -1,64 +1,110 @@
 <template>
   <div class="home-page-background" :style="{ backgroundImage: persona.image ? `url('${getBase64Image}')` : '' }">
     <div class="home-page-wrapper">
-      <div class="title">{{ persona.name }} Home</div>
-      <div class="welcome" v-if="showWelcome">
-        <p>
-          Welcome to the Aspect web browser.
-        </p>
-        <p>
-          Your personas are listed along the left column. Each persona has its own set of bookmarks and
-          login info. This means that you can access the same sites (or completely different sites!) with
-          different logins without leaving the browser.
-        </p>
-        <p>
-          A default, empty persona called "Personal" has been setup for you. You can store your personal
-          login details (emails, social media and so on) in this persona and create one or more separate
-          personas to store your work login details. Or you can edit this persona to store something else.
-          It's up to you!
-        </p>
-        <p>
-          To start adding bookmarks, search for a site using the address bar above and then press the star button.
-        </p>
-      </div>
-      <div class="welcome" v-else-if="!persona.bookmarks.length">
-        <p>
-          To start adding bookmarks, search for a site using the address bar above and then press the star button.
-        </p>
-      </div>
-      <div class="home-bookmarks">
-        <button v-for="(item, index) in persona.bookmarks" :key="item._id" :class="['bookmark-button', editing ? 'editing' : '']" @click="openBookmark(item, $event)" @auxclick="openBookmark(item, $event)" @mousedown="checkMouseButton($event)">
-          <img class="bookmark-icon" :src="item.icon">
-          <div class="bookmark-title">{{ item.title }}</div>
-          <div v-show="editing" class="edit-bookmark-links">
-            <button class="bookmark-edit-button" @click.stop="moveBookmarkUpAndSave({ db: $pdb, persona, index })" title="Move this bookmark up">
-              <fa icon="chevron-up"/>
-            </button>
-            <button class="bookmark-edit-button" @click.stop="moveBookmarkDownAndSave({ db: $pdb, persona, index })" title="Move this bookmark down">
-              <fa icon="chevron-down"/>
-            </button>
-            <button class="bookmark-edit-button" @click.stop="editBookmark({ db: $pdb, persona, index })" title="Edit this bookmark">
-              <fa icon="edit"/>
-            </button>
-            <button class="bookmark-edit-button delete-link" @click.stop="deleteBookmark({ db: $pdb, persona, bookmark: item })" title="Delete this bookmark">
-              <fa icon="trash"/>
+      <div class="home-page-left">
+        <div class="widget-container">
+          <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'left')" :key="widget._id">
+            <div class="widget-item">
+              <clock-widget :widget="widget"/>
+            </div>
+            <div v-if="editing" class="edit-widget-links">
+              <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
+                <fa icon="edit"/>
+              </button>
+              <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
+                <fa icon="trash"/>
+              </button>
+            </div>
+          </div>
+          <div v-if="editing" class="edit-widget-links left">
+            <button class="persona-edit-button" @click="addWidget({ db: $pdb, persona, position: 'left' })" title="Add a widget">
+              <fa class="editing-icon" icon="plus"/>
             </button>
           </div>
-        </button>
+        </div>
       </div>
-    </div>
-    <div v-if="editing" class="edit-image-links">
-      <button class="persona-edit-button" @click="setBackground" title="Set background image">
-        <fa class="editing-icon" icon="camera"/>
-      </button>
-      <button v-if="persona.image" class="persona-edit-button" @click="clearBackground" title="Clear background image">
-        <fa class="editing-icon" icon="times"/>
-      </button>
-    </div>
-    <div class="edit-persona-links">
-      <button class="persona-edit-button" @click="toggleEditing" :title="editing ? 'Done editing' : 'Edit home page'">
-        <fa class="editing-icon" :icon="editing ? 'check' : 'edit'"/>
-      </button>
+      <div class="home-page-center">
+        <div class="title">{{ persona.name }} Home</div>
+        <div class="welcome" v-if="showWelcome">
+          <p>
+            Welcome to the Aspect web browser.
+          </p>
+          <p>
+            Your personas are listed along the left column. Each persona has its own set of bookmarks and
+            login info. This means that you can access the same sites (or completely different sites!) with
+            different logins without leaving the browser.
+          </p>
+          <p>
+            A default, empty persona called "Personal" has been setup for you. You can store your personal
+            login details (emails, social media and so on) in this persona and create one or more separate
+            personas to store your work login details. Or you can edit this persona to store something else.
+            It's up to you!
+          </p>
+          <p>
+            To start adding bookmarks, search for a site using the address bar above and then press the star button.
+          </p>
+        </div>
+        <div class="welcome" v-else-if="!persona.bookmarks.length">
+          <p>
+            To start adding bookmarks, search for a site using the address bar above and then press the star button.
+          </p>
+        </div>
+        <div class="home-bookmarks">
+          <button v-for="(item, index) in persona.bookmarks" :key="item._id" :class="['bookmark-button', editing ? 'editing' : '']" @click="openBookmark(item, $event)" @auxclick="openBookmark(item, $event)" @mousedown="checkMouseButton($event)">
+            <img class="bookmark-icon" :src="item.icon">
+            <div class="bookmark-title">{{ item.title }}</div>
+            <div v-show="editing" class="edit-bookmark-links">
+              <button class="bookmark-edit-button" @click.stop="moveBookmarkUpAndSave({ db: $pdb, persona, index })" title="Move this bookmark up">
+                <fa icon="chevron-up"/>
+              </button>
+              <button class="bookmark-edit-button" @click.stop="moveBookmarkDownAndSave({ db: $pdb, persona, index })" title="Move this bookmark down">
+                <fa icon="chevron-down"/>
+              </button>
+              <button class="bookmark-edit-button" @click.stop="editBookmark({ db: $pdb, persona, index })" title="Edit this bookmark">
+                <fa icon="edit"/>
+              </button>
+              <button class="bookmark-edit-button delete-link" @click.stop="deleteBookmark({ db: $pdb, persona, bookmark: item })" title="Delete this bookmark">
+                <fa icon="trash"/>
+              </button>
+            </div>
+          </button>
+        </div>
+        <div v-if="editing" class="edit-image-links">
+          <button class="persona-edit-button" @click="setBackground" title="Set background image">
+            <fa class="editing-icon" icon="camera"/>
+          </button>
+          <button v-if="persona.image" class="persona-edit-button" @click="clearBackground" title="Clear background image">
+            <fa class="editing-icon" icon="times"/>
+          </button>
+        </div>
+        <div class="edit-persona-links">
+          <button class="persona-edit-button" @click="toggleEditing" :title="editing ? 'Done editing' : 'Edit home page'">
+            <fa class="editing-icon" :icon="editing ? 'check' : 'edit'"/>
+          </button>
+        </div>
+      </div>
+      <div class="home-page-right">
+        <div class="widget-container">
+          <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'right')" :key="widget._id">
+            <div class="widget-item">
+              <clock-widget :widget="widget"/>
+            </div>
+            <div v-if="editing" class="edit-widget-links">
+              <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
+                <fa icon="edit"/>
+              </button>
+              <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
+                <fa icon="trash"/>
+              </button>
+            </div>
+          </div>
+          <div v-if="editing" class="edit-widget-links right">
+            <button class="persona-edit-button" @click="addWidget({ db: $pdb, persona, position: 'right' })" title="Add a widget">
+              <fa class="editing-icon" icon="plus"/>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -69,7 +115,10 @@
   import path from 'path'
   import fs from 'fs-extra'
 
+  import ClockWidget from '../Widgets/ClockWidget.vue'
+
   export default {
+    components: { ClockWidget },
     props: {
       persona: null,
       tabs: Array,
@@ -103,7 +152,10 @@
         'moveBookmarkDownAndSave',
         'editBookmark',
         'deleteBookmark',
-        'setBackgroundImage'
+        'setBackgroundImage',
+        'addWidget',
+        'editWidget',
+        'deleteWidget'
       ]),
       checkMouseButton (e) {
         // If the middle button was clicked, prevent scrolling from starting so that we can handle opening the url
@@ -180,6 +232,11 @@
   }
 
   .home-page-wrapper {
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+  }
+
+  .home-page-center {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 2px;
     padding: 10px;
@@ -198,7 +255,7 @@
   }
 
   .home-bookmarks {
-    margin: 20px 0;
+    margin: 10px 0;
   }
 
   .bookmark-button {
@@ -274,7 +331,9 @@
   .bookmark-edit-button:hover,
   .bookmark-edit-button:focus,
   .persona-edit-button:hover,
-  .persona-edit-button:focus {
+  .persona-edit-button:focus,
+  .widget-edit-button:hover,
+  .widget-edit-button:focus {
     background-color: rgba(0, 0, 0, 0.15);
     cursor: pointer;
   }
@@ -285,6 +344,37 @@
     position: absolute;
     bottom: 20px;
     left: 20px;
+  }
+
+  .edit-widget-links {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+
+  .widget-container {
+    margin: 40px 20px;
+  }
+
+  .widget-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+  }
+
+  .home-page-right .edit-widget-links {
+    text-align: right;
+  }
+
+  .widget-edit-button {
+    background-color: transparent;
+    border-radius: 2px;
+    color: #777;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    text-align: center;
   }
 
 </style>
