@@ -8,6 +8,9 @@ const mutations = {
   openLoginMenu (state, data) {
     state.loginSettings = {
       host: data.host,
+      url: data.url,
+      title: data.title,
+      icon: data.icon,
       fields: data.fields
     }
     state.showLoginMenu = true
