@@ -20,9 +20,15 @@
     async mounted () {
       let locale = await osLocale()
       locale = locale.replace('_', '-')
+      this.getTime(locale)
       setInterval(() => {
-        this.time = new Date().toLocaleTimeString(locale, { timeZone: this.widget.timezone, hour: '2-digit', minute: '2-digit' }).toUpperCase()
+        this.getTime(locale)
       }, 1000)
+    },
+    methods: {
+      getTime (locale) {
+        this.time = new Date().toLocaleTimeString(locale, { timeZone: this.widget.timezone, hour: '2-digit', minute: '2-digit' }).toUpperCase()
+      }
     }
   }
 </script>

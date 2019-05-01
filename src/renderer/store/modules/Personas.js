@@ -376,8 +376,10 @@ const actions = {
         widgets: persona.widgets.map((widget) => {
           return {
             _id: widget._id,
+            type: widget.type,
             name: widget.name,
             timezone: widget.timezone,
+            units: widget.units,
             position: widget.position,
             order: widget.order
           }

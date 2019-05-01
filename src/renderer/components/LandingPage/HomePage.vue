@@ -5,7 +5,8 @@
         <div class="widget-container">
           <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'left')" :key="widget._id">
             <div class="widget-item">
-              <clock-widget :widget="widget"/>
+              <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
+              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
             </div>
             <div v-if="editing" class="edit-widget-links">
               <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
@@ -87,7 +88,8 @@
         <div class="widget-container">
           <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'right')" :key="widget._id">
             <div class="widget-item">
-              <clock-widget :widget="widget"/>
+              <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
+              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
             </div>
             <div v-if="editing" class="edit-widget-links">
               <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
@@ -116,9 +118,10 @@
   import fs from 'fs-extra'
 
   import ClockWidget from '../Widgets/ClockWidget.vue'
+  import WeatherWidget from '../Widgets/WeatherWidget.vue'
 
   export default {
-    components: { ClockWidget },
+    components: { ClockWidget, WeatherWidget },
     props: {
       persona: null,
       tabs: Array,
