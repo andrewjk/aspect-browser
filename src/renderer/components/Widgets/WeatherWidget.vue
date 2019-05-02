@@ -11,7 +11,9 @@
       <label>{{ this.weather }}</label>
     </div>
     <div class="temp">
-      <label>{{ this.maxmin }}</label>
+      <label>
+        <span class="temp-hot">{{ this.max }}</span> / <span class="temp-cold">{{ this.min }}</span>
+      </label>
     </div>
   </div>
 </template>
@@ -28,7 +30,8 @@
       return {
         temperature: 'Loading...',
         weather: '',
-        maxmin: '',
+        max: '',
+        min: '',
         icon: ''
       }
     },
@@ -46,16 +49,18 @@
         const units = this.widget.units === 'celsius' ? 'metric' : 'imperial'
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${weatherKey}&units=${units}`
         const result = await axios.get(url)
-        this.temperature = `${result.data.main.temp}°${this.widget.units.substring(0, 1).toUpperCase()}`
+        const unitsText = this.widget.units.substring(0, 1).toUpperCase()
+        this.temperature = `${result.data.main.temp.toFixed(1)}°${unitsText}`
         this.weather = result.data.weather[0].description.substring(0, 1).toUpperCase() + result.data.weather[0].description.substring(1)
-        this.maxmin = `${result.data.main.temp_max} / ${result.data.main.temp_min}`
+        this.max = `${result.data.main.temp_max.toFixed(1)}°${unitsText}`
+        this.min = `${result.data.main.temp_min.toFixed(1)}°${unitsText}`
         this.icon = `http://openweathermap.org/img/w/${result.data.weather[0].icon}.png`
       }
     }
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .title {
     font-size: 20px;
     margin-bottom: 7px;
@@ -63,5 +68,15 @@
 
   .temp {
     margin: 7px 0;
+  }
+
+  .widget-body:hover {
+    .temp-hot {
+      color: red;
+    }
+
+    .temp-cold {
+      color: blue;
+    }
   }
 </style>
