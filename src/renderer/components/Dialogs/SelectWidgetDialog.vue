@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-dialog dialog-mask" @click="$close(false)">
+  <div class="edit-dialog dialog-mask">
     <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
       <header>
         <h2>Widget Type</h2>
@@ -23,8 +23,8 @@
         </form>
       </div>
       <footer>
-        <button id="dialog-confirm" class="confirm" @click="$close(type)">OK</button>
-        <button id="dialog-cancel" class="cancel" @click="$close(false)">Cancel</button>
+        <button class="confirm" @click="$close(type)">OK</button>
+        <button class="cancel" @click="$close(false)">Cancel</button>
       </footer>
     </div>
   </div>

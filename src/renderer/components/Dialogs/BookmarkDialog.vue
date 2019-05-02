@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-dialog dialog-mask" @click="$close(false)">
+  <div class="edit-dialog dialog-mask">
     <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
       <header>
         <h2>{{ adding ? 'Add Bookmark:' : 'Edit Bookmark:' }}</h2>
@@ -30,8 +30,8 @@
       </div>
       <footer>
         <a v-show="!adding" href="#" class="delete-link" @click="deleteBookmarkAndClose">Delete bookmark</a>
-        <button id="dialog-confirm" class="confirm" @click="$close(true)">Save</button>
-        <button id="dialog-cancel" class="cancel" @click="$close(false)">Cancel</button>
+        <button class="confirm" @click="$close(true)">Save</button>
+        <button class="cancel" @click="$close(false)">Cancel</button>
       </footer>
     </div>
   </div>

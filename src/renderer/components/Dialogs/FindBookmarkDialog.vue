@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-dialog dialog-mask" @click="$close(false)">
+  <div class="edit-dialog dialog-mask">
     <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
       <header>
         <h2>Find Bookmark:</h2>
@@ -17,7 +17,7 @@
         </div>
       </div>
       <footer>
-        <button id="dialog-cancel" class="cancel" @click="$close(false)">Cancel</button>
+        <button class="cancel" @click="$close(false)">Cancel</button>
       </footer>
     </div>
   </div>

@@ -1,12 +1,12 @@
 <template>
-  <div class="message-box dialog-mask" @click="$close(false)">
+  <div class="message-box dialog-mask">
     <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
       <div class="dialog-body">
         <p>{{ content }}</p>
       </div>
       <footer>
-        <button id="dialog-confirm" class="confirm" @click="$close(true)">{{ this.confirmText ? this.confirmText : 'OK' }}</button>
-        <button id="dialog-cancel" class="cancel" @click="$close(false)">{{ this.cancelText ? this.cancelText : 'Cancel' }}</button>
+        <button class="confirm" @click="$close(true)">{{ this.confirmText ? this.confirmText : 'OK' }}</button>
+        <button class="cancel" @click="$close(false)">{{ this.cancelText ? this.cancelText : 'Cancel' }}</button>
       </footer>
     </div>
   </div>

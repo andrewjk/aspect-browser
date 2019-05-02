@@ -1,11 +1,11 @@
 <template>
-  <div class="message-box dialog-mask" @click="$close">
+  <div class="message-box dialog-mask">
     <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
       <div class="dialog-body">
         <p>{{ content }}</p>
       </div>
       <footer>
-        <button id="dialog-confirm" class="confirm" @click="$close">OK</button>
+        <button class="confirm" @click="$close">OK</button>
       </footer>
     </div>
   </div>

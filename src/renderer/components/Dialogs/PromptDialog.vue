@@ -1,5 +1,5 @@
 <template>
-  <div class="message-box dialog-mask" @click="$close('')">
+  <div class="message-box dialog-mask">
     <div class="dialog-content" @click.stop="doNothing">
       <div class="dialog-body">
         <p>{{ content }}</p>
