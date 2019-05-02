@@ -8,17 +8,17 @@
               <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
               <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
               <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
-            </div>
-            <div v-if="editing" class="edit-widget-links">
-              <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
-                <fa icon="edit"/>
-              </button>
-              <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
-                <fa icon="trash"/>
-              </button>
+              <div v-if="editing" class="edit-widget-links">
+                <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
+                  <fa icon="edit"/>
+                </button>
+                <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
+                  <fa icon="trash"/>
+                </button>
+              </div>
             </div>
           </div>
-          <div v-if="editing" class="edit-widget-links left">
+          <div v-if="editing" class="add-widget-link left">
             <button class="persona-edit-button" @click="addWidget({ db: $pdb, persona, position: 'left' })" title="Add a widget">
               <fa class="editing-icon" icon="plus"/>
             </button>
@@ -92,17 +92,17 @@
               <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
               <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
               <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
-            </div>
-            <div v-if="editing" class="edit-widget-links">
-              <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
-                <fa icon="edit"/>
-              </button>
-              <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
-                <fa icon="trash"/>
-              </button>
+              <div v-if="editing" class="edit-widget-links">
+                <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
+                  <fa icon="edit"/>
+                </button>
+                <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
+                  <fa icon="trash"/>
+                </button>
+              </div>
             </div>
           </div>
-          <div v-if="editing" class="edit-widget-links right">
+          <div v-if="editing" class="add-widget-link right">
             <button class="persona-edit-button" @click="addWidget({ db: $pdb, persona, position: 'right' })" title="Add a widget">
               <fa class="editing-icon" icon="plus"/>
             </button>
@@ -226,7 +226,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
   .home-page-background {
     background-size: cover;
@@ -352,10 +352,21 @@
     left: 20px;
   }
 
-  .edit-widget-links {
+  .add-widget-link {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 2px;
     margin-bottom: 10px;
+    display: flex;
+    button {
+      flex: 1 1 auto;
+    }
+  }
+
+  .edit-widget-links {
+    display: flex;
+    button {
+      flex: 1 1 auto;
+    }
   }
 
   .widget-container {

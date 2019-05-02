@@ -80,7 +80,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .title {
     font-size: 20px;
     margin-bottom: 7px;
@@ -95,7 +95,10 @@
   }
 
   .edit-todo-links {
-    text-align: right;
+    display: flex;
+    button {
+      flex: 1 1 auto;
+    }
   }
 
   .todo-edit-button {
