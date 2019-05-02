@@ -239,7 +239,7 @@
 
   .home-page-wrapper {
     display: grid;
-    grid-template-columns: 200px 1fr 200px;
+    grid-template-columns: 220px 1fr 220px;
   }
 
   .home-page-center {
