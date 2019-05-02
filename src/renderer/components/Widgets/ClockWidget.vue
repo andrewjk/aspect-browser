@@ -1,7 +1,9 @@
 <template>
   <div class="widget-body">
     <div class="title">{{ widget.name }}</div>
-    <div>{{ this.time }}</div>
+    <div>
+      <label>{{ this.time }}</label>
+    </div>
   </div>
 </template>
 

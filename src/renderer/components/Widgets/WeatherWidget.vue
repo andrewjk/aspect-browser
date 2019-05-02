@@ -4,9 +4,15 @@
     <div v-if="icon" class="temp">
       <img :src="icon">
     </div>
-    <div class="temp">Now: {{ this.temperature }}</div>
-    <div class="temp">{{ this.weather }}</div>
-    <div class="temp">{{ this.maxmin }}</div>
+    <div class="temp">
+      <label>Now: {{ this.temperature }}</label>
+    </div>
+    <div class="temp">
+      <label>{{ this.weather }}</label>
+    </div>
+    <div class="temp">
+      <label>{{ this.maxmin }}</label>
+    </div>
   </div>
 </template>
 
