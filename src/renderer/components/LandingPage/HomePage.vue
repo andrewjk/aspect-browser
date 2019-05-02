@@ -7,6 +7,7 @@
             <div class="widget-item">
               <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
               <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
+              <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
             </div>
             <div v-if="editing" class="edit-widget-links">
               <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
@@ -90,6 +91,7 @@
             <div class="widget-item">
               <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
               <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
+              <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
             </div>
             <div v-if="editing" class="edit-widget-links">
               <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
@@ -118,10 +120,11 @@
   import fs from 'fs-extra'
 
   import ClockWidget from '../Widgets/ClockWidget.vue'
+  import TodoWidget from '../Widgets/TodoWidget.vue'
   import WeatherWidget from '../Widgets/WeatherWidget.vue'
 
   export default {
-    components: { ClockWidget, WeatherWidget },
+    components: { ClockWidget, TodoWidget, WeatherWidget },
     props: {
       persona: null,
       tabs: Array,

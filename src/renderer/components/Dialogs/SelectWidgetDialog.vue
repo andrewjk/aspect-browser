@@ -12,6 +12,11 @@
           </label>
           <br/>
           <label>
+            <input type="radio" id="todo" value="todo" v-model="type">
+            To-do list
+          </label>
+          <br/>
+          <label>
             <input type="radio" id="weather" value="weather" v-model="type">
             Weather
           </label>
