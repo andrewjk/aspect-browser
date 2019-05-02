@@ -45,9 +45,9 @@
     methods: {
       async getWeather () {
         const weatherKey = secrets.weatherKey
-        const city = this.widget.name
+        const location = this.widget.location || this.widget.name
         const units = this.widget.units === 'celsius' ? 'metric' : 'imperial'
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${weatherKey}&units=${units}`
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${weatherKey}&units=${units}`
         const result = await axios.get(url)
         const unitsText = this.widget.units.substring(0, 1).toUpperCase()
         this.temperature = `${result.data.main.temp.toFixed(1)}°${unitsText}`

@@ -378,6 +378,7 @@ const actions = {
             _id: widget._id,
             type: widget.type,
             name: widget.name,
+            location: widget.location,
             timezone: widget.timezone,
             todos: widget.todos ? widget.todos.map((todo) => {
               return {

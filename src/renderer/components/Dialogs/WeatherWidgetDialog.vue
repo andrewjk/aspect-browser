@@ -10,10 +10,18 @@
             <tbody>
               <tr>
                 <td>
-                  <label for="name">Location</label>
+                  <label for="name">Name</label>
                 </td>
                 <td>
-                  <input type="text" id="name" v-model="widget.name" placeholder="Location" autofocus>
+                  <input type="text" id="name" v-model="widget.name" placeholder="Name" autofocus>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="location">Location</label>
+                </td>
+                <td>
+                  <input type="text" id="location" v-model="widget.location" placeholder="Location" autofocus>
                 </td>
               </tr>
               <tr>

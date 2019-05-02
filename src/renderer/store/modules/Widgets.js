@@ -14,6 +14,7 @@ const mutations = {
     const widget = data.widget
     if (data.type !== undefined) widget.type = data.type
     if (data.name !== undefined) widget.name = data.name
+    if (data.location !== undefined) widget.location = data.location
     if (data.timezone !== undefined) widget.timezone = data.timezone
     if (data.units !== undefined) widget.units = data.units
   },
@@ -107,6 +108,7 @@ const actions = {
       _id: uuid(),
       type: 'weather',
       name: data.name,
+      location: data.location,
       units: data.units || 'celsius',
       position: data.position,
       order: persona.widgets.length + 1,
@@ -170,12 +172,13 @@ const actions = {
     const widgetToEdit = {
       _id: widget._id,
       name: widget.name,
+      location: widget.location,
       units: widget.units
     }
     const showForm = create(WeatherWidgetDialog)
     const result = await showForm({ widget: widgetToEdit, persona }).transition()
     if (result) {
-      commit('setWidgetDetails', { widget, name: widgetToEdit.name, units: widgetToEdit.units })
+      commit('setWidgetDetails', { widget, name: widgetToEdit.name, location: widgetToEdit.location, units: widgetToEdit.units })
       dispatch('savePersona', { db, persona })
     }
   },
