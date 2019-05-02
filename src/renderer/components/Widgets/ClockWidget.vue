@@ -29,7 +29,7 @@
     },
     methods: {
       getTime (locale) {
-        this.time = new Date().toLocaleTimeString(locale, { timeZone: this.widget.timezone, hour: '2-digit', minute: '2-digit' }).toUpperCase()
+        this.time = new Date().toLocaleTimeString(locale, { timeZone: this.widget.location, hour: '2-digit', minute: '2-digit' }).toUpperCase()
       }
     }
   }

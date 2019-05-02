@@ -15,7 +15,6 @@ const mutations = {
     if (data.type !== undefined) widget.type = data.type
     if (data.name !== undefined) widget.name = data.name
     if (data.location !== undefined) widget.location = data.location
-    if (data.timezone !== undefined) widget.timezone = data.timezone
     if (data.units !== undefined) widget.units = data.units
   },
   insertWidget (state, data) {
@@ -68,7 +67,7 @@ const actions = {
       _id: uuid(),
       type: 'clock',
       name: data.name,
-      timezone: data.timezone,
+      location: data.location,
       position: data.position,
       order: persona.widgets.length + 1,
       isActive: true
@@ -139,12 +138,12 @@ const actions = {
     const widgetToEdit = {
       _id: widget._id,
       name: widget.name,
-      timezone: widget.timezone
+      location: widget.location
     }
     const showForm = create(ClockWidgetDialog)
     const result = await showForm({ widget: widgetToEdit, persona }).transition()
     if (result) {
-      commit('setWidgetDetails', { widget, name: widgetToEdit.name, timezone: widgetToEdit.timezone })
+      commit('setWidgetDetails', { widget, name: widgetToEdit.name, location: widgetToEdit.location })
       dispatch('savePersona', { db, persona })
     }
   },

@@ -18,10 +18,10 @@
               </tr>
               <tr>
                 <td>
-                  <label for="timezone">Timezone name</label>
+                  <label for="location">Timezone name</label>
                 </td>
                 <td>
-                  <input type="text" id="timezone" v-model="widget.timezone" placeholder="e.g. America/New_York">
+                  <input type="text" id="location" v-model="widget.location" placeholder="e.g. America/New_York">
                 </td>
               </tr>
               <tr>
