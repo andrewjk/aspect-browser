@@ -7,6 +7,7 @@ import ConfirmDialog from '../../components/Dialogs/ConfirmDialog'
 import SelectWidgetDialog from '../../components/Dialogs/SelectWidgetDialog'
 import ClockWidgetDialog from '../../components/Dialogs/ClockWidgetDialog'
 import TodoWidgetDialog from '../../components/Dialogs/TodoWidgetDialog'
+import NewsWidgetDialog from '../../components/Dialogs/NewsWidgetDialog'
 import WeatherWidgetDialog from '../../components/Dialogs/WeatherWidgetDialog'
 
 const mutations = {
@@ -55,6 +56,8 @@ const actions = {
       dispatch('addClockWidget', data)
     } else if (result === 'todo') {
       dispatch('addTodoWidget', data)
+    } else if (result === 'news') {
+      dispatch('addNewsWidget', data)
     } else if (result === 'weather') {
       dispatch('addWeatherWidget', data)
     }
@@ -99,6 +102,26 @@ const actions = {
       dispatch('savePersona', { db, persona })
     }
   },
+  async addNewsWidget ({ commit, dispatch }, data) {
+    const db = data.db
+    const persona = data.persona
+    // Create a new widget object to be edited
+    const widgetToEdit = {
+      _id: uuid(),
+      type: 'news',
+      name: data.name,
+      location: data.location,
+      position: data.position,
+      order: persona.widgets.length + 1,
+      isActive: true
+    }
+    const showForm = create(NewsWidgetDialog)
+    const result = await showForm({ widget: widgetToEdit, persona, adding: true }).transition()
+    if (result) {
+      commit('insertWidget', { persona, widget: widgetToEdit })
+      dispatch('savePersona', { db, persona })
+    }
+  },
   async addWeatherWidget ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
@@ -126,6 +149,8 @@ const actions = {
       dispatch('editClockWidget', data)
     } else if (widget.type === 'todo') {
       dispatch('editTodoWidget', data)
+    } else if (widget.type === 'news') {
+      dispatch('editNewsWidget', data)
     } else if (widget.type === 'weather') {
       dispatch('editWeatherWidget', data)
     }
@@ -157,6 +182,23 @@ const actions = {
       name: widget.name
     }
     const showForm = create(TodoWidgetDialog)
+    const result = await showForm({ widget: widgetToEdit, persona }).transition()
+    if (result) {
+      commit('setWidgetDetails', { widget, name: widgetToEdit.name })
+      dispatch('savePersona', { db, persona })
+    }
+  },
+  async editNewsWidget ({ commit, dispatch }, data) {
+    const db = data.db
+    const persona = data.persona
+    const widget = data.widget
+    // Create a new widget object to be edited
+    const widgetToEdit = {
+      _id: widget._id,
+      name: widget.name,
+      location: widget.location
+    }
+    const showForm = create(NewsWidgetDialog)
     const result = await showForm({ widget: widgetToEdit, persona }).transition()
     if (result) {
       commit('setWidgetDetails', { widget, name: widgetToEdit.name })

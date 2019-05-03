@@ -70,6 +70,7 @@
     "filesize": "^4.1.2",
     "fs-extra": "^7.0.1",
     "nedb": "^1.8.0",
+    "node-feedparser": "^1.0.1",
     "normalize.css": "^8.0.1",
     "os-locale": "^3.1.0",
     "semver": "^6.0.0",

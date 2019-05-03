@@ -6,8 +6,9 @@
           <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'left')" :key="widget._id">
             <div class="widget-item">
               <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
-              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
               <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
+              <news-widget v-if="widget.type === 'news'" :persona="persona" :tabs="tabs" :widget="widget"/>
+              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
               <div v-if="editing" class="edit-widget-links">
                 <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
                   <fa icon="edit"/>
@@ -90,8 +91,9 @@
           <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'right')" :key="widget._id">
             <div class="widget-item">
               <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
-              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
               <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
+              <news-widget v-if="widget.type === 'news'" :persona="persona" :tabs="tabs" :widget="widget"/>
+              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
               <div v-if="editing" class="edit-widget-links">
                 <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
                   <fa icon="edit"/>
@@ -121,10 +123,11 @@
 
   import ClockWidget from '../Widgets/ClockWidget.vue'
   import TodoWidget from '../Widgets/TodoWidget.vue'
+  import NewsWidget from '../Widgets/NewsWidget.vue'
   import WeatherWidget from '../Widgets/WeatherWidget.vue'
 
   export default {
-    components: { ClockWidget, TodoWidget, WeatherWidget },
+    components: { ClockWidget, TodoWidget, NewsWidget, WeatherWidget },
     props: {
       persona: null,
       tabs: Array,

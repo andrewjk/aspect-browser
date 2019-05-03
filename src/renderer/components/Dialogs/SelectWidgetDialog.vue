@@ -17,6 +17,11 @@
           </label>
           <br/>
           <label>
+            <input type="radio" id="news" value="news" v-model="type">
+            News feed
+          </label>
+          <br/>
+          <label>
             <input type="radio" id="weather" value="weather" v-model="type">
             Weather
           </label>
