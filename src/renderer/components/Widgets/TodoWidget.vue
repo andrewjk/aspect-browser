@@ -1,5 +1,5 @@
 <template>
-  <div class="widget-body">
+  <div class="widget-body" @mouseenter="showEditLinks = true" @mouseleave="showEditLinks = false">
     <div class="title">{{ widget.name }}</div>
     <div v-for="todo in widget.todos" :key="todo._id" class="todo-item">
       <label>
@@ -10,7 +10,7 @@
     <div v-if="adding" class="todo-item">
       <input type="text" v-model="newTodo" @keypress.enter="createTodo">
     </div>
-    <div v-if="adding || canAdd || canClear" class="edit-todo-links">
+    <div v-if="(showEditLinks || !widget.todos.length) && (adding || canAdd || canClear)" class="edit-todo-links">
       <button v-if="!adding && canAdd" class="todo-edit-button" @click="startAdding" title="Add a todo">
         <fa class="editing-icon" icon="plus"/>
       </button>
@@ -37,6 +37,7 @@
     },
     data () {
       return {
+        showEditLinks: false,
         adding: false,
         newTodo: '',
         canAdd: false,
