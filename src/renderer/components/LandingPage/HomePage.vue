@@ -2,29 +2,7 @@
   <div class="home-page-background" :style="{ backgroundImage: persona.image ? `url('${getBase64Image}')` : '' }">
     <div class="home-page-wrapper">
       <div class="home-page-left">
-        <div class="widget-container">
-          <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'left')" :key="widget._id">
-            <div class="widget-item">
-              <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
-              <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
-              <news-widget v-if="widget.type === 'news'" :persona="persona" :tabs="tabs" :widget="widget"/>
-              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
-              <div v-if="editing" class="edit-widget-links">
-                <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
-                  <fa icon="edit"/>
-                </button>
-                <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
-                  <fa icon="trash"/>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div v-if="editing" class="add-widget-link left">
-            <button class="persona-edit-button" @click="addWidget({ db: $pdb, persona, position: 'left' })" title="Add a widget">
-              <fa class="editing-icon" icon="plus"/>
-            </button>
-          </div>
-        </div>
+        <widget-container :persona="persona" :tabs="tabs" position="left" :editing="editing"/>
       </div>
       <div class="home-page-center">
         <div class="title">{{ persona.name }} Home</div>
@@ -87,29 +65,7 @@
         </div>
       </div>
       <div class="home-page-right">
-        <div class="widget-container">
-          <div v-for="(widget) in persona.widgets.filter((item) => item.position === 'right')" :key="widget._id">
-            <div class="widget-item">
-              <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
-              <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
-              <news-widget v-if="widget.type === 'news'" :persona="persona" :tabs="tabs" :widget="widget"/>
-              <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
-              <div v-if="editing" class="edit-widget-links">
-                <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
-                  <fa icon="edit"/>
-                </button>
-                <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
-                  <fa icon="trash"/>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div v-if="editing" class="add-widget-link right">
-            <button class="persona-edit-button" @click="addWidget({ db: $pdb, persona, position: 'right' })" title="Add a widget">
-              <fa class="editing-icon" icon="plus"/>
-            </button>
-          </div>
-        </div>
+        <widget-container :persona="persona" :tabs="tabs" position="right" :editing="editing"/>
       </div>
     </div>
   </div>
@@ -121,13 +77,10 @@
   import path from 'path'
   import fs from 'fs-extra'
 
-  import ClockWidget from '../Widgets/ClockWidget.vue'
-  import TodoWidget from '../Widgets/TodoWidget.vue'
-  import NewsWidget from '../Widgets/NewsWidget.vue'
-  import WeatherWidget from '../Widgets/WeatherWidget.vue'
+  import WidgetContainer from './WidgetContainer.vue'
 
   export default {
-    components: { ClockWidget, TodoWidget, NewsWidget, WeatherWidget },
+    components: { WidgetContainer },
     props: {
       persona: null,
       tabs: Array,
@@ -161,10 +114,7 @@
         'moveBookmarkDownAndSave',
         'editBookmark',
         'deleteBookmark',
-        'setBackgroundImage',
-        'addWidget',
-        'editWidget',
-        'deleteWidget'
+        'setBackgroundImage'
       ]),
       checkMouseButton (e) {
         // If the middle button was clicked, prevent scrolling from starting so that we can handle opening the url
@@ -340,9 +290,7 @@
   .bookmark-edit-button:hover,
   .bookmark-edit-button:focus,
   .persona-edit-button:hover,
-  .persona-edit-button:focus,
-  .widget-edit-button:hover,
-  .widget-edit-button:focus {
+  .persona-edit-button:focus {
     background-color: rgba(0, 0, 0, 0.15);
     cursor: pointer;
   }
@@ -354,47 +302,4 @@
     bottom: 20px;
     left: 20px;
   }
-
-  .add-widget-link {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 2px;
-    margin-bottom: 10px;
-    display: flex;
-    button {
-      flex: 1 1 auto;
-    }
-  }
-
-  .edit-widget-links {
-    display: flex;
-    button {
-      flex: 1 1 auto;
-    }
-  }
-
-  .widget-container {
-    margin: 40px 20px;
-  }
-
-  .widget-item {
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 2px;
-    margin-bottom: 10px;
-    padding: 10px 15px;
-  }
-
-  .home-page-right .edit-widget-links {
-    text-align: right;
-  }
-
-  .widget-edit-button {
-    background-color: transparent;
-    border-radius: 2px;
-    color: #777;
-    height: 30px;
-    width: 30px;
-    line-height: 30px;
-    text-align: center;
-  }
-
 </style>
