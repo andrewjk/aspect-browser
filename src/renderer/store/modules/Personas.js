@@ -40,7 +40,8 @@ const mutations = {
         image: persona.image,
         order: persona.order,
         bookmarks: persona.bookmarks || [],
-        widgets: persona.widgets || [],
+        leftWidgets: persona.leftWidgets || [],
+        rightWidgets: persona.rightWidgets || [],
         isActive: false,
         hasOpenTab: false,
         tabs: [
@@ -235,7 +236,8 @@ const actions = {
       image: null,
       order: 1,
       bookmarks: [],
-      widgets: []
+      leftWidgets: [],
+      rightWidgets: []
     }
     db.insert(defaultPersona, (err, dbPersona) => {
       if (err) {
@@ -286,7 +288,8 @@ const actions = {
       color: null,
       image: null,
       bookmarks: [],
-      widgets: []
+      leftWidgets: [],
+      rightWidgets: []
     }
     const showForm = create(PersonaDialog)
     showForm({ persona: personaToEdit, adding: true }).transition()
@@ -373,7 +376,7 @@ const actions = {
             order: bookmark.order
           }
         }),
-        widgets: persona.widgets.map((widget) => {
+        leftWidgets: persona.leftWidgets.map((widget) => {
           return {
             _id: widget._id,
             type: widget.type,
@@ -387,7 +390,23 @@ const actions = {
               }
             }) : widget.todos,
             units: widget.units,
-            position: widget.position,
+            order: widget.order
+          }
+        }),
+        rightWidgets: persona.rightWidgets.map((widget) => {
+          return {
+            _id: widget._id,
+            type: widget.type,
+            name: widget.name,
+            location: widget.location,
+            todos: widget.todos ? widget.todos.map((todo) => {
+              return {
+                _id: todo._id,
+                isCompleted: todo.isCompleted,
+                text: todo.text
+              }
+            }) : widget.todos,
+            units: widget.units,
             order: widget.order
           }
         })

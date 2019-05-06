@@ -10,6 +10,16 @@ import TodoWidgetDialog from '../../components/Dialogs/TodoWidgetDialog'
 import NewsWidgetDialog from '../../components/Dialogs/NewsWidgetDialog'
 import WeatherWidgetDialog from '../../components/Dialogs/WeatherWidgetDialog'
 
+function sorter (a, b) {
+  if (a.order < b.order) {
+    return -1
+  } else if (a.order > b.order) {
+    return 1
+  } else {
+    return 0
+  }
+}
+
 const mutations = {
   setWidgetDetails (state, data) {
     const widget = data.widget
@@ -19,15 +29,64 @@ const mutations = {
     if (data.units !== undefined) widget.units = data.units
   },
   insertWidget (state, data) {
-    const persona = data.persona
+    const widgets = data.widgets
     const widget = data.widget
-    persona.widgets.push(widget)
+    widgets.push(widget)
   },
   removeWidget (state, data) {
+    const widgets = data.widgets
+    const widget = data.widget
+    const index = widgets.indexOf(widget)
+    widgets.splice(index, 1)
+  },
+  moveWidgetUp (state, data) {
+    const widgets = data.widgets
+    const widget = data.widget
+    const index = widgets.indexOf(widget)
+    if (index === 0) {
+      return
+    }
+    // Swap this widget's order with the next widget's order
+    const thisOrder = widgets[index].order
+    const prevOrder = widgets[index - 1].order
+    widgets[index].order = prevOrder
+    widgets[index - 1].order = thisOrder
+  },
+  moveWidgetDown (state, data) {
+    const widgets = data.widgets
+    const widget = data.widget
+    const index = widgets.indexOf(widget)
+    if (index === widgets.length - 1) {
+      return
+    }
+    // Swap this persona's order with the next persona's order
+    const thisOrder = widgets[index].order
+    const nextOrder = widgets[index + 1].order
+    widgets[index].order = nextOrder
+    widgets[index + 1].order = thisOrder
+  },
+  moveWidgetLeft (state, data) {
     const persona = data.persona
     const widget = data.widget
-    const index = persona.widgets.indexOf(widget)
-    persona.widgets.splice(index, 1)
+    const index = persona.rightWidgets.indexOf(widget)
+    persona.rightWidgets.splice(index, 1)
+    persona.leftWidgets.push(widget)
+    widget.order = persona.leftWidgets.length
+  },
+  moveWidgetRight (state, data) {
+    const persona = data.persona
+    const widget = data.widget
+    const index = persona.leftWidgets.indexOf(widget)
+    persona.leftWidgets.splice(index, 1)
+    persona.rightWidgets.push(widget)
+    widget.order = persona.rightWidgets.length
+  },
+  sanitizeWidgetOrders (state, widgets) {
+    // Renumber everything, just in case something funny has gone on
+    widgets.sort(sorter)
+    for (var i = 0; i < widgets.length; i++) {
+      widgets[i].order = i + 1
+    }
   },
   insertTodo (state, data) {
     const widget = data.widget
@@ -55,13 +114,13 @@ const actions = {
     if (type) {
       const db = data.db
       const persona = data.persona
+      const widgets = data.widgets
       // Create a new widget object to be edited
       const widgetToEdit = {
         _id: uuid(),
         type,
         name: data.name,
-        position: data.position,
-        order: persona.widgets.length + 1,
+        order: widgets.length + 1,
         isActive: true
       }
       let widgetForm
@@ -81,9 +140,9 @@ const actions = {
         widgetToEdit.units = data.units || 'celsius'
         widgetForm = create(WeatherWidgetDialog)
       }
-      const result = await widgetForm({ widget: widgetToEdit, persona, adding: true }).transition()
+      const result = await widgetForm({ widget: widgetToEdit, persona, widgets, adding: true }).transition()
       if (result) {
-        commit('insertWidget', { persona, widget: widgetToEdit })
+        commit('insertWidget', { persona, widgets, widget: widgetToEdit })
         dispatch('savePersona', { db, persona })
       }
     }
@@ -91,6 +150,7 @@ const actions = {
   async editWidget ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
+    const widgets = data.widgets
     const widget = data.widget
     // Create a new widget object to be edited
     const widgetToEdit = {
@@ -111,7 +171,7 @@ const actions = {
       widgetToEdit.units = widget.units
       widgetForm = create(WeatherWidgetDialog)
     }
-    const result = await widgetForm({ widget: widgetToEdit, persona }).transition()
+    const result = await widgetForm({ widget: widgetToEdit, persona, widgets }).transition()
     if (result) {
       commit('setWidgetDetails', { widget, name: widgetToEdit.name, location: widgetToEdit.location })
       dispatch('savePersona', { db, persona })
@@ -120,12 +180,13 @@ const actions = {
   async deleteWidget ({ commit, dispatch }, data) {
     const db = data.db
     const persona = data.persona
+    const widgets = data.widgets
     const widget = data.widget
     return new Promise(async (resolve, reject) => {
       const dialog = create(ConfirmDialog)
       const okResult = await dialog({ content: 'Are you sure you want to delete this widget?' }).transition()
       if (okResult) {
-        commit('removeWidget', { persona, widget })
+        commit('removeWidget', { widgets, widget })
         dispatch('savePersona', { db, persona }).then(() => {
           resolve()
         })
@@ -153,6 +214,42 @@ const actions = {
     const persona = data.persona
     const widget = data.widget
     commit('clearCompleted', { widget })
+    dispatch('savePersona', { db, persona })
+  },
+  moveWidgetUpAndSave ({ commit, dispatch }, data) {
+    const db = data.db
+    const persona = data.persona
+    const widgets = data.widgets
+    const widget = data.widget
+    commit('moveWidgetUp', { widgets, widget })
+    commit('sanitizeWidgetOrders', widgets)
+    dispatch('savePersona', { db, persona })
+  },
+  moveWidgetDownAndSave ({ commit, dispatch }, data) {
+    const db = data.db
+    const persona = data.persona
+    const widgets = data.widgets
+    const widget = data.widget
+    commit('moveWidgetDown', { widgets, widget })
+    commit('sanitizeWidgetOrders', widgets)
+    dispatch('savePersona', { db, persona })
+  },
+  moveWidgetLeftAndSave ({ commit, dispatch }, data) {
+    const db = data.db
+    const persona = data.persona
+    const widget = data.widget
+    commit('moveWidgetLeft', { persona, widget })
+    commit('sanitizeWidgetOrders', persona.leftWidgets)
+    commit('sanitizeWidgetOrders', persona.rightWidgets)
+    dispatch('savePersona', { db, persona })
+  },
+  moveWidgetRightAndSave ({ commit, dispatch }, data) {
+    const db = data.db
+    const persona = data.persona
+    const widget = data.widget
+    commit('moveWidgetRight', { persona, widget })
+    commit('sanitizeWidgetOrders', persona.leftWidgets)
+    commit('sanitizeWidgetOrders', persona.rightWidgets)
     dispatch('savePersona', { db, persona })
   }
 }

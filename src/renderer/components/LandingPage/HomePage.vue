@@ -2,7 +2,7 @@
   <div class="home-page-background" :style="{ backgroundImage: persona.image ? `url('${getBase64Image}')` : '' }">
     <div class="home-page-wrapper">
       <div class="home-page-left">
-        <widget-container :persona="persona" :tabs="tabs" position="left" :editing="editing"/>
+        <widget-container :persona="persona" :widgets="persona.leftWidgets" :tabs="tabs" position="left" :editing="editing"/>
       </div>
       <div class="home-page-center">
         <div class="title">{{ persona.name }} Home</div>
@@ -65,7 +65,7 @@
         </div>
       </div>
       <div class="home-page-right">
-        <widget-container :persona="persona" :tabs="tabs" position="right" :editing="editing"/>
+        <widget-container :persona="persona" :widgets="persona.rightWidgets" :tabs="tabs" position="right" :editing="editing"/>
       </div>
     </div>
   </div>
@@ -200,7 +200,7 @@
     border-radius: 2px;
     padding: 10px;
     max-width: 600px;
-    margin: 40px auto;
+    margin: 20px auto;
   }
 
   .title {
@@ -210,7 +210,7 @@
   }
 
   .welcome {
-    margin: 40px 0;
+    margin: 20px 10px;
   }
 
   .home-bookmarks {

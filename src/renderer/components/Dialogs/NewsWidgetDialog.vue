@@ -43,6 +43,7 @@
   export default {
     props: {
       persona: null,
+      widgets: null,
       widget: null,
       adding: false
     },
@@ -54,7 +55,7 @@
         // HACK: This just prevents clicks on the dialog-content bubbling to the dialog-mask. There's probably a better way to do this...
       },
       async deleteWidgetAndClose () {
-        await this.deleteWidget({ db: this.$wdb, widget: this.widget })
+        await this.deleteWidget({ db: this.$wdb, persona: this.persona, widgets: this.widgets, widget: this.widget })
         this.$close(false)
       }
     }

@@ -1,23 +1,35 @@
 <template>
   <div class="widget-container">
-    <div v-for="(widget) in persona.widgets.filter((item) => item.position === position)" :key="widget._id">
+    <div v-for="(widget, index) in widgets" :key="widget._id">
       <div class="widget-item">
         <clock-widget v-if="widget.type === 'clock'" :widget="widget"/>
         <todo-widget v-if="widget.type === 'todo'" :persona="persona" :widget="widget"/>
         <news-widget v-if="widget.type === 'news'" :persona="persona" :tabs="tabs" :widget="widget"/>
         <weather-widget v-if="widget.type === 'weather'" :widget="widget"/>
         <div v-if="editing" class="edit-widget-links">
-          <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widget })" title="Edit this widget">
+          <button v-if="position === 'right'" class="widget-edit-button" @click.stop="moveWidgetLeftAndSave({ db: $pdb, persona, widget })" title="Move this widget to the left side">
+            <fa icon="chevron-left"/>
+          </button>
+          <button v-if="index > 0" class="widget-edit-button" @click.stop="moveWidgetUpAndSave({ db: $pdb, persona, widgets, widget })" title="Move this widget up">
+            <fa icon="chevron-up"/>
+          </button>
+          <button v-if="index < widgets.length - 1" class="widget-edit-button" @click.stop="moveWidgetDownAndSave({ db: $pdb, persona, widgets, widget })" title="Move this widget down">
+            <fa icon="chevron-down"/>
+          </button>
+          <button class="widget-edit-button" @click.stop="editWidget({ db: $pdb, persona, widgets, widget })" title="Edit this widget">
             <fa icon="edit"/>
           </button>
-          <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widget })" title="Delete this widget">
+          <button class="widget-edit-button delete-link" @click.stop="deleteWidget({ db: $pdb, persona, widgets, widget })" title="Delete this widget">
             <fa icon="trash"/>
+          </button>
+          <button v-if="position === 'left'" class="widget-edit-button" @click.stop="moveWidgetRightAndSave({ db: $pdb, persona, widget })" title="Move this widget to the right side">
+            <fa icon="chevron-right"/>
           </button>
         </div>
       </div>
     </div>
     <div v-if="editing" :class="['add-widget-link', position]">
-      <button class="widget-edit-button" @click="addWidget({ db: $pdb, persona, position })" title="Add a widget">
+      <button class="widget-edit-button" @click="addWidget({ db: $pdb, persona, widgets })" title="Add a widget">
         <fa class="editing-icon" icon="plus"/>
       </button>
     </div>
@@ -36,15 +48,20 @@
     components: { ClockWidget, TodoWidget, NewsWidget, WeatherWidget },
     props: {
       persona: null,
-      tabs: Array,
+      widgets: Array,
       position: '',
+      tabs: Array,
       editing: false
     },
     methods: {
       ...mapActions([
         'addWidget',
         'editWidget',
-        'deleteWidget'
+        'deleteWidget',
+        'moveWidgetDownAndSave',
+        'moveWidgetUpAndSave',
+        'moveWidgetLeftAndSave',
+        'moveWidgetRightAndSave'
       ])
     }
   }
@@ -52,7 +69,7 @@
 
 <style lang="scss" scoped>
   .widget-container {
-    margin: 40px 20px;
+    margin: 20px;
   }
 
   .widget-item {
@@ -61,10 +78,6 @@
     margin-bottom: 10px;
     padding: 10px 15px;
   }
-
-  //.home-page-right .edit-widget-links {
-  //  text-align: right;
-  //}
 
   .widget-edit-button {
     background-color: transparent;
