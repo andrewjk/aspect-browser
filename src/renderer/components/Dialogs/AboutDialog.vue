@@ -1,5 +1,5 @@
 <template>
-  <div class="message-box dialog-mask">
+  <div class="message-box dialog-mask" @click="$close(false)">
     <div class="dialog-content" @click.stop="doNothing" @keyup.enter="$close(true)" @keyup.esc="$close(false)">
       <div class="dialog-body">
         <div class="about-dialog-container">
