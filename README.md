@@ -34,16 +34,17 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
   * Has not been audited - use at your own risk!
 * Restore, save and load sessions
 * Automatically suspends background tabs after 30 minutes to lower memory usage
+* Personalize your home pages with background images and widgets including clock, weather, news and to-do
 
 ## Download
 
-![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.8/aspect-browser-setup-0.0.8.exe)
+![Windows logo](/docs/images/windows.png) [Windows](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.9/aspect-browser-setup-0.0.9.exe)
 
-![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.8/Aspect-0.0.8.dmg)
+![Apple logo](/docs/images/apple.png) [Mac](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.9/Aspect-0.0.9.dmg)
 
-![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.8/aspect-browser-0.0.8-x86_64.AppImage)
+![Linux logo](/docs/images/linux.png) [Linux](https://github.com/andrewjk/aspect-browser/releases/download/v0.0.9/aspect-browser-0.0.9-x86_64.AppImage)
 
-![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.8)
+![All platforms logo](/docs/images/all-platforms.png) [All platforms](https://github.com/andrewjk/aspect-browser/releases/tag/v0.0.9)
 
 ## Keyboard Shortcuts
 
@@ -65,23 +66,6 @@ Aspect is built on the Electron platform for Windows, Mac and Linux.
 | Ctrl/Command + D | Show Downloads |
 | Ctrl/Command + Plus/Minus | Zoom In/Zoom Out |
 | Ctrl/Command + 0 | Reset Zoom |
-
-## Roadmap
-
-The following is a very provisional roadmap of planned major features.
-
-| Date | Version | Feature | Done |
-| ---- | ------- | ------- | ---- |
-| 6 Aug | 0.0.2 | Check for updates | ✓ |
-| 13 Aug | 0.0.3 | History management | ✓ |
-| 20 Aug | 0.0.4 | Login management | ✓ |
-| 27 Aug | 0.0.5 | Ad blocking | ✗ |
-| 3 Sep | 0.0.6 | Session management | ✓ |
-| 10 Sep | 0.0.7 | Download management | ✓ |
-| 17 Sep | 0.0.8 | Memory management | ✓ |
-| 24 Sep | 0.0.9 | Notifications | |
-| 1 Oct | 0.0.10 | Bookmark management | |
-| 8 Oct | 0.0.11 | Home page widgets | |
 
 ## Build
 
