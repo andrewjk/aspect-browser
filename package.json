@@ -64,6 +64,7 @@
     "axios": "^0.18.0",
     "chrome-network-errors": "^1.0.0",
     "dateformat": "^3.0.3",
+    "dotenv": "^8.0.0",
     "electron-context-menu": "^0.12.1",
     "electron-dl": "^1.14.0",
     "ext-name": "^5.0.0",

@@ -19,7 +19,6 @@
 </template>
 
 <script>
-  import secrets from '../../../secrets.json'
   import axios from 'axios'
 
   export default {
@@ -44,7 +43,7 @@
     },
     methods: {
       async getWeather () {
-        const weatherKey = secrets.weatherKey
+        const weatherKey = process.env.WEATHER_KEY
         const location = this.widget.location || this.widget.name
         const units = this.widget.units === 'celsius' ? 'metric' : 'imperial'
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${weatherKey}&units=${units}`
