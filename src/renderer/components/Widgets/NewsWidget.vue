@@ -108,7 +108,7 @@
 
 <style lang="scss" scoped>
   .title {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 7px;
   }
 
