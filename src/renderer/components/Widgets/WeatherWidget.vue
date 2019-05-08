@@ -1,7 +1,7 @@
 <template>
   <div class="widget-body">
     <div class="title">{{ widget.name }}</div>
-    <div v-if="icon" class="temp">
+    <div v-if="icon" class="temp-image">
       <img :src="icon">
     </div>
     <div class="temp">
@@ -63,6 +63,10 @@
   .title {
     font-size: 18px;
     margin-bottom: 7px;
+  }
+
+  .temp-image {
+    margin: 0;
   }
 
   .temp {

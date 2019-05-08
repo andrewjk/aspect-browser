@@ -88,7 +88,7 @@
   }
 
   .todo-item {
-    margin: 7px 0;
+    margin: 10px 0;
   }
 
   .todo-completed {

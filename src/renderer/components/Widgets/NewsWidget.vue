@@ -107,19 +107,24 @@
 </script>
 
 <style lang="scss" scoped>
+  .widget-body {
+    margin: -5px -5px 0;
+  }
+
   .title {
     font-size: 18px;
-    margin-bottom: 7px;
+    margin: 5px;
   }
 
   .news-item {
-    margin: 7px 0;
+    //margin: 7px 0;
   }
   
   .news-button {
     background-color: transparent;
     border-radius: 2px;
     color: #777;
+    padding: 5px;
     text-align: left;
   }
 

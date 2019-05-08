@@ -76,7 +76,7 @@
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 2px;
     font-size: 14px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding: 10px 15px;
   }
 
