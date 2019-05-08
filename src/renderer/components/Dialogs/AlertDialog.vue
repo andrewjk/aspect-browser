@@ -5,7 +5,7 @@
         <p>{{ content }}</p>
       </div>
       <footer>
-        <button class="confirm" @click="$close">OK</button>
+        <button id="dialog-confirm" class="confirm" @click="$close">OK</button>
       </footer>
     </div>
   </div>
