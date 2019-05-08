@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapState, mapMutations } from 'vuex'
   import os from 'os'
   import electron from 'electron'
   import { create } from 'vue-modal-dialogs'
@@ -51,6 +51,9 @@
       })
     },
     methods: {
+      ...mapMutations([
+        'setShowAllOpenTabCounts'
+      ]),
       canMaximize () {
         return window.isResizable() && window.isMaximizable()
       },
@@ -70,12 +73,11 @@
         let personaCount = 0
         let tabCount = 0
         this.personas.forEach(persona => {
-          personaCount = personaCount + (persona.isActive || persona.hasOpenTab ? 1 : 0)
-          persona.tabs.forEach(tab => {
-            tabCount = tabCount + (tab.url.indexOf('aspect://') === -1 ? 1 : 0)
-          })
+          personaCount = personaCount + (persona.isActive || persona.openTabCount > 0 ? 1 : 0)
+          tabCount = tabCount + persona.openTabCount
         })
         if (tabCount > 0) {
+          this.setShowAllOpenTabCounts(true)
           const prompt = create(ConfirmDialog)
           let content = `You are about to close ${tabCount} ${tabCount === 1 ? 'tab' : 'tabs'}`
           if (personaCount > 1) {
@@ -86,6 +88,7 @@
           if (result) {
             window.close()
           }
+          this.setShowAllOpenTabCounts(false)
         } else {
           window.close()
         }

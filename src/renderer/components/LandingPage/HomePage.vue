@@ -106,7 +106,7 @@
       ...mapMutations([
         'setTabDetails',
         'addToHistory',
-        'setHasOpenTab'
+        'setOpenTabCount'
       ]),
       ...mapActions([
         'openInTab',
@@ -139,7 +139,7 @@
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: bookmark.url })
         this.addToHistory({ tab: activeTab, url: 'aspect://home', title: 'Home' })
-        this.setHasOpenTab(this.persona)
+        this.setOpenTabCount(this.persona)
       },
       toggleEditing () {
         this.editing = !this.editing

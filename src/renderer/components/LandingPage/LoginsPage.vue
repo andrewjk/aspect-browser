@@ -78,7 +78,7 @@
       ...mapMutations([
         'setTabDetails',
         'addToHistory',
-        'setHasOpenTab'
+        'setOpenTabCount'
       ]),
       ...mapActions([
         'loadLogins',
@@ -124,7 +124,7 @@
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: login.url })
         this.addToHistory({ tab: activeTab, url: 'aspect://logins', title: 'Logins' })
-        this.setHasOpenTab(this.persona)
+        this.setOpenTabCount(this.persona)
       },
       toggleAll () {
         this.checkAll(!this.selectAll)

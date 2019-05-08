@@ -4,11 +4,12 @@
       <fa v-if="platform !== 'darwin'" icon="bars"/>
     </div>
     <div class="list">
-      <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersona(index)">
-        <div v-show="item.hasOpenTab" class="open-tab-indicator"></div>
+      <button v-for="(item, index) in personas" :key="item._id" :class="['persona', showEditPersonaLinks ? 'editing' : '']" @click="setActivePersona(index)" @mouseenter="setShowOpenTabCount(index, true)" @mouseleave="setShowOpenTabCount(index, false)">
+        <div v-show="item.openTabCount" class="open-tab-indicator"/>
         <div class="persona-info">
           <div class="persona-icon" :style="{ backgroundColor: getBackgroundColor(item) }">
             {{ item.shortName }}
+            <div v-show="item.openTabCount && (showAllOpenTabCounts || item.showOpenTabCount)" class="open-tab-count">{{ item.openTabCount }}</div>
           </div>
           <div class="persona-name">{{ item.name }}</div>
         </div>
@@ -47,6 +48,7 @@
   export default {
     computed: mapState({
       personas: state => state.Personas.personas,
+      showAllOpenTabCounts: state => state.Personas.showAllOpenTabCounts,
       settings: state => state.Settings.settings,
       ...mapGetters([
         'getActiveTab'
@@ -55,12 +57,14 @@
     data () {
       return {
         platform: os.platform(),
-        showEditPersonaLinks: false
+        showEditPersonaLinks: false,
+        showOpenTabCount: false
       }
     },
     methods: {
       ...mapMutations([
         'setActivePersonaIndex',
+        'setShowPersonaOpenTabCount',
         'insertPersona',
         'sortPersonas'
       ]),
@@ -85,6 +89,9 @@
           this.setActivePersonaIndex(index)
         }
       },
+      setShowOpenTabCount (index, show) {
+        this.setShowPersonaOpenTabCount({ index, show })
+      },
       findBookmark () {
         this.$emit('show-find-bookmark')
       },
@@ -95,7 +102,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
   .drag-indicator {
     color: white;
@@ -160,6 +167,7 @@
     line-height: 60px; 
     margin-bottom: 10px;
     font-size: 18px;
+    position: relative;
   }
 
   .persona-name {
@@ -197,5 +205,22 @@
   .edit-persona-button:focus {
     background-color: #777;
   }
-  
+
+  .open-tab-count {
+    background-color: #66a0fe;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+    line-height: 18px;
+    height: 18px;
+    width: 18px;
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    text-align: center;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+    vertical-align: top;
+  }
+
 </style>

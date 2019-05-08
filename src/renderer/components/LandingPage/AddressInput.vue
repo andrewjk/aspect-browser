@@ -76,7 +76,7 @@
         'addToHistory',
         'goToUrl',
         'goHome',
-        'setHasOpenTab'
+        'setOpenTabCount'
       ]),
       ...mapActions([
         'setActiveTabIndex',
@@ -292,7 +292,7 @@
             this.goHome(activeTab)
           }
         }
-        this.setHasOpenTab(this.persona)
+        this.setOpenTabCount(this.persona)
       }
     }
   }

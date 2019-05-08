@@ -103,7 +103,7 @@
         'setTabDetails',
         'editHistory',
         'addToHistory',
-        'setHasOpenTab'
+        'setOpenTabCount'
       ]),
       ...mapActions([
         'openInTab',
@@ -144,7 +144,7 @@
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: history.url })
         this.addToHistory({ tab: activeTab, url: 'aspect://history', title: 'History' })
-        this.setHasOpenTab(this.persona)
+        this.setOpenTabCount(this.persona)
       },
       areDatesEqual (d1, d2) {
         if (!d1.getFullYear) console.log(d1)

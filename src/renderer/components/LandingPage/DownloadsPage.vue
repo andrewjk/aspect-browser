@@ -109,7 +109,7 @@
         'setTabDetails',
         'editDownloads',
         'addToHistory',
-        'setHasOpenTab'
+        'setOpenTabCount'
       ]),
       ...mapActions([
         'openInTab',

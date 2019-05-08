@@ -209,7 +209,7 @@ const actions = {
       }
       index = Math.min(index, persona.tabs.length - 1)
       dispatch('setActiveTabIndexInPersona', { persona, index })
-      commit('setHasOpenTab', persona)
+      commit('setOpenTabCount', persona)
     }
   },
   reopenTab ({ getters, commit, dispatch }) {
@@ -261,7 +261,7 @@ const actions = {
       // If it's a background tab, pass index = null to setActiveTabIndexInPersona to indicate that we shouldn't actually change to that tab
       const newIndex = background ? null : persona.tabs.length - 1
       dispatch('setActiveTabIndexInPersona', { persona, index: newIndex })
-      commit('setHasOpenTab', persona)
+      commit('setOpenTabCount', persona)
     }
   }
 }

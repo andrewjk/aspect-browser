@@ -37,7 +37,7 @@
       ...mapMutations([
         'setTabDetails',
         'addToHistory',
-        'setHasOpenTab'
+        'setOpenTabCount'
       ]),
       ...mapActions([
         'openInTab'
@@ -100,7 +100,7 @@
 
         this.setTabDetails({ persona: this.persona, tab: activeTab, isLoading: true, url: link.link })
         this.addToHistory({ tab: activeTab, url: 'aspect://home', title: 'Home' })
-        this.setHasOpenTab(this.persona)
+        this.setOpenTabCount(this.persona)
       }
     }
   }

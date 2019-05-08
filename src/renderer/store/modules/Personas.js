@@ -7,7 +7,8 @@ import ConfirmDialog from '../../components/Dialogs/ConfirmDialog'
 import PersonaDialog from '../../components/Dialogs/PersonaDialog'
 
 const state = {
-  personas: []
+  personas: [],
+  showAllOpenTabCounts: false
 }
 
 const getters = {
@@ -43,7 +44,8 @@ const mutations = {
         leftWidgets: persona.leftWidgets || [],
         rightWidgets: persona.rightWidgets || [],
         isActive: false,
-        hasOpenTab: false,
+        openTabCount: 0,
+        showOpenTabCount: false,
         tabs: [
           {
             _id: uuid(),
@@ -75,14 +77,23 @@ const mutations = {
   sortPersonas (state) {
     state.personas = state.personas.sort(sorter)
   },
-  setHasOpenTab (state, persona) {
-    persona.hasOpenTab = persona.tabs.some((tab) => {
-      return tab.url && tab.url.indexOf('aspect://') === -1
+  setOpenTabCount (state, persona) {
+    let openTabCount = 0
+    persona.tabs.forEach(tab => {
+      openTabCount = openTabCount + (tab.url.indexOf('aspect://') === -1 ? 1 : 0)
     })
+    persona.openTabCount = openTabCount
+  },
+  setShowAllOpenTabCounts (state, show) {
+    state.showAllOpenTabCounts = show
+  },
+  setShowPersonaOpenTabCount (state, { index, show }) {
+    state.personas[index].showOpenTabCount = show
   },
   addHomeTab (state, persona) {
     persona.isActive = false
-    persona.hasOpenTab = false
+    persona.openTabCount = 0
+    persona.showOpenTabCount = false
     persona.tabs = [
       {
         _id: uuid(),
@@ -146,9 +157,11 @@ const mutations = {
         backHistory: [],
         forwardHistory: []
       })
-      persona.hasOpenTab = tabs.some((tab) => {
-        return tab.url
+      let openTabCount = 0
+      persona.tabs.forEach(tab => {
+        openTabCount = openTabCount + (tab.url.indexOf('aspect://') === -1 ? 1 : 0)
       })
+      persona.openTabCount = openTabCount
     }
   },
   movePersonaUp (state, index) {

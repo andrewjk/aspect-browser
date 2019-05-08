@@ -44,7 +44,6 @@
       this.loadActivity(this.$adb)
     },
     mounted () {
-      console.log(this.personas)
       window.addEventListener('keydown', (e) => {
         this.keyDown(e)
       }, true)
