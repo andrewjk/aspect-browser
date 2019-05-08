@@ -5,7 +5,7 @@
         <p>{{ content }}</p>
       </div>
       <footer>
-        <button class="confirm" @click="$close(true)">{{ this.confirmText ? this.confirmText : 'OK' }}</button>
+        <button id="dialog-confirm" class="confirm" @click="$close(true)">{{ this.confirmText ? this.confirmText : 'OK' }}</button>
         <button class="cancel" @click="$close(false)">{{ this.cancelText ? this.cancelText : 'Cancel' }}</button>
       </footer>
     </div>
