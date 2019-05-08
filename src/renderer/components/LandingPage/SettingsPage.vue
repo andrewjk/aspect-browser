@@ -137,7 +137,6 @@
         this.saveSettings()
       },
       async changeLoginManagerPassword () {
-        // TODO: This is some spaghetti that needs to be cleaned up...
         // Get the existing master password
         const prompt = create(ChangePasswordDialog)
         const result = await prompt({ content: 'Enter your old master password and new master password below:', type: 'password' }).transition()

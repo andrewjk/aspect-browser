@@ -130,24 +130,36 @@
       },
       async maybeShowLogins () {
         // Always get the password before showing the saved logins
-        // TODO: Loop this until we get the right password
-        const db = this.$ldb
-        const prompt = create(PromptDialog)
-        const result = await prompt({ content: 'Enter your master password:', type: 'password' }).transition()
-        if (result) {
-          const crypt = new Encrypter(result)
-          db.persistence.afterSerialization = crypt.encrypt
-          db.persistence.beforeDeserialization = crypt.decrypt
-          db.loadDatabase(async (err) => {
-            if (err) {
-              const dialog = create(AlertDialog)
-              await dialog({ content: 'Failed to unlock database.' }).transition()
-              return
-            }
-            db.persistence.isLoaded = true
-            this.showLogins({ persona: this.persona })
-          })
-        }
+        let result
+        do {
+          result = await this.decryptLogins()
+        } while (!result)
+      },
+      async decryptLogins () {
+        return new Promise(async (resolve, reject) => {
+          const db = this.$ldb
+          const prompt = create(PromptDialog)
+          const result = await prompt({ content: 'Enter your master password:', type: 'password' }).transition()
+          if (result) {
+            const crypt = new Encrypter(result)
+            db.persistence.afterSerialization = crypt.encrypt
+            db.persistence.beforeDeserialization = crypt.decrypt
+            db.loadDatabase(async (err) => {
+              if (err) {
+                const dialog = create(AlertDialog)
+                await dialog({ content: 'Failed to unlock database.' }).transition()
+                resolve(false)
+                return
+              }
+              db.persistence.isLoaded = true
+              this.showLogins({ persona: this.persona })
+              console.log('returning true')
+              resolve(true)
+            })
+          } else {
+            resolve(true)
+          }
+        })
       },
       async fillLogin () {
         const activeTab = this.getActiveTab

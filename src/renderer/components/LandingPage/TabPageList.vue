@@ -89,22 +89,10 @@
             const host = data.host
             // Maybe load the logins database
             if (!db.persistence.isLoaded) {
-              const prompt = create(PromptDialog)
-              const result = await prompt({ content: 'Enter your master password:', type: 'password' }).transition()
-              if (result) {
-                const crypt = new Encrypter(result)
-                db.persistence.afterSerialization = crypt.encrypt
-                db.persistence.beforeDeserialization = crypt.decrypt
-                db.loadDatabase(async (err) => {
-                  if (err) {
-                    const dialog = create(AlertDialog)
-                    await dialog({ content: 'Failed to unlock database.' }).transition()
-                    return
-                  }
-                  db.persistence.isLoaded = true
-                  this.loadFormLoginDetails(db, host, form, event)
-                })
-              }
+              let result
+              do {
+                result = await this.decryptLogins(db, host, form, event)
+              } while (!result)
             } else {
               this.loadFormLoginDetails(db, host, form, event)
             }
@@ -149,6 +137,30 @@
                 }
               })
             }
+          }
+        })
+      },
+      async decryptLogins (db, host, form, event) {
+        return new Promise(async (resolve, reject) => {
+          const prompt = create(PromptDialog)
+          const result = await prompt({ content: 'Enter your master password:', type: 'password' }).transition()
+          if (result) {
+            const crypt = new Encrypter(result)
+            db.persistence.afterSerialization = crypt.encrypt
+            db.persistence.beforeDeserialization = crypt.decrypt
+            db.loadDatabase(async (err) => {
+              if (err) {
+                const dialog = create(AlertDialog)
+                await dialog({ content: 'Failed to unlock database.' }).transition()
+                resolve(false)
+                return
+              }
+              db.persistence.isLoaded = true
+              this.loadFormLoginDetails(db, host, form, event)
+              resolve(true)
+            })
+          } else {
+            resolve(true)
           }
         })
       },
