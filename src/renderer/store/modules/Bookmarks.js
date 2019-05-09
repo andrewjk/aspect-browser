@@ -17,11 +17,7 @@ function sorter (a, b) {
 }
 
 const mutations = {
-  moveBookmarkUp (state, data) {
-    const persona = state.personas.find((p) => {
-      return p._id === data.persona._id
-    })
-    const index = data.index
+  moveBookmarkUp (state, { persona, index }) {
     if (index === 0) {
       return
     }
@@ -31,11 +27,7 @@ const mutations = {
     persona.bookmarks[index].order = prevOrder
     persona.bookmarks[index - 1].order = thisOrder
   },
-  moveBookmarkDown (state, data) {
-    const persona = state.personas.find((p) => {
-      return p._id === data.persona._id
-    })
-    const index = data.index
+  moveBookmarkDown (state, { persona, index }) {
     if (index === persona.bookmarks.length - 1) {
       return
     }
@@ -45,41 +37,29 @@ const mutations = {
     persona.bookmarks[index].order = nextOrder
     persona.bookmarks[index + 1].order = thisOrder
   },
-  sanitizeBookmarkOrders (state, data) {
-    const persona = state.personas.find((p) => {
-      return p._id === data.persona._id
-    })
+  sanitizeBookmarkOrders (state, { persona }) {
     // Renumber everything, just in case something funny has gone on
     persona.bookmarks.sort(sorter)
     for (var i = 0; i < persona.bookmarks.length; i++) {
       persona.bookmarks[i].order = i + 1
     }
   },
-  sortBookmarks (state) {
-    const activePersona = state.personas.find((p) => {
-      return p.isActive
-    })
-    if (activePersona) {
-      activePersona.bookmarks = activePersona.bookmarks.sort(sorter)
-    }
+  sortBookmarks (state, persona) {
+    persona.bookmarks = persona.bookmarks.sort(sorter)
   },
   setBookmarkDetails (state, data) {
     const bookmark = data.bookmark
     if (data.title !== undefined) bookmark.title = data.title
     if (data.url !== undefined) bookmark.url = data.url
   },
-  insertBookmark (state, data) {
-    const persona = data.persona
-    const bookmark = data.bookmark
+  insertBookmark (state, { persona, bookmark }) {
     persona.bookmarks.push(bookmark)
     const newIndex = persona.bookmarks.length - 1
     persona.bookmarks.forEach((p, i) => {
       p.isActive = (i === newIndex)
     })
   },
-  removeBookmark (state, data) {
-    const persona = data.persona
-    const bookmark = data.bookmark
+  removeBookmark (state, { persona, bookmark }) {
     const index = persona.bookmarks.indexOf(bookmark)
     persona.bookmarks.splice(index, 1)
     const newIndex = Math.min(index, persona.bookmarks.length - 1)
