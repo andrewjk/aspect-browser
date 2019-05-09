@@ -58,7 +58,7 @@
       return {
         platform: os.platform(),
         showEditPersonaLinks: false,
-        showOpenTabCount: false
+        showOpenTabCountTimeout: null
       }
     },
     methods: {
@@ -81,6 +81,9 @@
         }
       },
       setActivePersona (index) {
+        if (this.showOpenTabCountTimeout) {
+          clearTimeout(this.showOpenTabCountTimeout)
+        }
         const persona = this.personas[index]
         if (persona.isActive) {
           const activeTab = this.getActiveTab
@@ -90,7 +93,14 @@
         }
       },
       setShowOpenTabCount (index, show) {
-        this.setShowPersonaOpenTabCount({ index, show })
+        if (this.showOpenTabCountTimeout) {
+          clearTimeout(this.showOpenTabCountTimeout)
+        }
+        if (show) {
+          this.showOpenTabCountTimeout = setTimeout(() => this.setShowPersonaOpenTabCount({ index, show }), 600)
+        } else {
+          this.setShowPersonaOpenTabCount({ index, show })
+        }
       },
       findBookmark () {
         this.$emit('show-find-bookmark')
