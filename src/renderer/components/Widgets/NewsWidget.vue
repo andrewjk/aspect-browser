@@ -115,10 +115,6 @@
     font-size: 18px;
     margin: 5px;
   }
-
-  .news-item {
-    //margin: 7px 0;
-  }
   
   .news-button {
     background-color: transparent;
@@ -132,5 +128,8 @@
   .news-button:focus {
     background-color: rgba(0, 0, 0, 0.15);
     cursor: pointer;
+    label {
+      cursor: pointer;
+    }
   }
 </style>
