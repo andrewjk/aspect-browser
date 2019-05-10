@@ -43,9 +43,9 @@
           <fa icon="plus"/>
         </button>
       </button>
-      <!-- <button class="tab-dragger">
+      <button class="tab-dragger" @dblclick="maximizeOrRestore()">
         &nbsp;
-      </button> -->
+      </button>
     </div>
     <button class="tab-nav" v-show="showTabNavigation" @click="scrollTabsRight()">
       <button :class="['tab-nav-button', canScrollRight ? '' : 'disabled']">
@@ -58,9 +58,12 @@
 
 <script>
   import { mapMutations, mapActions } from 'vuex'
+  import electron from 'electron'
 
   import WindowButtons from './WindowButtons'
   import draggable from 'vuedraggable'
+
+  const window = electron.remote.getCurrentWindow()
 
   export default {
     components: { WindowButtons, draggable },
@@ -140,6 +143,16 @@
       },
       tabsSorted () {
         this.sortTabs({ persona: this.persona })
+      },
+      maximizeOrRestore () {
+        const canMaximize = window.isResizable() && window.isMaximizable()
+        if (canMaximize) {
+          if (!window.isMaximized()) {
+            window.maximize()
+          } else {
+            window.unmaximize()
+          }
+        }
       }
     }
   }
@@ -186,17 +199,15 @@
   /* HACK: the element with -webkit-app-region: drag; only seems to get calculated on load, which is no good for us as we want a dynamic width! */
   /* Apart from that, putting this in the tab-list works nicely */
   .tab-dragger {
-    background-color: green;
     display: inline-block;
     line-height: 18px;
     height: 28px;
     min-width: 30px;
     vertical-align: top;
-    text-align: left;
     flex: 1;
-    border-right: 1px solid #aaa;
-    -ms-overflow-style: scrollbar;
+    /*
     -webkit-app-region: drag;
+    */
   }
 
   .tab.active {
