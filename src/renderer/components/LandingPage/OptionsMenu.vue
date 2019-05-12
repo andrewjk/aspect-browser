@@ -163,7 +163,8 @@
       },
       async fillLogin () {
         const activeTab = this.getActiveTab
-        activeTab.webview.send('force-password-fill')
+        const personaId = this.persona._id
+        activeTab.webview.send('force-password-fill', personaId)
       },
       async showAboutDialog () {
         const dialog = create(AboutDialog)

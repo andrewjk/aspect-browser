@@ -233,14 +233,11 @@
 
         // HACK: We need to get personaId into the webview preload somehow, so that it knows whether
         // to handle login details that are sent to it, and so that it can send events to the listeners
-        // for that persona. We can't just pass parameters into preload, so instead we have to do this
-        // hacky back and forth to put the id into document.__personaId using executeJavascript()
+        // for that persona. We can't just pass parameters into preload, so instead we have to pass
+        // it via event.sender.send
         electron.remote.ipcMain.on('persona-id-needed', (event, data) => {
           const personaId = this.persona._id
-          const javascript = `document.__personaId = "${personaId}"`
-          webview.executeJavaScript(javascript, false, () => {
-            event.sender.send('persona-id-available')
-          })
+          event.sender.send('persona-id-available', { personaId })
         })
 
         // Add a context menu to the webview (after it's ready so that the context-menu event gets intercepted correctly)

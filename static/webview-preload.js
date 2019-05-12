@@ -12,18 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // When the peronaId has been sent to us, request login details and listen to submits for forms with password fields
 ipcRenderer.on('persona-id-available', (event, data) => {
   // Set up login management for forms with password fields
-  setupForms()
+  const personaId = data.personaId
+  setupForms(personaId)
 })
 
 // Sometimes a form is created after the DOM content, and the user needs to force passwords to be filled
 ipcRenderer.on('force-password-fill', (event, data) => {
-  setupForms()
+  const personaId = data.personaId
+  setupForms(personaId)
 })
 
-function setupForms () {
-  // Get the personaId from the document
-  let personaId = document.__personaId
-
+function setupForms (personaId) {
   // Load forms with password fields
   const allForms = document.getElementsByTagName('form')
   const formsToHook = []
