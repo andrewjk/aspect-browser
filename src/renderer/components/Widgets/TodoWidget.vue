@@ -8,7 +8,7 @@
       </label>
     </div>
     <div v-if="adding" class="todo-item">
-      <input type="text" v-model="newTodo" @keypress.enter="createTodo">
+      <input type="text" v-model="newTodo" @keypress.enter="createTodo" ref="todoInput">
     </div>
     <div v-if="(showEditLinks || !widget.todos.length) && (adding || canAdd || canClear)" class="edit-todo-links">
       <button v-if="!adding && canAdd" class="todo-edit-button" @click="startAdding" title="Add a todo">
@@ -26,6 +26,7 @@
 
 <script>
   import { mapActions } from 'vuex'
+  import Vue from 'vue'
 
   // NOTE: V4 uses random numbers
   import uuid from 'uuid/v4'
@@ -56,6 +57,9 @@
       ]),
       startAdding () {
         this.adding = true
+        Vue.nextTick(() => {
+          this.$refs.todoInput.focus()
+        })
       },
       createTodo () {
         const todo = {
