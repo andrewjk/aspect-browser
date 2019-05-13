@@ -60,7 +60,10 @@
         const db = this.$ldb
         const personaId = this.persona._id
         const host = this.loginSettings.host
-        await this.ignoreLoginDetails({ db, personaId, host })
+        const url = this.loginSettings.url
+        const title = this.loginSettings.title
+        const icon = this.loginSettings.icon
+        await this.ignoreLoginDetails({ db, personaId, host, url, title, icon })
         this.closeLoginMenu()
       }
     }

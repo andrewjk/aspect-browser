@@ -153,7 +153,6 @@
               }
               db.persistence.isLoaded = true
               this.showLogins({ persona: this.persona })
-              console.log('returning true')
               resolve(true)
             })
           } else {

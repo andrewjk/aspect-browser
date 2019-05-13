@@ -115,6 +115,10 @@ const actions = {
         if (dbDetails.length) {
           // Update the existing details
           const id = dbDetails[0]._id
+          dbDetails[0].host = host
+          dbDetails[0].url = data.url
+          dbDetails[0].title = data.title
+          dbDetails[0].icon = data.icon
           dbDetails[0].fields = undefined
           dbDetails[0].ignore = true
           db.update({ _id: id }, dbDetails[0], {}, (err, numReplaced) => {
@@ -128,6 +132,9 @@ const actions = {
           const login = {
             personaId,
             host,
+            url: data.url,
+            title: data.title,
+            icon: data.icon,
             ignore: true
           }
           db.insert(login, (err, dbDetails) => {
