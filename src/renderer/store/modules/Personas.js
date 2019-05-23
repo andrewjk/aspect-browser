@@ -151,6 +151,7 @@ const mutations = {
         title: data.title ? data.title : url.replace(/http[s]*:\/\/(www\.)*/, ''),
         index: tabs.length,
         icon: data.icon,
+        activityId: data.activityId,
         isActive: false,
         isLoading: false,
         isSuspended: !!data.isSuspended,

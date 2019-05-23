@@ -130,7 +130,7 @@ const actions = {
           return
         }
         dbActivity.forEach((item) => {
-          commit('openInPersona', { url: item.url, personaId: item.personaId, title: item.title, icon: item.icon, isSuspended: true })
+          commit('openInPersona', { url: item.url, personaId: item.personaId, title: item.title, icon: item.icon, activityId: item._id, isSuspended: true })
         })
         // Set the activity to have isCurrentSession = true so they are current again and can be
         // reloaded the next time the browser is opened, even if they haven't been restored from
