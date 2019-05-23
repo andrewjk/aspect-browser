@@ -139,7 +139,7 @@
       },
       async deleteSelectedItems () {
         const ids = this.sessions.filter((item) => item.isSelected).map((item) => item._id)
-        await this.deleteSessions({ db: this.$adb, ids })
+        await this.deleteSessions({ db: this.$sdb, ids })
         const response = await this.loadSessions({ db: this.$sdb, personaId: this.persona._id, search: this.searchText, limit: 100 })
         this.sessions = response
         this.showSelectAll = true
@@ -149,7 +149,7 @@
         const dialog = create(ConfirmDialog)
         const result = await dialog({ content: 'Are you sure you want to clear the sessions for this persona?' }).transition()
         if (result) {
-          this.clearSessions({ db: this.$adb, personaId: this.persona._id })
+          this.clearSessions({ db: this.$sdb, personaId: this.persona._id })
           const response = await this.loadSessions({ db: this.$sdb, personaId: this.persona._id, limit: 100 })
           this.sessions = response
         }
