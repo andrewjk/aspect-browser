@@ -2,28 +2,31 @@
   <div class="tab-page-list-wrapper">
       <div v-for="(item, index) in tabs" :key="item._id" class="tab-page-list-item" :style="{ zIndex: getZIndex(index) }">
         <template v-if="item.isSuspended">
-          <suspended-page></suspended-page>
+          <suspended-page/>
         </template>
         <template v-else-if="item.url === 'aspect://home'">
-          <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome"></home-page>
+          <home-page :persona="persona" :tabs="tabs" :show-welcome="showWelcome"/>
         </template>
         <template v-else-if="item.url === 'aspect://history'">
-          <history-page :persona="persona" :tabs="tabs"></history-page>
+          <history-page :persona="persona" :tabs="tabs"/>
+        </template>
+        <template v-else-if="item.url === 'aspect://sessions'">
+          <sessions-page :persona="persona" :tabs="tabs"/>
         </template>
         <template v-else-if="item.url === 'aspect://downloads'">
-          <downloads-page :persona="persona" :tabs="tabs"></downloads-page>
+          <downloads-page :persona="persona" :tabs="tabs"/>
         </template>
         <template v-else-if="item.url === 'aspect://logins'">
-          <logins-page :persona="persona" :tabs="tabs"></logins-page>
+          <logins-page :persona="persona" :tabs="tabs"/>
         </template>
         <template v-else-if="item.url === 'aspect://settings'">
-          <settings-page></settings-page>
+          <settings-page/>
         </template>
         <template v-else-if="item.url === 'aspect://error'">
-          <error-page :persona="persona" :tabs="tabs"></error-page>
+          <error-page :persona="persona" :tabs="tabs"/>
         </template>
         <template v-else>
-          <tab-page :persona="persona" :tab="item"></tab-page>
+          <tab-page :persona="persona" :tab="item"/>
         </template>
       </div>
   </div>
@@ -38,6 +41,7 @@
 
   import HomePage from './HomePage'
   import HistoryPage from './HistoryPage'
+  import SessionsPage from './SessionsPage'
   import DownloadsPage from './DownloadsPage'
   import LoginsPage from './LoginsPage'
   import SettingsPage from './SettingsPage'
@@ -49,7 +53,7 @@
   import Encrypter from '../../data/Encrypter'
 
   export default {
-    components: { HomePage, HistoryPage, DownloadsPage, LoginsPage, SettingsPage, ErrorPage, SuspendedPage, TabPage },
+    components: { HomePage, HistoryPage, SessionsPage, DownloadsPage, LoginsPage, SettingsPage, ErrorPage, SuspendedPage, TabPage },
     props: {
       persona: null,
       showWelcome: false
@@ -81,6 +85,7 @@
         // Set up login management for forms with password fields
         const personaId = this.persona._id
         electron.remote.ipcMain.on('form-found-with-password-' + personaId, async (event, data) => {
+          console.log('found a form')
           // Is the login manager enabled?
           if (this.settings.enableLoginManager) {
             // Load the existing username/password
@@ -100,6 +105,7 @@
         })
         electron.remote.ipcMain.on('form-submitted-with-password-' + personaId, async (event, data) => {
           // Is the login manager enabled?
+          console.log('saving the fields...', data.fields)
           if (this.settings.enableLoginManager) {
             // Has the user entered the master password?
             // TODO: If not, prompt them to enter it...
@@ -126,6 +132,7 @@
                 }
                 if (dbDetails.length) {
                   if (!dbDetails[0].ignore) {
+                    console.log(icon)
                     await this.saveLoginDetails({ db, personaId, host, url, title, icon, fields })
                   }
                 } else {
@@ -172,6 +179,7 @@
           if (result.ignore) {
             console.log('Ignoring login')
           } else if (result.fields) {
+            console.log('filling the fields...', result.fields)
             event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
           }
         }

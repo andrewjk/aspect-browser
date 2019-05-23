@@ -90,7 +90,38 @@ const actions = {
       }
     })
   },
-  restoreSession ({ commit }, data) {
+  saveSession ({ commit }, data) {
+    return new Promise((resolve, reject) => {
+      const adb = data.adb
+      const sdb = data.sdb
+      const personaId = data.personaId
+      adb.find({ personaId, isCurrentSession: true }).sort({ index: 1 }).exec((err, dbActivity) => {
+        if (err) {
+          alert('ERROR: ' + err)
+          return
+        }
+        const session = {
+          _id: uuid(),
+          personaId,
+          name: data.name,
+          sites: dbActivity.map((item) => {
+            return {
+              url: item.url,
+              icon: item.icon,
+              title: item.title,
+              index: item.index
+            }
+          })
+        }
+        sdb.insert(session, (err, dbSession) => {
+          if (err) {
+            reject(err)
+          }
+        })
+      })
+    })
+  },
+  restorePreviousActivity ({ commit }, data) {
     return new Promise((resolve, reject) => {
       const db = data.db
       db.find({ isPreviousSession: true }).sort({ index: 1 }).exec((err, dbActivity) => {
@@ -110,47 +141,6 @@ const actions = {
           } else {
             resolve()
           }
-        })
-      })
-    })
-  },
-  saveSession ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      db.find({ isCurrentSession: true }).sort({ index: 1 }).exec((err, dbActivity) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
-        }
-        dbActivity.forEach((item) => {
-          const activity = {
-            _id: uuid(),
-            personaId: item.personaId,
-            url: item.url,
-            icon: item.icon,
-            title: item.title,
-            index: item.index,
-            name: data.name
-          }
-          db.insert(activity, (err, dbActivity) => {
-            if (err) {
-              reject(err)
-            }
-          })
-        })
-      })
-    })
-  },
-  loadSession ({ commit }, data) {
-    return new Promise((resolve, reject) => {
-      const db = data.db
-      db.find({ name: data.name }).sort({ index: 1 }).exec((err, dbActivity) => {
-        if (err) {
-          alert('ERROR: ' + err)
-          return
-        }
-        dbActivity.forEach((item) => {
-          commit('openInPersona', { url: item.url, personaId: item.personaId, title: item.title, icon: item.icon, isSuspended: true })
         })
       })
     })

@@ -10,6 +10,7 @@ import pdb from './data/personas'
 import usdb from './data/user-settings'
 import hdb from './data/history'
 import adb from './data/activity'
+import sdb from './data/sessions'
 import ddb from './data/downloads'
 import ldb from './data/logins'
 import ssdb from './data/system-settings'
@@ -47,7 +48,9 @@ import {
   faFolderOpen,
   faInfoCircle,
   faExclamationTriangle,
-  faCamera
+  faCamera,
+  faCaretRight,
+  faCaretDown
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faClock,
@@ -71,6 +74,7 @@ Vue.prototype.$pdb = pdb
 Vue.prototype.$usdb = usdb
 Vue.prototype.$hdb = hdb
 Vue.prototype.$adb = adb
+Vue.prototype.$sdb = sdb
 Vue.prototype.$ddb = ddb
 Vue.prototype.$ldb = ldb
 Vue.prototype.$ssdb = ssdb
@@ -107,6 +111,8 @@ library.add(faFolderOpen)
 library.add(faInfoCircle)
 library.add(faExclamationTriangle)
 library.add(faCamera)
+library.add(faCaretRight)
+library.add(faCaretDown)
 
 library.add(faClock)
 library.add(faFile)

@@ -26,7 +26,7 @@
       </div>
     </button>
     <div class="options-menu-separator"></div>
-    <button class="options-menu-item" @click="restoreSession({ db: $adb })" title="Restore the session that was active when you last closed Aspect">
+    <button class="options-menu-item" @click="restorePreviousActivity({ db: $adb })" title="Restore the session that was active when you last closed Aspect">
       <div class="options-menu-item-grid">
         <fa icon="table" class="options-menu-icon"/>
         <span>Restore previous session</span>
@@ -38,10 +38,16 @@
         <span>Save this session</span>
       </div>
     </button>
-    <button class="options-menu-item" @click="loadSessionWithName" title="Load a previously-saved session">
+    <!--<button class="options-menu-item" @click="loadSessionWithName" title="Load a saved session">
       <div class="options-menu-item-grid">
         <fa icon="table" class="options-menu-icon"/>
         <span>Load a session</span>
+      </div>
+    </button>-->
+    <button class="options-menu-item" @click="showSessions({ persona })" title="Show saved sessions for this persona">
+      <div class="options-menu-item-grid">
+        <fa icon="table" class="options-menu-icon"/>
+        <span>View {{ this.persona.name }} sessions</span>
       </div>
     </button>
     <div class="options-menu-separator"></div>
@@ -106,10 +112,11 @@
         'clearAllActivity',
         'clearDownloads',
         'clearAllDownloads',
-        'restoreSession',
+        'restorePreviousActivity',
         'saveSession',
         'loadSession',
         'showHistory',
+        'showSessions',
         'showDownloads',
         'showLogins',
         'loadLoginDetails'
@@ -118,7 +125,7 @@
         const prompt = create(PromptDialog)
         const result = await prompt({ content: 'Enter a name for this session:' }).transition()
         if (result) {
-          this.saveSession({ db: this.$adb, name: result })
+          this.saveSession({ personaId: this.persona._id, adb: this.$adb, sdb: this.$sdb, name: result })
         }
       },
       async loadSessionWithName () {

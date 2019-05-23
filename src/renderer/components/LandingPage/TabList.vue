@@ -14,6 +14,9 @@
           <template v-else-if="item.url === 'aspect://history'">
             <fa :icon="['far', 'clock']" class="tab-icon"/>
           </template>
+          <template v-else-if="item.url === 'aspect://sessions'">
+            <fa icon="table" class="tab-icon"/>
+          </template>
           <template v-else-if="item.url === 'aspect://downloads'">
             <fa :icon="['far', 'file']" class="tab-icon"/>
           </template>
