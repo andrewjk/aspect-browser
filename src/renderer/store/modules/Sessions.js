@@ -57,16 +57,25 @@ const actions = {
       }
     })
   },
-  restoreSession ({ commit }, data) {
+  restoreSession ({ commit, dispatch }, data) {
     return new Promise((resolve, reject) => {
-      const db = data.db
-      db.findOne({ _id: data.sessionId }).exec((err, dbSession) => {
+      const adb = data.adb
+      const sdb = data.sdb
+      sdb.findOne({ _id: data.sessionId }).exec((err, dbSession) => {
         if (err) {
           alert('ERROR: ' + err)
           return
         }
-        dbSession.sites.forEach((item) => {
-          commit('openInPersona', { url: item.url, personaId: data.personaId, title: item.title, icon: item.icon, isSuspended: true })
+        dbSession.sites.forEach(async (item) => {
+          const activityId = await dispatch('saveToActivity', {
+            db: adb,
+            personaId: dbSession.personaId,
+            url: item.url,
+            icon: item.icon,
+            title: item.title,
+            index: item.index
+          })
+          commit('openInPersona', { url: item.url, personaId: data.personaId, title: item.title, icon: item.icon, activityId, isSuspended: true })
         })
       })
     })

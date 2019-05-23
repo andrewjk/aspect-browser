@@ -102,7 +102,7 @@
               title: this.tab.title
             })
           } else {
-            const _id = await this.saveToActivity({
+            const activityId = await this.saveToActivity({
               db: this.$adb,
               personaId: this.persona._id,
               url: this.tab.url,
@@ -110,7 +110,7 @@
               title: this.tab.title,
               index: this.tab.index
             })
-            this.tab.activityId = _id
+            this.tab.activityId = activityId
           }
         }
         this.historyUrl = this.tab.url
