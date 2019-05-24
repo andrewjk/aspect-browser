@@ -26,7 +26,7 @@
       </div>
     </button>
     <div class="options-menu-separator"></div>
-    <button class="options-menu-item" @click="restorePreviousActivity({ db: $adb })" title="Restore the session that was active when you last closed Aspect">
+    <button class="options-menu-item" @click="restorePreviousActivityAndMaybeClose" title="Restore the session that was active when you last closed Aspect">
       <div class="options-menu-item-grid">
         <fa icon="table" class="options-menu-icon"/>
         <span>Restore previous session</span>
@@ -119,7 +119,8 @@
         'showSessions',
         'showDownloads',
         'showLogins',
-        'loadLoginDetails'
+        'loadLoginDetails',
+        'closeTab'
       ]),
       async saveSessionWithName () {
         const prompt = create(PromptDialog)
@@ -192,6 +193,13 @@
           this.clearAllHistory({ db: this.$hdb })
           this.clearAllActivity({ db: this.$adb })
           this.clearAllDownloads({ db: this.$ddb })
+        }
+      },
+      async restorePreviousActivityAndMaybeClose () {
+        await this.restorePreviousActivity({ db: this.$adb })
+        const activeTab = this.getActiveTab
+        if (activeTab.url === 'aspect://home') {
+          this.closeTab()
         }
       }
     }

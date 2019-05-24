@@ -61,12 +61,12 @@ const actions = {
     return new Promise((resolve, reject) => {
       const adb = data.adb
       const sdb = data.sdb
-      sdb.findOne({ _id: data.sessionId }).exec((err, dbSession) => {
+      sdb.findOne({ _id: data.sessionId }).exec(async (err, dbSession) => {
         if (err) {
           alert('ERROR: ' + err)
-          return
+          reject(err)
         }
-        dbSession.sites.forEach(async (item) => {
+        await Promise.all(dbSession.sites.map(async (item) => {
           const activityId = await dispatch('saveToActivity', {
             db: adb,
             personaId: dbSession.personaId,
@@ -76,7 +76,8 @@ const actions = {
             index: item.index
           })
           commit('openInPersona', { url: item.url, personaId: data.personaId, title: item.title, icon: item.icon, activityId, isSuspended: true })
-        })
+        }))
+        resolve()
       })
     })
   }

@@ -107,7 +107,8 @@
         'loadSessions',
         'deleteSessions',
         'clearSessions',
-        'restoreSession'
+        'restoreSession',
+        'closeTab'
       ]),
       searchSessions () {
         this.checkAll(false)
@@ -154,8 +155,9 @@
           this.sessions = response
         }
       },
-      openSession (item) {
-        this.restoreSession({ adb: this.$adb, sdb: this.$sdb, sessionId: item._id, personaId: this.persona._id })
+      async openSession (item) {
+        await this.restoreSession({ adb: this.$adb, sdb: this.$sdb, sessionId: item._id, personaId: this.persona._id })
+        this.closeTab()
       },
       openSite (site, e) {
         // If the control key is pressed, or the middle button was clicked, open the url in a new tab in the background
