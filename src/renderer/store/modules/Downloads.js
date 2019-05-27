@@ -143,7 +143,6 @@ const actions = {
         // 5 minutes in development, 30 minutes in production
         const timeUntilRemoval = process.env.NODE_ENV === 'development' ? 5 * 60 * 1000 : 30 * 60 * 1000
         setTimeout(() => {
-          console.log('removing download: ' + download.localFile)
           commit('removeDownload', { persona, download })
         }, timeUntilRemoval)
       }

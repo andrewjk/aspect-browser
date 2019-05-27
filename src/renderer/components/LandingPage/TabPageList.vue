@@ -85,7 +85,6 @@
         // Set up login management for forms with password fields
         const personaId = this.persona._id
         electron.remote.ipcMain.on('form-found-with-password-' + personaId, async (event, data) => {
-          console.log('found a form')
           // Is the login manager enabled?
           if (this.settings.enableLoginManager) {
             // Load the existing username/password
@@ -105,7 +104,6 @@
         })
         electron.remote.ipcMain.on('form-submitted-with-password-' + personaId, async (event, data) => {
           // Is the login manager enabled?
-          console.log('saving the fields...', data.fields)
           if (this.settings.enableLoginManager) {
             // Has the user entered the master password?
             // TODO: If not, prompt them to enter it...
@@ -132,7 +130,6 @@
                 }
                 if (dbDetails.length) {
                   if (!dbDetails[0].ignore) {
-                    console.log(icon)
                     await this.saveLoginDetails({ db, personaId, host, url, title, icon, fields })
                   }
                 } else {
@@ -179,7 +176,6 @@
           if (result.ignore) {
             console.log('Ignoring login')
           } else if (result.fields) {
-            console.log('filling the fields...', result.fields)
             event.sender.send('form-password-fill-' + personaId, { form, fields: result.fields })
           }
         }
