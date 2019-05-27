@@ -90,7 +90,7 @@
         }
         keys = keys + e.key.toLowerCase()
 
-        // console.log('keydown: ' + keys)
+        /* console.log('keydown: ' + keys) */
         switch (keys) {
           case 'ctrl+`': {
             this.nextPersona()
